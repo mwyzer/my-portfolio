@@ -5,7 +5,22 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1, maximum-scale=1" />
-	<meta http-equiv="refresh" content="0;url=https://www.wyzer.my.id/" />
+	<script>
+	// Environment-aware redirect: enforce canonical non-www domain but allow preview bypass
+	(function(){
+		try{
+			const params = new URLSearchParams(location.search);
+			if (params.get('preview') === '1' || params.get('preview') === 'true') return; // preview bypass
+			const host = location.hostname;
+			if (host === 'localhost' || host === '127.0.0.1') return; // local dev
+			const canonical = 'wyzer.my.id';
+			if (host !== canonical) {
+				const dest = location.protocol + '//' + canonical + location.pathname + location.search + location.hash;
+				location.replace(dest);
+			}
+		}catch(e){/* fail safe - do nothing */}
+	})();
+	</script>
 	<title>Portfolio Muhammad Wyzer</title>
 	<script src="bower_components/jquery/dist/jquery.min.js" charset="utf-8"></script>
 	<link rel="stylesheet" href="bower_components/foundation-sites/dist/css/foundation.min.css">
