@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { formatDate } from "@/lib/utils";
-import { ArrowRight, ExternalLink, Github, Linkedin, Gitlab, Mail, Phone } from "lucide-react";
+import { ArrowRight, ExternalLink, Github, Linkedin, Gitlab, Mail, Phone, Code2, Shield, Database, Palette, CheckSquare, Layers } from "lucide-react";
 import type { PortfolioAbout, PortfolioProject, BlogPost } from "@/types/database";
 import ThemeToggle from "@/components/theme-toggle";
 
@@ -115,6 +115,69 @@ export default async function HomePage() {
           </div>
         </div>
       </div>
+
+      {/* Tech Stack Section — DaisyUI cards + badges */}
+      <section className="py-16">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <h2 className="text-3xl font-bold text-center mb-10">Tech Stack</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Framework & Language */}
+            <div className="card bg-base-100 border shadow-sm">
+              <div className="card-body p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Code2 className="h-5 w-5 text-primary" />
+                  <h3 className="font-semibold">Core</h3>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <span className="badge badge-primary">Next.js 15</span>
+                  <span className="badge badge-primary">TypeScript</span>
+                  <span className="badge badge-primary">React 19</span>
+                </div>
+              </div>
+            </div>
+            {/* Styling */}
+            <div className="card bg-base-100 border shadow-sm">
+              <div className="card-body p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Palette className="h-5 w-5 text-secondary" />
+                  <h3 className="font-semibold">Styling</h3>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <span className="badge badge-secondary">Tailwind CSS v4</span>
+                  <span className="badge badge-secondary">DaisyUI v5</span>
+                </div>
+              </div>
+            </div>
+            {/* Backend & Auth */}
+            <div className="card bg-base-100 border shadow-sm">
+              <div className="card-body p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Database className="h-5 w-5 text-accent" />
+                  <h3 className="font-semibold">Backend</h3>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <span className="badge badge-accent">Supabase</span>
+                </div>
+              </div>
+            </div>
+            {/* UI & Forms */}
+            <div className="card bg-base-100 border shadow-sm">
+              <div className="card-body p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Layers className="h-5 w-5 text-info" />
+                  <h3 className="font-semibold">UI &amp; Forms</h3>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <span className="badge badge-info">Lucide Icons</span>
+                  <span className="badge badge-info">Radix UI</span>
+                  <span className="badge badge-info">React Hook Form</span>
+                  <span className="badge badge-info">Zod</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Education Section — DaisyUI timeline */}
       {educationEntries.length > 0 && (
