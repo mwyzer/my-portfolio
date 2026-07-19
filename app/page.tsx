@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { formatDate } from "@/lib/utils";
-import { ArrowRight, ExternalLink, Github, Linkedin, Gitlab, Mail, Phone, Code2, Shield, Database, Palette, CheckSquare, Layers } from "lucide-react";
+import { ArrowRight, ExternalLink, Github, Linkedin, Gitlab, Mail, Phone, Code2, Database, Palette, Rocket } from "lucide-react";
 import type { PortfolioAbout, PortfolioProject, BlogPost } from "@/types/database";
 import ThemeToggle from "@/components/theme-toggle";
 
@@ -119,9 +119,10 @@ export default async function HomePage() {
       {/* Tech Stack Section — DaisyUI cards + badges */}
       <section className="py-16">
         <div className="container mx-auto px-4 max-w-5xl">
-          <h2 className="text-3xl font-bold text-center mb-10">Tech Stack</h2>
+          <h2 className="text-3xl font-bold text-center mb-4">Tech Stack</h2>
+          <p className="text-center text-sm opacity-60 mb-10">Tools &amp; technologies I use across my projects</p>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {/* Framework & Language */}
+            {/* Core */}
             <div className="card bg-base-100 border shadow-sm">
               <div className="card-body p-5">
                 <div className="flex items-center gap-2 mb-3">
@@ -130,51 +131,68 @@ export default async function HomePage() {
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <span className="badge badge-primary">Next.js 15</span>
-                  <span className="badge badge-primary">TypeScript</span>
+                  <span className="badge badge-primary">Nuxt 4</span>
                   <span className="badge badge-primary">React 19</span>
+                  <span className="badge badge-primary">Vue 3</span>
+                  <span className="badge badge-primary">TypeScript</span>
+                  <span className="badge badge-primary">Pinia</span>
                 </div>
               </div>
             </div>
-            {/* Styling */}
+            {/* Styling & UI */}
             <div className="card bg-base-100 border shadow-sm">
               <div className="card-body p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <Palette className="h-5 w-5 text-secondary" />
-                  <h3 className="font-semibold">Styling</h3>
+                  <h3 className="font-semibold">Styling &amp; UI</h3>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <span className="badge badge-secondary">Tailwind CSS v4</span>
-                  <span className="badge badge-secondary">DaisyUI v5</span>
+                  <span className="badge badge-secondary">Tailwind CSS</span>
+                  <span className="badge badge-secondary">DaisyUI</span>
+                  <span className="badge badge-secondary">Vuestic UI</span>
+                  <span className="badge badge-secondary">Lucide Icons</span>
+                  <span className="badge badge-secondary">Radix UI</span>
+                  <span className="badge badge-secondary">PWA</span>
                 </div>
               </div>
             </div>
-            {/* Backend & Auth */}
+            {/* Backend & DB */}
             <div className="card bg-base-100 border shadow-sm">
               <div className="card-body p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <Database className="h-5 w-5 text-accent" />
-                  <h3 className="font-semibold">Backend</h3>
+                  <h3 className="font-semibold">Backend &amp; DB</h3>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <span className="badge badge-accent">Supabase</span>
+                  <span className="badge badge-accent">Nitro</span>
                 </div>
               </div>
             </div>
-            {/* UI & Forms */}
+            {/* Build & Test */}
             <div className="card bg-base-100 border shadow-sm">
               <div className="card-body p-5">
                 <div className="flex items-center gap-2 mb-3">
-                  <Layers className="h-5 w-5 text-info" />
-                  <h3 className="font-semibold">UI &amp; Forms</h3>
+                  <Rocket className="h-5 w-5 text-info" />
+                  <h3 className="font-semibold">Build &amp; Test</h3>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <span className="badge badge-info">Lucide Icons</span>
-                  <span className="badge badge-info">Radix UI</span>
+                  <span className="badge badge-info">Vite</span>
+                  <span className="badge badge-info">Vitest</span>
+                  <span className="badge badge-info">Playwright</span>
                   <span className="badge badge-info">React Hook Form</span>
                   <span className="badge badge-info">Zod</span>
                 </div>
               </div>
             </div>
+          </div>
+          <div className="text-center mt-6">
+            <a href="https://github.com/mwyzer/vue-lms-mahasiswa" target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm">
+              <Github className="h-4 w-4" /> LMS Mahasiswa
+            </a>
+            <a href="https://nuxt-lms-mahasiswa.vercel.app" target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm">
+              <ExternalLink className="h-4 w-4" /> Live Demo
+            </a>
           </div>
         </div>
       </section>
