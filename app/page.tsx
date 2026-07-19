@@ -286,44 +286,76 @@ export default async function HomePage() {
       )}
 
       {/* Projects Section — DaisyUI cards */}
-      {projects && projects.length > 0 && (
-        <section id="projects" className="py-16 bg-base-200">
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center mb-12">Projects</h2>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto">
-              {projects.map((project) => (
-                <div key={project.id} className="card bg-base-100 shadow-sm border">
-                  <div className="card-body">
-                    <h3 className="card-title">{project.title}</h3>
-                    <p className="text-sm opacity-70">{project.description}</p>
-                    {project.technologies && project.technologies.length > 0 && (
-                      <div className="card-actions mt-3">
-                        {project.technologies.map((tech) => (
-                          <span key={tech} className="badge badge-sm">{tech}</span>
-                        ))}
-                      </div>
-                    )}
-                    {(project.live_url || project.github_url) && (
-                      <div className="card-actions mt-3">
-                        {project.live_url && (
-                          <a href={project.live_url} target="_blank" rel="noreferrer" className="btn btn-sm btn-ghost">
-                            <ExternalLink className="h-4 w-4" /> Live
-                          </a>
-                        )}
-                        {project.github_url && (
-                          <a href={project.github_url} target="_blank" rel="noreferrer" className="btn btn-sm btn-ghost">
-                            <Github className="h-4 w-4" /> Code
-                          </a>
-                        )}
-                      </div>
-                    )}
-                  </div>
+      <section id="projects" className="py-16 bg-base-200">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">Projects</h2>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto">
+            {/* Static: LMS Mahasiswa */}
+            <div className="card bg-base-100 shadow-sm border border-primary/20">
+              <div className="card-body">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xl">📚</span>
+                  <h3 className="card-title">LMS Mahasiswa</h3>
                 </div>
-              ))}
+                <p className="text-sm opacity-70">
+                  Full-stack Learning Management System — multi-role (student, instructor, admin), attendance, assignments, quizzes, AI chat assistant, Python playground &amp; PWA support.
+                </p>
+                <div className="card-actions mt-3">
+                  <span className="badge badge-sm">Nuxt 4</span>
+                  <span className="badge badge-sm">Vue 3</span>
+                  <span className="badge badge-sm">TypeScript</span>
+                  <span className="badge badge-sm">Pinia</span>
+                  <span className="badge badge-sm">Supabase</span>
+                  <span className="badge badge-sm">Nitro</span>
+                  <span className="badge badge-sm">Vite</span>
+                  <span className="badge badge-sm">Vuestic UI</span>
+                  <span className="badge badge-sm">PWA</span>
+                  <span className="badge badge-sm">Vitest</span>
+                  <span className="badge badge-sm">Playwright</span>
+                </div>
+                <div className="card-actions mt-3">
+                  <a href="https://nuxt-lms-mahasiswa.vercel.app" target="_blank" rel="noreferrer" className="btn btn-sm btn-ghost">
+                    <ExternalLink className="h-4 w-4" /> Live
+                  </a>
+                  <a href="https://github.com/mwyzer/vue-lms-mahasiswa" target="_blank" rel="noreferrer" className="btn btn-sm btn-ghost">
+                    <Github className="h-4 w-4" /> Code
+                  </a>
+                </div>
+              </div>
+            </div>
+            {/* Dynamic: Supabase projects */}
+            {projects?.map((project) => (
+              <div key={project.id} className="card bg-base-100 shadow-sm border">
+                <div className="card-body">
+                  <h3 className="card-title">{project.title}</h3>
+                  <p className="text-sm opacity-70">{project.description}</p>
+                  {project.technologies && project.technologies.length > 0 && (
+                    <div className="card-actions mt-3">
+                      {project.technologies.map((tech) => (
+                        <span key={tech} className="badge badge-sm">{tech}</span>
+                      ))}
+                    </div>
+                  )}
+                  {(project.live_url || project.github_url) && (
+                    <div className="card-actions mt-3">
+                      {project.live_url && (
+                        <a href={project.live_url} target="_blank" rel="noreferrer" className="btn btn-sm btn-ghost">
+                          <ExternalLink className="h-4 w-4" /> Live
+                        </a>
+                      )}
+                      {project.github_url && (
+                        <a href={project.github_url} target="_blank" rel="noreferrer" className="btn btn-sm btn-ghost">
+                          <Github className="h-4 w-4" /> Code
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
             </div>
           </div>
         </section>
-      )}
 
       {/* Blog Section — DaisyUI cards */}
       {posts && posts.length > 0 && (
