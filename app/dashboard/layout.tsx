@@ -37,9 +37,9 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dark, setDark] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const supabase = createClient();
 
   useEffect(() => {
+    const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => {
       if (!data?.user) {
         router.push("/auth/login");
@@ -62,6 +62,7 @@ export default function DashboardLayout({
   };
 
   const handleSignOut = async () => {
+    const supabase = createClient();
     await supabase.auth.signOut();
     router.push("/auth/login");
   };
