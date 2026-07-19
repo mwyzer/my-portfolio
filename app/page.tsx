@@ -116,7 +116,7 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* Tech Stack Section — DaisyUI cards + badges */}
+      {/* Tech Stack Section — DaisyUI cards */}
       <section className="py-16">
         <div className="container mx-auto px-4 max-w-5xl">
           <h2 className="text-3xl font-bold text-center mb-4">Tech Stack</h2>
@@ -129,13 +129,14 @@ export default async function HomePage() {
                   <Code2 className="h-5 w-5 text-primary" />
                   <h3 className="font-semibold">Core</h3>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <span className="badge badge-primary">Next.js 15</span>
-                  <span className="badge badge-primary">Nuxt 4</span>
-                  <span className="badge badge-primary">React 19</span>
-                  <span className="badge badge-primary">Vue 3</span>
-                  <span className="badge badge-primary">TypeScript</span>
-                  <span className="badge badge-primary">Pinia</span>
+                <div className="flex flex-wrap gap-x-3 gap-y-1">
+                  <span className="text-sm">Next.js 15</span>
+                  <span className="text-sm">Nuxt 4</span>
+                  <span className="text-sm">React 18/19</span>
+                  <span className="text-sm">Vue 3</span>
+                  <span className="text-sm">TypeScript</span>
+                  <span className="text-sm">ASP.NET Core</span>
+                  <span className="text-sm">Pinia</span>
                 </div>
               </div>
             </div>
@@ -146,13 +147,15 @@ export default async function HomePage() {
                   <Palette className="h-5 w-5 text-secondary" />
                   <h3 className="font-semibold">Styling &amp; UI</h3>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <span className="badge badge-secondary">Tailwind CSS</span>
-                  <span className="badge badge-secondary">DaisyUI</span>
-                  <span className="badge badge-secondary">Vuestic UI</span>
-                  <span className="badge badge-secondary">Lucide Icons</span>
-                  <span className="badge badge-secondary">Radix UI</span>
-                  <span className="badge badge-secondary">PWA</span>
+                <div className="flex flex-wrap gap-x-3 gap-y-1">
+                  <span className="text-sm">Tailwind CSS</span>
+                  <span className="text-sm">DaisyUI</span>
+                  <span className="text-sm">shadcn/ui</span>
+                  <span className="text-sm">Vuestic UI</span>
+                  <span className="text-sm">Radix UI</span>
+                  <span className="text-sm">Lucide Icons</span>
+                  <span className="text-sm">Recharts</span>
+                  <span className="text-sm">PWA</span>
                 </div>
               </div>
             </div>
@@ -163,25 +166,34 @@ export default async function HomePage() {
                   <Database className="h-5 w-5 text-accent" />
                   <h3 className="font-semibold">Backend &amp; DB</h3>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <span className="badge badge-accent">Supabase</span>
-                  <span className="badge badge-accent">Nitro</span>
+                <div className="flex flex-wrap gap-x-3 gap-y-1">
+                  <span className="text-sm">Supabase</span>
+                  <span className="text-sm">PostgreSQL</span>
+                  <span className="text-sm">EF Core</span>
+                  <span className="text-sm">pgvector</span>
+                  <span className="text-sm">Nitro</span>
+                  <span className="text-sm">SignalR</span>
+                  <span className="text-sm">Docker</span>
                 </div>
               </div>
             </div>
-            {/* Build & Test */}
+            {/* Build, Test & Tools */}
             <div className="card bg-base-100 border shadow-sm">
               <div className="card-body p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <Rocket className="h-5 w-5 text-info" />
-                  <h3 className="font-semibold">Build &amp; Test</h3>
+                  <h3 className="font-semibold">Build, Test &amp; Tools</h3>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <span className="badge badge-info">Vite</span>
-                  <span className="badge badge-info">Vitest</span>
-                  <span className="badge badge-info">Playwright</span>
-                  <span className="badge badge-info">React Hook Form</span>
-                  <span className="badge badge-info">Zod</span>
+                <div className="flex flex-wrap gap-x-3 gap-y-1">
+                  <span className="text-sm">Vite</span>
+                  <span className="text-sm">Vitest</span>
+                  <span className="text-sm">Playwright</span>
+                  <span className="text-sm">xUnit</span>
+                  <span className="text-sm">React Hook Form</span>
+                  <span className="text-sm">Zod</span>
+                  <span className="text-sm">Zustand</span>
+                  <span className="text-sm">TanStack Query</span>
+                  <span className="text-sm">Axios</span>
                 </div>
               </div>
             </div>
@@ -192,6 +204,9 @@ export default async function HomePage() {
             </a>
             <a href="https://nuxt-lms-mahasiswa.vercel.app" target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm">
               <ExternalLink className="h-4 w-4" /> Live Demo
+            </a>
+            <a href="https://github.com/mwyzer/portal-helpdesk" target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm">
+              <Github className="h-4 w-4" /> AI Helpdesk
             </a>
           </div>
         </div>
