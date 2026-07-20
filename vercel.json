@@ -1,14 +1,6 @@
 {
   "buildCommand": "next build",
-  "outputDirectory": ".next",
   "framework": "nextjs",
-  "redirects": [
-    {
-      "source": "/dashboard",
-      "destination": "/auth/login",
-      "permanent": false
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",
