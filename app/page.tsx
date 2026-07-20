@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { formatDate } from "@/lib/utils";
-import { ArrowRight, ExternalLink, Github, Linkedin, Gitlab, Mail, Phone, Code2, Database, Palette, Rocket } from "lucide-react";
+import { ArrowRight, ExternalLink, Github, Linkedin, Gitlab, Mail, Phone, Code2, Database, Palette, Rocket, Layout, Server, Globe } from "lucide-react";
 import type { PortfolioAbout, PortfolioProject, BlogPost } from "@/types/database";
 import ThemeToggle from "@/components/theme-toggle";
 
@@ -27,10 +27,39 @@ export default async function HomePage() {
     .order("created_at", { ascending: false })
     .limit(3) as unknown as Promise<{ data: BlogPost[] | null; error: any }>);
 
-  const social = (profile?.social_links as Record<string, string> | null) ?? {};
-  const educationEntries = social?.education?.split("\n\n").filter(Boolean) ?? [];
-  const certEntries = social?.certifications?.split("\n\n").filter(Boolean) ?? [];
-  const experienceEntries = social?.experience?.split("\n\n").filter(Boolean) ?? [];
+  const social = (profile?.social_links as Record<string, any> | null) ?? {};
+  const educationEntries: string[] = (typeof social?.education === "string" ? social.education.split("\n\n").filter(Boolean) : []);
+  const certEntries: string[] = (typeof social?.certifications === "string" ? social.certifications.split("\n\n").filter(Boolean) : []);
+  const experienceEntries: string[] = (typeof social?.experience === "string" ? social.experience.split("\n\n").filter(Boolean) : []);
+
+  // Tech stack from DB (or fallback)
+  const techStack: { category: string; items: string[] }[] = Array.isArray(social?.techstack)
+    ? social.techstack
+    : [
+        {
+          category: "Frontend",
+          items: ["Next.js 15","Nuxt 4","React 18/19","Vue 3","TypeScript","Pinia","Tailwind CSS","DaisyUI","shadcn/ui","Vuestic UI","Radix UI","Lucide Icons","Recharts","PWA","Zustand","TanStack Query","Axios","React Hook Form","Zod"],
+        },
+        {
+          category: "Backend",
+          items: ["ASP.NET Core","Supabase","PostgreSQL","EF Core","pgvector","Nitro","SignalR","Docker","Vite","Vitest","Playwright","xUnit"],
+        },
+      ];
+
+  const iconForCategory = (cat: string) => {
+    const lower = cat.toLowerCase();
+    if (lower.includes("front")) return Layout;
+    if (lower.includes("back")) return Server;
+    if (lower.includes("db") || lower.includes("data")) return Database;
+    if (lower.includes("style") || lower.includes("ui") || lower.includes("design")) return Palette;
+    if (lower.includes("build") || lower.includes("test") || lower.includes("tool")) return Rocket;
+    if (lower.includes("core")) return Code2;
+    return Globe;
+  };
+  const accentForIndex = (i: number) => {
+    const accents = ["text-primary", "text-secondary", "text-accent", "text-info", "text-warning", "text-error"];
+    return accents[i % accents.length];
+  };
 
   return (
     <div className="min-h-screen">
@@ -121,82 +150,26 @@ export default async function HomePage() {
         <div className="container mx-auto px-4 max-w-5xl">
           <h2 className="text-3xl font-bold text-center mb-4">Tech Stack</h2>
           <p className="text-center text-sm opacity-60 mb-10">Tools &amp; technologies I use across my projects</p>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {/* Core */}
-            <div className="card bg-base-100 border shadow-sm">
-              <div className="card-body p-5">
-                <div className="flex items-center gap-2 mb-3">
-                  <Code2 className="h-5 w-5 text-primary" />
-                  <h3 className="font-semibold">Core</h3>
+          <div className={`grid gap-4 sm:grid-cols-2 ${techStack.length === 1 ? "lg:grid-cols-1 max-w-md mx-auto" : techStack.length === 2 ? "lg:grid-cols-2 max-w-3xl mx-auto" : "lg:grid-cols-3 max-w-5xl mx-auto"}`}>
+            {techStack.map((group, i) => {
+              const Icon = iconForCategory(group.category);
+              const accent = accentForIndex(i);
+              return (
+                <div key={group.category} className="card bg-base-100 border shadow-sm">
+                  <div className="card-body p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Icon className={`h-5 w-5 ${accent}`} />
+                      <h3 className="font-semibold">{group.category}</h3>
+                    </div>
+                    <div className="flex flex-wrap gap-x-3 gap-y-1">
+                      {group.items.map((item) => (
+                        <span key={item} className="text-sm">{item}</span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-x-3 gap-y-1">
-                  <span className="text-sm">Next.js 15</span>
-                  <span className="text-sm">Nuxt 4</span>
-                  <span className="text-sm">React 18/19</span>
-                  <span className="text-sm">Vue 3</span>
-                  <span className="text-sm">TypeScript</span>
-                  <span className="text-sm">ASP.NET Core</span>
-                  <span className="text-sm">Pinia</span>
-                </div>
-              </div>
-            </div>
-            {/* Styling & UI */}
-            <div className="card bg-base-100 border shadow-sm">
-              <div className="card-body p-5">
-                <div className="flex items-center gap-2 mb-3">
-                  <Palette className="h-5 w-5 text-secondary" />
-                  <h3 className="font-semibold">Styling &amp; UI</h3>
-                </div>
-                <div className="flex flex-wrap gap-x-3 gap-y-1">
-                  <span className="text-sm">Tailwind CSS</span>
-                  <span className="text-sm">DaisyUI</span>
-                  <span className="text-sm">shadcn/ui</span>
-                  <span className="text-sm">Vuestic UI</span>
-                  <span className="text-sm">Radix UI</span>
-                  <span className="text-sm">Lucide Icons</span>
-                  <span className="text-sm">Recharts</span>
-                  <span className="text-sm">PWA</span>
-                </div>
-              </div>
-            </div>
-            {/* Backend & DB */}
-            <div className="card bg-base-100 border shadow-sm">
-              <div className="card-body p-5">
-                <div className="flex items-center gap-2 mb-3">
-                  <Database className="h-5 w-5 text-accent" />
-                  <h3 className="font-semibold">Backend &amp; DB</h3>
-                </div>
-                <div className="flex flex-wrap gap-x-3 gap-y-1">
-                  <span className="text-sm">Supabase</span>
-                  <span className="text-sm">PostgreSQL</span>
-                  <span className="text-sm">EF Core</span>
-                  <span className="text-sm">pgvector</span>
-                  <span className="text-sm">Nitro</span>
-                  <span className="text-sm">SignalR</span>
-                  <span className="text-sm">Docker</span>
-                </div>
-              </div>
-            </div>
-            {/* Build, Test & Tools */}
-            <div className="card bg-base-100 border shadow-sm">
-              <div className="card-body p-5">
-                <div className="flex items-center gap-2 mb-3">
-                  <Rocket className="h-5 w-5 text-info" />
-                  <h3 className="font-semibold">Build, Test &amp; Tools</h3>
-                </div>
-                <div className="flex flex-wrap gap-x-3 gap-y-1">
-                  <span className="text-sm">Vite</span>
-                  <span className="text-sm">Vitest</span>
-                  <span className="text-sm">Playwright</span>
-                  <span className="text-sm">xUnit</span>
-                  <span className="text-sm">React Hook Form</span>
-                  <span className="text-sm">Zod</span>
-                  <span className="text-sm">Zustand</span>
-                  <span className="text-sm">TanStack Query</span>
-                  <span className="text-sm">Axios</span>
-                </div>
-              </div>
-            </div>
+              );
+            })}
           </div>
           <div className="text-center mt-6">
             <a href="https://github.com/mwyzer/vue-lms-mahasiswa" target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm">
@@ -207,6 +180,9 @@ export default async function HomePage() {
             </a>
             <a href="https://github.com/mwyzer/portal-helpdesk" target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm">
               <Github className="h-4 w-4" /> AI Helpdesk
+            </a>
+            <a href="https://github.com/mwyzer/99999" target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm">
+              <Github className="h-4 w-4" /> 99999
             </a>
           </div>
         </div>

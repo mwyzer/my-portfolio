@@ -29,7 +29,22 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
-  await supabase.auth.getUser();
+  try {
+    await supabase.auth.getUser();
+  } catch {
+    // Refresh token is invalid or expired — clear auth cookies and continue
+    const authCookieNames = request.cookies
+      .getAll()
+      .filter((c) => c.name.includes("sb-") && c.name.includes("auth-token"))
+      .map((c) => c.name);
+
+    authCookieNames.forEach((name) => {
+      supabaseResponse.cookies.set(name, "", {
+        maxAge: 0,
+        path: "/",
+      });
+    });
+  }
 
   return supabaseResponse;
 }
