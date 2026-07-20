@@ -37,15 +37,32 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [dark, setDark] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => {
-      if (!data?.user) {
-        router.push("/auth/login");
-      } else {
-        setUser(data.user);
+
+    // 1. Fast check — read session from cookie (no network request)
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session) {
+        // No session at all — redirect to login
+        await supabase.auth.signOut();
+        router.replace("/auth/login");
+        return;
       }
+
+      // 2. Verify session is still valid with Supabase
+      const { data: { user }, error } = await supabase.auth.getUser();
+
+      if (error || !user) {
+        // Session exists locally but is invalid on the server — clean up and redirect
+        await supabase.auth.signOut();
+        router.replace("/auth/login");
+        return;
+      }
+
+      setUser(user);
+      setChecking(false);
     });
   }, []);
 
@@ -66,6 +83,14 @@ export default function DashboardLayout({
     await supabase.auth.signOut();
     router.push("/auth/login");
   };
+
+  if (checking) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <span className="loading loading-spinner loading-lg"></span>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen">
