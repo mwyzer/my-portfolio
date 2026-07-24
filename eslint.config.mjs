@@ -1,3 +1,3 @@
-const eslintConfig = [];
+const eslintConfig = [{}];
 
 export default eslintConfig;

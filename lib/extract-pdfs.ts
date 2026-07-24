@@ -163,8 +163,11 @@ export function readDataJson(): string {
  * @deprecated Use extractAllDocuments() instead — it handles all file types.
  */
 export async function extractAllPdfs(): Promise<string> {
-  return extractAllDocuments();
+  return readDataJson();
 }
+
+let cachedContext: string | null = null;
+let cachedAt = 0;
 
 /**
  * Invalidate the file cache — call this after updating files.

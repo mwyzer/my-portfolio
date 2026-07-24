@@ -22,7 +22,6 @@ export default function ChatWidget() {
     transport: new DefaultChatTransport({ api: "/api/agent/chat" }),
     onError: (err) => console.error("[chat-widget] useChat error:", err),
     onFinish: (msg) => console.log("[chat-widget] onFinish:", msg),
-    onResponse: (resp) => console.log("[chat-widget] onResponse:", resp.status),
     messages: [
       {
         id: "welcome",
