@@ -38,3 +38,6 @@ next-env.d.ts
 
 # seed scripts (contain credentials)
 scripts/seed-profile.mjs
+
+# personal data files (CV, portfolio, reference docs)
+/files

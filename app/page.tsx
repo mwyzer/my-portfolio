@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { formatDate } from "@/lib/utils";
-import { ArrowRight, ExternalLink, Github, Linkedin, Gitlab, Mail, Phone, Code2, Database, Palette, Rocket, Layout, Server, Globe } from "lucide-react";
+import { ArrowRight, ExternalLink, Github, Linkedin, Gitlab, Mail, Phone, Download, Code2, Database, Palette, Rocket, Layout, Server, Globe } from "lucide-react";
 import type { PortfolioAbout, PortfolioProject, BlogPost } from "@/types/database";
 import ThemeToggle from "@/components/theme-toggle";
 
@@ -139,6 +139,9 @@ export default async function HomePage() {
                     <Gitlab className="h-4 w-4" /> GitLab
                   </a>
                 )}
+                <a href="/Muhammad_Wyzer_CV_ATS_v2.pdf" download className="btn btn-primary btn-sm">
+                  <Download className="h-4 w-4" /> Download CV
+                </a>
               </div>
             )}
           </div>

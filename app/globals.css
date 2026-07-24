@@ -38,6 +38,15 @@ body {
   font-family: system-ui, -apple-system, sans-serif;
 }
 
+/* Chat widget bounce animation */
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.animate-bounce-slow {
+  animation: bounce-slow 2.5s ease-in-out infinite;
+}
+
 /* Typography for blog content */
 .prose {
   max-width: 65ch;
