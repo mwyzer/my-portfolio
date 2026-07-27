@@ -105,102 +105,126 @@ export default function LoginPage() {
   }[mode];
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4 bg-base-200">
-      <div className="card bg-base-100 shadow-xl w-full max-w-sm">
-        <div className="card-body">
-          <h2 className="card-title text-2xl justify-center">{modeLabel}</h2>
-          <p className="text-sm opacity-70 text-center">{modeDescription}</p>
+    <div className="flex min-h-screen items-center justify-center p-4" style={{ background: "var(--bg)" }}>
+      <div className="card-noir w-full max-w-sm !p-6">
+        <h2 className="text-2xl font-bold text-center text-text mb-1">{modeLabel}</h2>
+        <p className="text-sm text-text-muted text-center mb-4">{modeDescription}</p>
 
-          {/* Mode switcher tabs */}
-          <div className="tabs tabs-boxed justify-center mt-2">
-            <button
-              type="button"
-              className={`tab tab-sm ${mode === "password" ? "tab-active" : ""}`}
-              onClick={() => switchTo("password")}
-            >
-              Password
-            </button>
-            <button
-              type="button"
-              className={`tab tab-sm ${mode === "magiclink" ? "tab-active" : ""}`}
-              onClick={() => switchTo("magiclink")}
-            >
-              Magic Link
-            </button>
-            <button
-              type="button"
-              className={`tab tab-sm ${mode === "reset" ? "tab-active" : ""}`}
-              onClick={() => switchTo("reset")}
-            >
-              Reset
-            </button>
+        {/* Mode switcher tabs */}
+        <div className="flex justify-center gap-0 mb-4 p-0.5 rounded-lg" style={{ background: "var(--surface-hover)" }}>
+          <button
+            type="button"
+            className={`px-3 py-1.5 text-sm rounded-md transition-colors ${mode === "password" ? "text-text font-medium" : "text-text-muted hover:text-text"}`}
+            style={mode === "password" ? { background: "var(--surface)" } : undefined}
+            onClick={() => switchTo("password")}
+          >
+            Password
+          </button>
+          <button
+            type="button"
+            className={`px-3 py-1.5 text-sm rounded-md transition-colors ${mode === "magiclink" ? "text-text font-medium" : "text-text-muted hover:text-text"}`}
+            style={mode === "magiclink" ? { background: "var(--surface)" } : undefined}
+            onClick={() => switchTo("magiclink")}
+          >
+            Magic Link
+          </button>
+          <button
+            type="button"
+            className={`px-3 py-1.5 text-sm rounded-md transition-colors ${mode === "reset" ? "text-text font-medium" : "text-text-muted hover:text-text"}`}
+            style={mode === "reset" ? { background: "var(--surface)" } : undefined}
+            onClick={() => switchTo("reset")}
+          >
+            Reset
+          </button>
+        </div>
+
+        <form
+          onSubmit={
+            mode === "password"
+              ? handlePasswordLogin
+              : mode === "magiclink"
+                ? handleMagicLink
+                : handleResetPassword
+          }
+          className="space-y-4 mt-4"
+        >
+          <div className="space-y-1.5">
+            <span className="text-sm font-medium text-text">Email</span>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              className="w-full px-3 py-2 text-sm rounded-lg outline-none transition-colors"
+              style={{
+                background: "var(--bg)",
+                color: "var(--text)",
+                border: "1px solid var(--border)",
+              }}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onFocus={(e) => { e.target.style.borderColor = "var(--color-accent)"; }}
+              onBlur={(e) => { e.target.style.borderColor = "var(--border)"; }}
+              required
+            />
           </div>
 
-          <form
-            onSubmit={
-              mode === "password"
-                ? handlePasswordLogin
-                : mode === "magiclink"
-                  ? handleMagicLink
-                  : handleResetPassword
-            }
-            className="space-y-4 mt-4"
-          >
-            <label className="form-control w-full">
-              <div className="label">
-                <span className="label-text">Email</span>
-              </div>
+          {mode === "password" && (
+            <div className="space-y-1.5">
+              <span className="text-sm font-medium text-text">Password</span>
               <input
-                type="email"
-                placeholder="you@example.com"
-                className="input input-bordered w-full"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="password"
+                className="w-full px-3 py-2 text-sm rounded-lg outline-none transition-colors"
+                style={{
+                  background: "var(--bg)",
+                  color: "var(--text)",
+                  border: "1px solid var(--border)",
+                }}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onFocus={(e) => { e.target.style.borderColor = "var(--color-accent)"; }}
+                onBlur={(e) => { e.target.style.borderColor = "var(--border)"; }}
                 required
               />
-            </label>
-
-            {mode === "password" && (
-              <label className="form-control w-full">
-                <div className="label">
-                  <span className="label-text">Password</span>
-                </div>
-                <input
-                  type="password"
-                  className="input input-bordered w-full"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </label>
-            )}
-
-            {error && <div className="alert alert-error text-sm">{error}</div>}
-            {message && <div className="alert alert-success text-sm">{message}</div>}
-
-            <button type="submit" className="btn btn-primary w-full" disabled={loading}>
-              {loading && <span className="loading loading-spinner"></span>}
-              {loading
-                ? mode === "password"
-                  ? "Signing in..."
-                  : "Sending..."
-                : mode === "password"
-                  ? "Sign In"
-                  : mode === "magiclink"
-                    ? "Send Magic Link"
-                    : "Send Reset Link"}
-            </button>
-          </form>
-
-          {/* Hint for dev / troubleshooting */}
-          {error && (
-            <div className="text-xs text-muted-foreground mt-2 text-center leading-relaxed">
-              Tip: Make sure <strong>Email provider</strong> is enabled in<br />
-              Supabase Dashboard → Authentication → Email.<br />
-              Free tier is limited to 4 emails/hour.
             </div>
           )}
-        </div>
+
+          {error && (
+            <div className="px-3 py-2 rounded-lg text-sm" style={{ background: "rgba(239,68,68,0.1)", color: "var(--color-error)", border: "1px solid rgba(239,68,68,0.3)" }}>
+              {error}
+            </div>
+          )}
+          {message && (
+            <div className="px-3 py-2 rounded-lg text-sm" style={{ background: "rgba(34,197,94,0.1)", color: "var(--color-success)", border: "1px solid rgba(34,197,94,0.3)" }}>
+              {message}
+            </div>
+          )}
+
+          <button type="submit" className="btn-noir btn-noir-primary w-full justify-center" disabled={loading}>
+            {loading && (
+              <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            )}
+            {loading
+              ? mode === "password"
+                ? "Signing in..."
+                : "Sending..."
+              : mode === "password"
+                ? "Sign In"
+                : mode === "magiclink"
+                  ? "Send Magic Link"
+                  : "Send Reset Link"}
+          </button>
+        </form>
+
+        {/* Hint for dev / troubleshooting */}
+        {error && (
+          <div className="text-xs text-text-dim mt-4 text-center leading-relaxed">
+            Tip: Make sure <strong>Email provider</strong> is enabled in<br />
+            Supabase Dashboard → Authentication → Email.<br />
+            Free tier is limited to 4 emails/hour.
+          </div>
+        )}
       </div>
     </div>
   );

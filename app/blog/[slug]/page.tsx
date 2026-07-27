@@ -62,31 +62,31 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     });
 
   return (
-    <div className="min-h-screen">
-      <div className="navbar bg-base-100 border-b sticky top-0 z-50 backdrop-blur">
-        <div className="navbar-start">
-          <Link href="/" className="btn btn-ghost text-xl">Portfolio</Link>
+    <div className="min-h-screen" style={{ background: "var(--bg)", color: "var(--text)" }}>
+      <nav className="glass sticky top-0 z-50">
+        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+          <Link href="/" className="font-semibold text-lg text-text hover:text-accent transition-colors">Portfolio</Link>
+          <div className="flex items-center gap-1">
+            <Link href="/" className="btn-noir btn-noir-ghost btn-noir-sm">Home</Link>
+            <Link href="/blog" className="btn-noir btn-noir-ghost btn-noir-sm">Blog</Link>
+            <ThemeToggle />
+          </div>
         </div>
-        <div className="navbar-end gap-1">
-          <Link href="/" className="btn btn-ghost btn-sm">Home</Link>
-          <Link href="/blog" className="btn btn-ghost btn-sm">Blog</Link>
-          <ThemeToggle />
-        </div>
-      </div>
+      </nav>
 
-      <article className="container mx-auto px-4 py-16 max-w-3xl">
-        <Link href="/blog" className="btn btn-ghost btn-sm mb-8">
+      <article className="max-w-3xl mx-auto px-4 py-16">
+        <Link href="/blog" className="btn-noir btn-noir-ghost btn-noir-sm mb-8">
           <ArrowLeft className="h-4 w-4" /> Back to blog
         </Link>
 
         <header className="mb-8">
-          <h1 className="text-4xl font-bold">{post.title}</h1>
-          <div className="mt-2 flex items-center gap-4 text-sm opacity-70">
+          <h1 className="text-4xl font-bold text-text">{post.title}</h1>
+          <div className="mt-3 flex items-center gap-4 text-sm text-text-dim">
             <time>{formatDate(post.created_at)}</time>
             {post.tags && post.tags.length > 0 && (
               <div className="flex gap-1.5">
                 {post.tags.map((tag) => (
-                  <span key={tag} className="badge badge-sm">{tag}</span>
+                  <span key={tag} className="badge-noir">{tag}</span>
                 ))}
               </div>
             )}
@@ -97,7 +97,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           <img
             src={post.cover_image}
             alt={post.title}
-            className="mb-8 w-full rounded-box object-cover max-h-96"
+            className="mb-8 w-full rounded-lg object-cover max-h-96"
           />
         )}
 

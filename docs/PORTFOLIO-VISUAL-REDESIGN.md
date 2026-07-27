@@ -41,6 +41,35 @@ The current project is built with:
 
 The existing architecture already supports a strong foundation for the redesign. The visual layer should be enhanced incrementally rather than rewriting the application architecture unnecessarily.
 
+### Existing AI Chat Infrastructure
+
+The project already includes a production-quality AI chat system:
+
+- `@ai-sdk/deepseek` — DeepSeek LLM provider via Vercel AI SDK
+- `@ai-sdk/react` — React hooks for streaming AI responses (`useChat`)
+- `ai` — Vercel AI SDK core
+- `ChatWidget` component (`components/chat/chat-widget.tsx`) — floating chat bubble rendered in root layout
+- API route at `api/agent/chat/route.ts` — server-side chat endpoint
+
+The existing chat widget should be restyled to match the Noir design system and can serve as a live demonstration of AI engineering capability directly on the portfolio.
+
+### DaisyUI Strategy Decision
+
+The current `globals.css` defines a DaisyUI "portfolio" theme with a light base (`--color-base-100: oklch(1 0 0)` — pure white). The Noir redesign requires a **dark-first, near-black background with a monochromatic palette**.
+
+**Decision: Remove DaisyUI.**
+
+DaisyUI provides pre-built component classes that conflict with the custom Noir visual language. The redesign requires full control over colors, spacing, and component styling. DaisyUI's utility classes and opinionated defaults would require constant overriding.
+
+**Migration path:**
+
+1. Port existing DaisyUI-dependent components to raw Tailwind + Radix UI primitives
+2. Define Noir color tokens as CSS custom properties in `globals.css`
+3. Remove `@plugin "daisyui"` and the `@plugin "daisyui/theme"` block
+4. Keep `tailwindcss-animate` for animation utilities
+
+This simplifies the CSS pipeline and ensures the Noir design system has no conflicting opinions.
+
 ---
 
 ## 3. Target Experience
@@ -522,16 +551,97 @@ npm install lenis
 
 Only add dependencies that are actually required. Avoid overlapping animation libraries for the same use case.
 
-Recommended responsibility:
+**Animation library strategy — primary vs secondary:**
 
-| Tool | Responsibility |
+- **Motion (Framer Motion)** is the primary animation library for all component-level animations (hover, enter, exit, layout, gestures).
+- **GSAP + ScrollTrigger** is secondary — use only when complex scroll-driven timelines are required (hero storytelling, horizontal project showcase, experience timeline). Do not use GSAP for simple fade/translate animations.
+- **Lenis** for smooth scrolling — test carefully with Next.js App Router. Lenis manipulates the native scroll, which can conflict with Next.js's scroll restoration and `useRouter` navigation. If issues arise, fall back to CSS `scroll-behavior: smooth`.
+- **`tailwindcss-animate`** remains for simple utility-driven animations (e.g., `animate-fade-in`, `animate-slide-up`). These are sufficient for 80% of micro-interactions.
+
+**Decision tree:**
+
+```
+Animation needed?
+├── Simple CSS transition/utility? → tailwindcss-animate
+├── Component enter/exit/layout? → Motion
+├── Scroll-driven complex timeline? → GSAP ScrollTrigger
+└── Page smooth scrolling? → Lenis (with Next.js caveat)
+```
+
+Responsibility table:
+
+| Tool | Responsibility | Priority |
+|---|---|---|
+| tailwindcss-animate | Utility CSS animations | Primary |
+| Motion (Framer Motion) | Component-level animations | Primary |
+| GSAP + ScrollTrigger | Complex scroll timelines | Secondary |
+| React Three Fiber | React-based 3D scenes | Feature |
+| Three.js | 3D engine (peer dep of R3F) | Feature |
+| Drei | R3F helpers | Feature |
+| Lenis | Smooth scrolling | Optional |
+
+Full install command:
+
+```bash
+npm install three @react-three/fiber @react-three/drei motion gsap lenis
+npm install -D @types/three
+```
+
+Only add dependencies when the corresponding feature is being implemented in that phase.
+
+---
+
+## 14.5 Bundle Size Budget
+
+Adding 3D and animation libraries significantly impacts bundle size. Set and enforce a budget.
+
+### Budget Targets
+
+| Metric | Target |
 |---|---|
-| React Three Fiber | React-based 3D scenes |
-| Three.js | 3D engine |
-| Drei | R3F helpers |
-| Motion | Component animations |
-| GSAP | Complex scroll timelines |
-| Lenis | Smooth scrolling |
+| Initial JS (gzip) | < 150 KB |
+| Total JS (gzip) | < 300 KB |
+| Lighthouse Performance | ≥ 90 |
+| First Contentful Paint | < 1.5s |
+| Largest Contentful Paint | < 2.5s |
+| Time to Interactive | < 3.0s |
+
+### Code-Splitting Strategy
+
+- **`next/dynamic`** with `ssr: false` for all Three.js / R3F components
+- **Route-based splitting** — 3D scenes only on the homepage; other pages exclude R3F entirely
+- **GSAP + ScrollTrigger** — imported only in components that use them, not globally
+- **Lenis** — initialized only on the homepage, destroyed on route change
+- **Static fallbacks** — render a static CSS alternative when a 3D component is loading or on mobile
+
+### Monitoring
+
+- Run `next build` and inspect the output for chunk sizes
+- Use `@vercel/analytics` (already installed) for real-user Core Web Vitals
+- Run Lighthouse CI in CI/CD if available
+
+---
+
+## 14.6 AI Chat Widget Integration
+
+The existing `ChatWidget` component and DeepSeek-powered chat API route should be preserved and enhanced as a demonstration of AI engineering capability.
+
+### Current State
+
+- Floating chat bubble rendered in `app/layout.tsx`
+- Uses `@ai-sdk/deepseek` for LLM inference
+- Streaming responses via `useChat` from `@ai-sdk/react`
+- Styled with DaisyUI utility classes
+
+### Redesign Integration
+
+1. **Restyle the chat widget** to match the Noir design system (dark glassmorphism, accent glow, sharp typography).
+2. **Position the chat as an "Ask My AI" feature** — a live demonstration that the developer builds AI systems, not just talks about them.
+3. **Expand the chat system prompt** to include portfolio context (projects, skills, experience) so visitors can ask questions about the developer's work.
+4. **Add a subtle visual indicator** in the Hero section (e.g., "💬 Ask my AI assistant anything") to drive engagement.
+5. **Keep the existing API route intact** — only modify the system prompt and UI styling.
+
+This turns the chat widget from a generic feature into a portfolio differentiator that directly supports the "AI Engineer" brand positioning.
 
 ---
 
@@ -635,59 +745,81 @@ Mobile should feel intentionally designed, not like a reduced desktop version.
 
 ## Phase 1 — Visual Foundation
 
-- [ ] Establish Noir design system
-- [ ] Define typography
-- [ ] Define color tokens
-- [ ] Redesign navigation
-- [ ] Redesign buttons
-- [ ] Redesign cards
+- [ ] Remove DaisyUI; port components to raw Tailwind + Radix
+- [ ] Define Noir color tokens (CSS custom properties)
+- [ ] Define typography (display, body, mono)
+- [ ] Redesign navigation (sticky, glassmorphism, Noir) — see Section 5
+- [ ] Redesign buttons (magnetic, accent, outline variants)
+- [ ] Redesign cards (dark surface, border glow, hover tilt)
 - [ ] Improve spacing system
 - [ ] Improve responsive layouts
 
 ## Phase 2 — Hero Experience
 
-- [ ] Redesign hero
-- [ ] Add typography reveal
-- [ ] Add parallax
-- [ ] Add initial 3D Wyzer Orb
-- [ ] Add CTA interactions
+- [ ] Redesign hero with Noir visual direction
+- [ ] Add typography reveal animation (Motion)
+- [ ] Add parallax / mouse-follow effect
+- [ ] Add initial 3D Wyzer Orb (React Three Fiber, lazy-loaded)
+- [ ] Add CTA interactions (magnetic buttons, hover glow)
+- [ ] Add "Ask my AI" teaser linking to chat widget
 
-## Phase 3 — Motion System
+## Phase 3 — About & Capabilities
 
-- [ ] Add Motion animations
-- [ ] Add GSAP ScrollTrigger
+- [ ] Redesign "Who I Am" section as interactive profile (Section 5.2)
+- [ ] Redesign "What I Build" as capability cards (Section 5.3)
+- [ ] Add section entrance reveals
+- [ ] Add hover micro-interactions on capability cards
+- [ ] Data-like text masking animations
+
+## Phase 4 — Motion System
+
+- [ ] Add Motion animations to all sections
+- [ ] Add GSAP ScrollTrigger for complex timelines (hero, timeline)
 - [ ] Add page transitions
 - [ ] Add magnetic buttons
-- [ ] Add custom cursor
+- [ ] Add custom cursor (desktop only, respects `prefers-reduced-motion`)
 
-## Phase 4 — Project Showcase
+## Phase 5 — Project Showcase
 
-- [ ] Redesign project cards
-- [ ] Add hover interactions
-- [ ] Add project-specific visuals
-- [ ] Add case-study layout
-- [ ] Add scroll storytelling
+- [ ] Redesign project cards as case-study cards (Section 6)
+- [ ] Add 3D card tilt on hover
+- [ ] Add cursor-following glow
+- [ ] Add project-specific visual metaphors
+- [ ] Add case-study detail layout
+- [ ] Add horizontal scroll storytelling (GSAP)
 
-## Phase 5 — Tech Constellation
+## Phase 6 — Tech Constellation
 
-- [ ] Create interactive technology graph
-- [ ] Add relationship highlighting
+- [ ] Create interactive technology graph (Section 7)
+- [ ] Add relationship highlighting on hover
 - [ ] Add contextual technology panels
+- [ ] Add connection line animations
 
-## Phase 6 — Experience & Contact
+## Phase 7 — Experience Timeline & Blog
 
-- [ ] Redesign timeline
-- [ ] Add scroll-driven timeline
-- [ ] Create final CTA
-- [ ] Integrate Wyzer Orb ending animation
+- [ ] Redesign experience timeline (Section 8)
+- [ ] Add scroll-driven timeline progression (GSAP ScrollTrigger)
+- [ ] Redesign blog cards as editorial cards (Section 9)
+- [ ] Add blog hover interactions (image movement, magnetic CTA)
+- [ ] Ensure existing blog CRUD functionality is preserved
 
-## Phase 7 — Performance & QA
+## Phase 8 — Contact & Chat Integration
 
-- [ ] Lighthouse optimization
-- [ ] WebGL performance testing
-- [ ] Mobile testing
+- [ ] Redesign contact section as minimal final CTA (Section 10)
+- [ ] Integrate Wyzer Orb ending animation (contracts to point)
+- [ ] Restyle ChatWidget to Noir design system
+- [ ] Expand chat system prompt with portfolio context
+- [ ] Test chat streaming with new styling
+
+## Phase 9 — Performance & QA
+
+- [ ] Lighthouse optimization (target ≥ 90)
+- [ ] Bundle size audit (target < 150 KB initial JS gzip)
+- [ ] Code-splitting verification (R3F, GSAP lazy-loaded)
+- [ ] WebGL performance testing (low-end device)
+- [ ] Mobile testing (simplified 3D, no custom cursor)
 - [ ] Reduced-motion testing
-- [ ] Accessibility audit
+- [ ] Accessibility audit (keyboard nav, focus states, contrast)
 - [ ] SEO audit
 - [ ] Vercel production testing
 

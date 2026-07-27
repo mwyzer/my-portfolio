@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { MessageCircle, X, Send, Sparkles } from "lucide-react";
@@ -18,22 +18,32 @@ export default function ChatWidget() {
   const [hasOpened, setHasOpened] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { messages, sendMessage, status, error } = useChat({
-    transport: new DefaultChatTransport({ api: "/api/agent/chat" }),
-    onError: (err) => console.error("[chat-widget] useChat error:", err),
-    onFinish: (msg) => console.log("[chat-widget] onFinish:", msg),
-    messages: [
+  const transport = useMemo(
+    () => new DefaultChatTransport({ api: "/api/agent/chat" }),
+    []
+  );
+
+  const initialMessages = useMemo(
+    () => [
       {
         id: "welcome",
-        role: "assistant",
+        role: "assistant" as const,
         parts: [
           {
-            type: "text",
+            type: "text" as const,
             text: "Hi there! 👋 I'm Wyzer's AI assistant. Ask me anything about his background, skills, projects, or experience — I'm here to help!",
           },
         ],
       },
     ],
+    []
+  );
+
+  const { messages, sendMessage, status, error } = useChat({
+    transport,
+    onError: (err) => console.error("[chat-widget] useChat error:", err),
+    onFinish: (msg) => console.log("[chat-widget] onFinish:", msg),
+    messages: initialMessages,
   });
 
   const isLoading = status === "submitted" || status === "streaming";
@@ -68,25 +78,39 @@ export default function ChatWidget() {
       {!open && (
         <button
           onClick={handleOpen}
-          className="fixed bottom-6 right-6 z-50 btn btn-circle btn-primary shadow-lg btn-lg animate-bounce-slow hover:animate-none"
+          className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-lg animate-bounce-slow hover:animate-none transition-all"
+          style={{ background: "var(--color-accent)", color: "#fff" }}
           aria-label="Open chat with AI assistant"
         >
           <MessageCircle className="h-6 w-6" />
         </button>
       )}
 
-      {/* Chat panel */}
+      {/* Chat panel — Noir glass */}
       {open && (
-        <div className="fixed bottom-6 right-6 z-50 w-[22rem] sm:w-[26rem] h-[32rem] rounded-2xl shadow-2xl flex flex-col bg-base-100 border border-base-300 overflow-hidden">
+        <div
+          className="fixed bottom-6 right-6 z-50 w-[22rem] sm:w-[26rem] h-[32rem] rounded-2xl shadow-2xl flex flex-col overflow-hidden border"
+          style={{
+            background: "var(--surface-elevated)",
+            borderColor: "var(--border)",
+          }}
+        >
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-base-300 bg-primary text-primary-content shrink-0">
+          <div
+            className="flex items-center justify-between px-4 py-3 border-b shrink-0"
+            style={{
+              background: "var(--color-accent)",
+              color: "#fff",
+              borderColor: "var(--color-accent-hover)",
+            }}
+          >
             <div className="flex items-center gap-2">
               <Sparkles className="h-5 w-5" />
               <span className="font-semibold text-sm">AI Secretary</span>
             </div>
             <button
               onClick={() => setOpen(false)}
-              className="btn btn-ghost btn-xs btn-circle"
+              className="inline-flex items-center justify-center w-7 h-7 rounded-full hover:bg-white/20 transition-colors"
               aria-label="Close chat"
             >
               <X className="h-4 w-4" />
@@ -97,28 +121,58 @@ export default function ChatWidget() {
           <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
             {messages.map((msg) =>
               msg.role === "assistant" ? (
-                <div key={msg.id} className="chat chat-start">
-                  <div className="chat-bubble chat-bubble-accent text-sm leading-relaxed whitespace-pre-wrap">
+                <div key={msg.id} className="flex justify-start">
+                  <div
+                    className="max-w-[85%] px-4 py-2.5 rounded-2xl rounded-bl-md text-sm leading-relaxed whitespace-pre-wrap"
+                    style={{
+                      background: "var(--surface)",
+                      color: "var(--text)",
+                      border: "1px solid var(--border)",
+                    }}
+                  >
                     {getMessageText(msg)}
                   </div>
                 </div>
               ) : (
-                <div key={msg.id} className="chat chat-end">
-                  <div className="chat-bubble chat-bubble-primary text-sm leading-relaxed">
+                <div key={msg.id} className="flex justify-end">
+                  <div
+                    className="max-w-[85%] px-4 py-2.5 rounded-2xl rounded-br-md text-sm leading-relaxed"
+                    style={{
+                      background: "var(--color-accent)",
+                      color: "#fff",
+                    }}
+                  >
                     {getMessageText(msg)}
                   </div>
                 </div>
               )
             )}
             {isLoading && (
-              <div className="chat chat-start">
-                <div className="chat-bubble chat-bubble-accent">
-                  <span className="loading loading-dots loading-sm" />
+              <div className="flex justify-start">
+                <div
+                  className="px-4 py-2.5 rounded-2xl rounded-bl-md"
+                  style={{
+                    background: "var(--surface)",
+                    border: "1px solid var(--border)",
+                  }}
+                >
+                  <div className="flex gap-1.5">
+                    <span className="w-2 h-2 rounded-full animate-bounce" style={{ background: "var(--text-dim)", animationDelay: "0ms" }} />
+                    <span className="w-2 h-2 rounded-full animate-bounce" style={{ background: "var(--text-dim)", animationDelay: "150ms" }} />
+                    <span className="w-2 h-2 rounded-full animate-bounce" style={{ background: "var(--text-dim)", animationDelay: "300ms" }} />
+                  </div>
                 </div>
               </div>
             )}
             {error && (
-              <div className="alert alert-error text-xs">
+              <div
+                className="px-3 py-2 rounded-lg text-xs"
+                style={{
+                  background: "rgba(239, 68, 68, 0.1)",
+                  color: "var(--color-error)",
+                  border: "1px solid rgba(239, 68, 68, 0.3)",
+                }}
+              >
                 <span>⚠️ {error.message || "Failed to get response"}</span>
               </div>
             )}
@@ -128,19 +182,34 @@ export default function ChatWidget() {
           {/* Input */}
           <form
             onSubmit={onSubmit}
-            className="flex items-center gap-2 px-4 py-3 border-t border-base-300 bg-base-200 shrink-0"
+            className="flex items-center gap-2 px-4 py-3 border-t shrink-0"
+            style={{
+              background: "var(--surface)",
+              borderColor: "var(--border)",
+            }}
           >
             <input
               type="text"
               name="message"
               placeholder="Ask about Wyzer..."
-              className="input input-bordered input-sm flex-1"
+              className="flex-1 px-3 py-2 text-sm rounded-lg outline-none transition-colors"
+              style={{
+                background: "var(--bg)",
+                color: "var(--text)",
+                border: "1px solid var(--border)",
+              }}
               disabled={isLoading}
               autoFocus
+              onFocus={(e) => { e.target.style.borderColor = "var(--color-accent)"; }}
+              onBlur={(e) => { e.target.style.borderColor = "var(--border)"; }}
             />
             <button
               type="submit"
-              className="btn btn-primary btn-sm btn-circle"
+              className="inline-flex items-center justify-center w-9 h-9 rounded-full transition-all disabled:opacity-50"
+              style={{
+                background: isLoading ? "var(--surface-hover)" : "var(--color-accent)",
+                color: "#fff",
+              }}
               disabled={isLoading}
               aria-label="Send message"
             >
