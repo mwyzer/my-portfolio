@@ -13,7 +13,7 @@ const ElectricBorder = ({
   chaos = 0.12,
   borderRadius = 24,
   className = '',
-  style
+  style = {}
 }) => {
   const [mounted, setMounted] = useState(false);
   const canvasRef = useRef(null);
