@@ -4,7 +4,17 @@
 // Component inspired by @BalintFerenczy on X
 // https://codepen.io/BalintFerenczy/pen/KwdoyEN
 
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback, useState, type ReactNode, type CSSProperties } from 'react';
+
+interface ElectricBorderProps {
+  children?: ReactNode;
+  color?: string;
+  speed?: number;
+  chaos?: number;
+  borderRadius?: number;
+  className?: string;
+  style?: CSSProperties;
+}
 
 const ElectricBorder = ({
   children,
@@ -13,26 +23,26 @@ const ElectricBorder = ({
   chaos = 0.12,
   borderRadius = 24,
   className = '',
-  style = {}
-}) => {
+  style = {},
+}: ElectricBorderProps) => {
   const [mounted, setMounted] = useState(false);
-  const canvasRef = useRef(null);
-  const containerRef = useRef(null);
-  const animationRef = useRef(null);
-  const timeRef = useRef(0);
-  const lastFrameTimeRef = useRef(0);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const animationRef = useRef<number | null>(null);
+  const timeRef = useRef<number>(0);
+  const lastFrameTimeRef = useRef<number>(0);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
   // Noise functions
-  const random = useCallback(x => {
+  const random = useCallback((x: number): number => {
     return (Math.sin(x * 12.9898) * 43758.5453) % 1;
   }, []);
 
   const noise2D = useCallback(
-    (x, y) => {
+    (x: number, y: number): number => {
       const i = Math.floor(x);
       const j = Math.floor(y);
       const fx = x - i;
@@ -52,7 +62,7 @@ const ElectricBorder = ({
   );
 
   const octavedNoise = useCallback(
-    (x, octaves, lacunarity, gain, baseAmplitude, baseFrequency, time, seed, baseFlatness) => {
+    (x: number, octaves: number, lacunarity: number, gain: number, baseAmplitude: number, baseFrequency: number, time: number, seed: number, baseFlatness: number): number => {
       let y = 0;
       let amplitude = baseAmplitude;
       let frequency = baseFrequency;
@@ -72,7 +82,7 @@ const ElectricBorder = ({
     [noise2D]
   );
 
-  const getCornerPoint = useCallback((centerX, centerY, radius, startAngle, arcLength, progress) => {
+  const getCornerPoint = useCallback((centerX: number, centerY: number, radius: number, startAngle: number, arcLength: number, progress: number): { x: number; y: number } => {
     const angle = startAngle + progress * arcLength;
     return {
       x: centerX + radius * Math.cos(angle),
@@ -81,7 +91,7 @@ const ElectricBorder = ({
   }, []);
 
   const getRoundedRectPoint = useCallback(
-    (t, left, top, width, height, radius) => {
+    (t: number, left: number, top: number, width: number, height: number, radius: number): { x: number; y: number } => {
       const straightWidth = width - 2 * radius;
       const straightHeight = height - 2 * radius;
       const cornerArc = (Math.PI * radius) / 2;
@@ -183,7 +193,7 @@ const ElectricBorder = ({
     let { width, height } = updateSize();
     let lastDpr = Math.min(window.devicePixelRatio || 1, 2);
 
-    const drawElectricBorder = currentTime => {
+    const drawElectricBorder = (currentTime: number) => {
       if (!canvas || !ctx) return;
 
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
