@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-import { Analytics } from "@vercel/analytics/next";
-import ChatWidget from "@/components/chat/chat-widget";
-import SplashCursor from "@/components/splash-cursor";
+import SplashCursorDeferred from "@/components/deferred/splash-cursor-deferred";
+import ChatWidgetDeferred from "@/components/deferred/chat-widget-deferred";
+import AnalyticsDeferred from "@/components/deferred/analytics-deferred";
 
 export const metadata: Metadata = {
   title: {
@@ -21,6 +21,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Preconnect to Supabase — API + Storage images.
+            SUPABASE_URL is inlined at build time by Next.js (NEXT_PUBLIC_*).
+            Hardcoded as a secondary fallback so these ALWAYS render. */}
+        <link rel="preconnect" href="https://zocyqljjolsamywllnml.supabase.co" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://zocyqljjolsamywllnml.supabase.co" />
         <script dangerouslySetInnerHTML={{
           __html: `
             (function() {
@@ -36,10 +41,10 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen antialiased">
         {children}
-        <SplashCursor />
-        <ChatWidget />
+        <SplashCursorDeferred />
+        <ChatWidgetDeferred />
         <Toaster />
-        <Analytics />
+        <AnalyticsDeferred />
       </body>
     </html>
   );

@@ -175,19 +175,22 @@ const ElectricBorder = ({
     const borderOffset = 60;
 
     const updateSize = () => {
+      // Batch all layout reads first to avoid forced reflow
       const rect = container.getBoundingClientRect();
       const width = rect.width + borderOffset * 2;
       const height = rect.height + borderOffset * 2;
-
-      // Use device pixel ratio for sharp rendering
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-      ctx.scale(dpr, dpr);
 
-      return { width, height };
+      // Defer all layout-triggering writes to the next animation frame
+      requestAnimationFrame(() => {
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        ctx.scale(dpr, dpr);
+      });
+
+      return { width, height, dpr };
     };
 
     let { width, height } = updateSize();

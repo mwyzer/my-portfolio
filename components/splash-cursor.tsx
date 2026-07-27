@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 interface SplashCursorProps {
   /** Color of the splash dots */
@@ -28,6 +28,34 @@ interface Dot {
   maxLife: number;
 }
 
+/** Resolve a CSS custom property to its computed value. Called once, not per frame. */
+function resolveCssVar(varExpr: string): string {
+  if (typeof document === "undefined") return varExpr;
+  const match = varExpr.match(/var\(([^,)]+)/);
+  if (!match) return varExpr;
+  const resolved = getComputedStyle(document.documentElement)
+    .getPropertyValue(match[1].trim())
+    .trim();
+  return resolved || varExpr;
+}
+
+/** Hex or rgb(a) string → rgba with given alpha. Pure computation, no DOM access. */
+function colorWithAlpha(color: string, alpha: number): string {
+  if (color.startsWith("#")) {
+    const hex = color.slice(1);
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+  if (color.startsWith("rgb")) {
+    return color.replace(/rgb(a?)\(([^)]+)\)/, (_, a, vals) =>
+      a ? `rgba(${vals})` : `rgba(${vals},${alpha})`
+    );
+  }
+  return color;
+}
+
 export default function SplashCursor({
   color = "var(--color-accent, #6366f1)",
   dotSize = 4,
@@ -41,6 +69,12 @@ export default function SplashCursor({
   const dotsRef = useRef<Dot[]>([]);
   const mouseRef = useRef({ x: -100, y: -100 });
   const rafRef = useRef(0);
+
+  // Resolve CSS variable once — avoids getComputedStyle() in the animation loop
+  const resolvedColor = useMemo(() => {
+    if (color.startsWith("var(")) return resolveCssVar(color);
+    return color;
+  }, [color]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -104,7 +138,7 @@ export default function SplashCursor({
 
         ctx.beginPath();
         ctx.arc(d.x, d.y, size, 0, Math.PI * 2);
-        ctx.fillStyle = colorWithAlpha(color, alpha);
+        ctx.fillStyle = colorWithAlpha(resolvedColor, alpha);
         ctx.fill();
       }
 
@@ -117,46 +151,13 @@ export default function SplashCursor({
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", onMouseMove);
     };
-  }, [color, dotSize, splashOpacity, fadeSpeed, blendMode]);
+  }, [resolvedColor, dotSize, splashOpacity, fadeSpeed, blendMode]);
 
   return (
     <canvas
       ref={canvasRef}
+      className={`pointer-events-none fixed inset-0 z-50 ${className}`}
       aria-hidden="true"
-      className={`pointer-events-none fixed inset-0 z-[9998] ${className}`}
     />
   );
-}
-
-/** Parse a CSS color string and apply alpha */
-function colorWithAlpha(color: string, alpha: number): string {
-  // Handle CSS custom properties by computing them
-  if (color.startsWith("var(")) {
-    // Try to resolve CSS variable from body
-    if (typeof document !== "undefined") {
-      const varName = color.match(/var\(([^,)]+)/)?.[1]?.trim();
-      if (varName) {
-        const resolved = getComputedStyle(document.documentElement)
-          .getPropertyValue(varName)
-          .trim();
-        if (resolved) color = resolved;
-      }
-    }
-  }
-
-  if (color.startsWith("#")) {
-    const hex = color.slice(1);
-    const r = parseInt(hex.slice(0, 2), 16);
-    const g = parseInt(hex.slice(2, 4), 16);
-    const b = parseInt(hex.slice(4, 6), 16);
-    return `rgba(${r},${g},${b},${alpha})`;
-  }
-
-  if (color.startsWith("rgb")) {
-    return color.replace(/rgb(a?)\(([^)]+)\)/, (_, a, vals) => {
-      return a ? `rgba(${vals})` : `rgba(${vals},${alpha})`;
-    });
-  }
-
-  return color;
 }

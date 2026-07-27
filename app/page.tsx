@@ -1,4 +1,7 @@
+import { Suspense } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { formatDate } from "@/lib/utils";
@@ -7,8 +10,35 @@ import type { PortfolioAbout, PortfolioProject, BlogPost } from "@/types/databas
 import ThemeToggle from "@/components/theme-toggle";
 import AnimateOnScroll from "@/components/animate-on-scroll";
 import DecryptedText from "@/components/decrypted-text";
-import HeroCTA from "@/components/hero-cta";
 import ElectricBorder from "@/components/electric-border";
+
+// HeroCTA wraps SpecularButton which imports ogl (WebGL) — defer it
+// to remove a heavy JS bundle from the critical rendering path.
+const HeroCTA = dynamic(() => import("@/components/hero-cta"), {
+  loading: () => <div className="mt-8 h-12" />,
+});
+
+// ── Module-level helpers (hoisted out to avoid re-creating per render) ──
+const iconForCategory = (cat: string) => {
+  const lower = cat.toLowerCase();
+  if (lower.includes("front")) return Layout;
+  if (lower.includes("back")) return Server;
+  if (lower.includes("db") || lower.includes("data")) return Database;
+  if (lower.includes("style") || lower.includes("ui") || lower.includes("design")) return Palette;
+  if (lower.includes("build") || lower.includes("test") || lower.includes("tool")) return Rocket;
+  if (lower.includes("core")) return Code2;
+  return Globe;
+};
+
+const accentColors = [
+  "text-[#6366f1]",
+  "text-[#22c55e]",
+  "text-[#f59e0b]",
+  "text-[#06b6d4]",
+  "text-[#ec4899]",
+  "text-[#ef4444]",
+];
+const accentForIndex = (i: number) => accentColors[i % accentColors.length];
 
 export default async function HomePage({
   searchParams,
@@ -29,24 +59,12 @@ export default async function HomePage({
 
   const supabase = await createServerSupabaseClient();
 
+  // Fetch profile only — this is all the hero section needs.
+  // Projects & blog posts are streamed later via Suspense to reduce TTFB.
   const { data: profile } = await (supabase
     .from("portfolio_about")
     .select("*")
     .single() as unknown as Promise<{ data: PortfolioAbout | null; error: any }>);
-
-  const { data: projects } = await (supabase
-    .from("portfolio_projects")
-    .select("*")
-    .order("featured", { ascending: false })
-    .order("order", { ascending: true })
-    .limit(6) as unknown as Promise<{ data: PortfolioProject[] | null; error: any }>);
-
-  const { data: posts } = await (supabase
-    .from("blog_posts")
-    .select("*")
-    .eq("published", true)
-    .order("created_at", { ascending: false })
-    .limit(3) as unknown as Promise<{ data: BlogPost[] | null; error: any }>);
 
   const social = (profile?.social_links as Record<string, any> | null) ?? {};
   const educationEntries: string[] = (typeof social?.education === "string" ? social.education.split("\n\n").filter(Boolean) : []);
@@ -66,36 +84,12 @@ export default async function HomePage({
         },
       ];
 
-  const iconForCategory = (cat: string) => {
-    const lower = cat.toLowerCase();
-    if (lower.includes("front")) return Layout;
-    if (lower.includes("back")) return Server;
-    if (lower.includes("db") || lower.includes("data")) return Database;
-    if (lower.includes("style") || lower.includes("ui") || lower.includes("design")) return Palette;
-    if (lower.includes("build") || lower.includes("test") || lower.includes("tool")) return Rocket;
-    if (lower.includes("core")) return Code2;
-    return Globe;
-  };
-
-  const accentColors = [
-    "text-[#6366f1]", /* accent */
-    "text-[#22c55e]", /* success */
-    "text-[#f59e0b]", /* warning */
-    "text-[#06b6d4]", /* cyan */
-    "text-[#ec4899]", /* pink */
-    "text-[#ef4444]", /* error */
-  ];
-  const accentForIndex = (i: number) => accentColors[i % accentColors.length];
-
   return (
     <div className="min-h-screen" style={{ background: "var(--bg)", color: "var(--text)" }}>
       {/* ── Navigation ── */}
       <nav className="glass sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 text-text hover:text-accent transition-colors">
-            {profile?.avatar_url ? (
-              <img src={profile.avatar_url} alt="Logo" className="w-8 h-8 rounded-full object-cover" />
-            ) : null}
             <span className="font-semibold text-lg">{profile?.name || "Portfolio"}</span>
           </Link>
           <div className="flex items-center gap-1">
@@ -122,9 +116,12 @@ export default async function HomePage({
                 style={{ borderRadius: 9999 }}
               >
                 <div className="w-32 h-32 rounded-full p-0.5" style={{ background: "linear-gradient(135deg, var(--color-accent), rgba(99,102,241,0.3))" }}>
-                  <img
+                  <Image
                     src={profile.avatar_url}
                     alt={profile.name || "Avatar"}
+                    width={128}
+                    height={128}
+                    priority
                     className="w-full h-full rounded-full object-cover"
                     style={{ background: "var(--bg)" }}
                   />
@@ -183,6 +180,68 @@ export default async function HomePage({
         </div>
       </section>
 
+      {/* ── Below-fold: streamed via Suspense ──
+          Projects & blog posts are fetched in parallel inside
+          HomeBelowFold, so the hero section streams to the browser
+          immediately after the single profile query completes. */}
+      <Suspense fallback={<BelowFoldSkeleton />}>
+        <HomeBelowFold
+          profile={profile}
+          social={social}
+          educationEntries={educationEntries}
+          certEntries={certEntries}
+          experienceEntries={experienceEntries}
+          techStack={techStack}
+        />
+      </Suspense>
+    </div>
+  );
+}
+
+// ────────────────────────────────────────────────────────────────
+//  Below-fold content — streamed after the hero section
+// ────────────────────────────────────────────────────────────────
+
+type BelowFoldProps = {
+  profile: PortfolioAbout | null;
+  social: Record<string, any>;
+  educationEntries: string[];
+  certEntries: string[];
+  experienceEntries: string[];
+  techStack: { category: string; items: string[] }[];
+};
+
+async function HomeBelowFold({
+  profile,
+  social,
+  educationEntries,
+  certEntries,
+  experienceEntries,
+  techStack,
+}: BelowFoldProps) {
+  const supabase = await createServerSupabaseClient();
+
+  // Fetch projects and blog posts in parallel — no sequential wait
+  const [projectsResult, postsResult] = await Promise.all([
+    supabase
+      .from("portfolio_projects")
+      .select("*")
+      .order("featured", { ascending: false })
+      .order("order", { ascending: true })
+      .limit(6) as unknown as Promise<{ data: PortfolioProject[] | null; error: any }>,
+    supabase
+      .from("blog_posts")
+      .select("*")
+      .eq("published", true)
+      .order("created_at", { ascending: false })
+      .limit(3) as unknown as Promise<{ data: BlogPost[] | null; error: any }>,
+  ]);
+
+  const projects = projectsResult.data;
+  const posts = postsResult.data;
+
+  return (
+    <>
       {/* ── Tech Stack ── */}
       <section className="py-20" style={{ background: "var(--surface)" }}>
         <div className="max-w-5xl mx-auto px-4">
@@ -239,7 +298,6 @@ export default async function HomePage({
             </AnimateOnScroll>
             <AnimateOnScroll stagger={0.15} y={25} duration={0.5} triggerStart="top 80%">
             <div className="relative">
-              {/* Vertical line */}
               <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px md:-translate-x-px" style={{ background: "var(--border)" }} />
               <div className="space-y-8">
                 {educationEntries.map((entry, i) => {
@@ -249,9 +307,7 @@ export default async function HomePage({
                   const isLeft = i % 2 === 0;
                   return (
                     <div key={i} className={`relative flex items-start gap-6 ${isLeft ? "md:flex-row" : "md:flex-row-reverse"}`}>
-                      {/* Dot */}
                       <div className="absolute left-4 md:left-1/2 w-3 h-3 rounded-full -translate-x-1/2 mt-1.5 z-10" style={{ background: "var(--color-accent)", boxShadow: "0 0 8px var(--color-accent-glow)" }} />
-                      {/* Content */}
                       <div className={`ml-10 md:ml-0 md:w-1/2 ${isLeft ? "md:pr-8 md:text-right" : "md:pl-8"}`}>
                         <div className="card-noir !p-4">
                           <h3 className="font-semibold text-text text-base">{institution}</h3>
@@ -451,6 +507,32 @@ export default async function HomePage({
           &copy; {new Date().getFullYear()} {profile?.name || "Portfolio"}. All rights reserved.
         </p>
       </footer>
+    </>
+  );
+}
+
+/** Skeleton shown while the below-fold section streams in */
+function BelowFoldSkeleton() {
+  return (
+    <div className="animate-pulse space-y-20 py-20">
+      {/* Tech Stack skeleton */}
+      <div className="max-w-5xl mx-auto px-4">
+        <div className="h-8 w-48 bg-[var(--surface-hover)] rounded mx-auto mb-12" />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-40 rounded-xl bg-[var(--surface-hover)]" />
+          ))}
+        </div>
+      </div>
+      {/* Projects skeleton */}
+      <div className="max-w-5xl mx-auto px-4">
+        <div className="h-8 w-32 bg-[var(--surface-hover)] rounded mx-auto mb-12" />
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-56 rounded-xl bg-[var(--surface-hover)]" />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

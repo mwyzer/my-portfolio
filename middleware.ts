@@ -7,6 +7,13 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    /*
+     * Only run middleware on protected routes.
+     * This avoids the ~50-150ms Supabase getUser() call on public pages
+     * (homepage, blog, etc.) which was causing unnecessary latency.
+     */
+    "/dashboard/:path*",
+    "/api/agent/:path*",
+    "/api/settings/:path*",
   ],
 };

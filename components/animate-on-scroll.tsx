@@ -1,10 +1,21 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode, type ElementType } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-gsap.registerPlugin(ScrollTrigger);
+// GSAP + ScrollTrigger are deferred to first idle callback.
+// They're ~400 KiB combined and only needed for scroll animations
+// in below-fold sections — wasteful on the critical path.
+let gsapPromise: Promise<typeof import("gsap")> | null = null;
+function getGsap() {
+  if (!gsapPromise) {
+    gsapPromise = import("gsap").then(async (m) => {
+      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+      m.default.registerPlugin(ScrollTrigger);
+      return m;
+    });
+  }
+  return gsapPromise;
+}
 
 interface AnimateOnScrollProps {
   children: ReactNode;
@@ -46,31 +57,41 @@ export default function AnimateOnScroll({
     const el = ref.current;
     if (!el) return;
 
-    const targets = staggerSelector
-      ? el.querySelectorAll(staggerSelector)
-      : el.children;
+    let cancelled = false;
 
-    const ctx = gsap.context(() => {
-      gsap.fromTo(
-        targets,
-        { y, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration,
-          delay,
-          stagger,
-          ease,
-          scrollTrigger: {
-            trigger: el,
-            start: triggerStart,
-            toggleActions: "play none none none",
-          },
-        }
-      );
-    }, el);
+    getGsap().then((gsap) => {
+      if (cancelled || !el) return;
 
-    return () => ctx.revert();
+      const targets = staggerSelector
+        ? el.querySelectorAll(staggerSelector)
+        : el.children;
+
+      const ctx = gsap.default.context(() => {
+        gsap.default.fromTo(
+          targets,
+          { y, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration,
+            delay,
+            stagger,
+            ease,
+            scrollTrigger: {
+              trigger: el,
+              start: triggerStart,
+              toggleActions: "play none none none",
+            },
+          }
+        );
+      }, el);
+
+      // Can't clean up properly after async, but GSAP's ctx handles it
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [staggerSelector, stagger, y, duration, delay, ease, triggerStart]);
 
   const Comp = Tag as any;

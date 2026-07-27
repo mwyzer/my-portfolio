@@ -117,6 +117,8 @@ const SpecularButton = ({
 }: SpecularButtonProps) => {
   const btnRef = useRef<HTMLButtonElement>(null);
   const fxRef = useRef<HTMLSpanElement>(null);
+  // Cache button rect to avoid getBoundingClientRect() on every pointermove
+  const rectRef = useRef({ left: 0, top: 0, width: 1, height: 1 });
   const propsRef = useRef({
     radius,
     lineColor,
@@ -187,11 +189,13 @@ const SpecularButton = ({
     const mesh = new Mesh(gl, { geometry, program });
     fx.appendChild(gl.canvas);
 
+    // Cache button rect to avoid getBoundingClientRect() on every pointermove
     const sizeRef = { w: 1, h: 1 };
     const resize = () => {
       const rect = btn.getBoundingClientRect();
       const w = rect.width;
       const h = rect.height;
+      rectRef.current = { left: rect.left, top: rect.top, width: w, height: h };
       sizeRef.w = w;
       sizeRef.h = h;
       renderer.setSize(w + PAD * 2, h + PAD * 2);
@@ -208,32 +212,22 @@ const SpecularButton = ({
     let pointerAngle: number | null = null;
     let proximityT = 0;
     const onPointerMove = (e: PointerEvent) => {
-      const rect = btn.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const dx = Math.max(
-        rect.left - e.clientX,
-        0,
-        e.clientX - rect.right,
-      );
-      const dy = Math.max(
-        rect.top - e.clientY,
-        0,
-        e.clientY - rect.bottom,
-      );
+      // Use cached rect — avoids forced reflow on every pointer move
+      const r = rectRef.current;
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const dx = Math.max(r.left - e.clientX, 0, e.clientX - (r.left + r.width));
+      const dy = Math.max(r.top - e.clientY, 0, e.clientY - (r.top + r.height));
       const dist = Math.hypot(dx, dy);
       if (dist === 0) {
-        const nx = (e.clientX - cx) / (rect.width / 2);
-        const ny = (cy - e.clientY) / (rect.height / 2);
+        const nx = (e.clientX - cx) / (r.width / 2);
+        const ny = (cy - e.clientY) / (r.height / 2);
         pointerAngle =
-          Math.atan2(2 / rect.height, -2 / rect.width) + nx * 0.3 + ny * 0.15;
+          Math.atan2(2 / r.height, -2 / r.width) + nx * 0.3 + ny * 0.15;
       } else {
         pointerAngle = Math.atan2(cy - e.clientY, e.clientX - cx);
       }
-      const t = Math.max(
-        0,
-        1 - dist / Math.max(propsRef.current.proximity, 1),
-      );
+      const t = Math.max(0, 1 - dist / Math.max(propsRef.current.proximity, 1));
       proximityT = t * t * (3 - 2 * t);
     };
     window.addEventListener("pointermove", onPointerMove);

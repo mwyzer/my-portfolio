@@ -70,6 +70,51 @@ npm start
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ | Supabase anon/publishable key |
 | `SUPABASE_SERVICE_ROLE_KEY` | ✅ | Supabase service role key (server-side only) |
 
+## Documentation
+
+| Document | Description |
+|---|---|
+| [PRD.md](./docs/PRD.md) | Full product requirements document — goals, personas, functional spec, database schema, API routes, backlog |
+| [PORTFOLIO-VISUAL-REDESIGN.md](./docs/PORTFOLIO-VISUAL-REDESIGN.md) | Visual redesign specification with color tokens, typography, and component design |
+
+## Testing
+
+Test strategy, framework configs, and example suites for every layer of the testing pyramid.
+
+| Document | Scope |
+|---|---|
+| [Testing Overview](./docs/testing/README.md) | Strategy, tooling table, file conventions, CI pipeline |
+| [Unit Testing](./docs/testing/unit-testing.md) | Components, hooks, utilities — Vitest + React Testing Library + MSW |
+| [Integration Testing](./docs/testing/integration-testing.md) | API routes, Supabase queries, auth middleware |
+| [Smoke Testing](./docs/testing/smoke-testing.md) | Post-deploy health checks — 3-tier criticality, Playwright + HTTP scripts |
+| [E2E Testing](./docs/testing/e2e-testing.md) | Full browser flows — Playwright, visual regression, auth state |
+
+### Quick Start
+
+```bash
+# Install test dependencies
+npm install -D vitest @testing-library/react @testing-library/jest-dom @testing-library/user-event happy-dom msw playwright @playwright/test
+
+# Unit tests
+npx vitest run
+
+# Smoke tests (post-deploy)
+SMOKE_BASE_URL=https://wyzer.my.id npx playwright test --config=playwright.smoke.config.ts
+
+# E2E tests
+npx playwright test
+```
+
+## Changelog & Versioning
+
+| Document | Description |
+|---|---|
+| [CHANGELOG.md](./docs/CHANGELOG.md) | Structured release notes (Keep a Changelog format) — v1.3.0 through v0.x |
+| [VERSIONING.md](./docs/VERSIONING.md) | Semantic versioning rules, branch strategy, release checklist, commit conventions |
+| [GIT-LOG.md](./docs/GIT-LOG.md) | Chronological commit history with quick-reference commands |
+
+**Current version: v1.3.0** — Performance Optimization (2026-07-27)
+
 ## Deployment
 
 Pushes to `main` auto-deploy to Vercel at **[www.wyzer.my.id](https://www.wyzer.my.id)**.
