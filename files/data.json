@@ -1,0 +1,350 @@
+{
+  "personal_information": {
+    "name": "Muhammad Wyzer",
+    "gender": "Male",
+    "age": 41,
+    "place_of_birth": "Jakarta",
+    "date_of_birth": "1984-08-24",
+    "address": "RT 01/02 Kampung Legok Nyenang, Cibeuteung Muara Village, Ciseeng District, Bogor Regency, West Java 16330",
+    "email": "muhammad.wyzer@gmail.com",
+    "phone_whatsapp": "+62 822 1137 6074"
+  },
+  "professional_titles": [
+    "Backend Engineer",
+    "Full-Stack Developer",
+    "Programming Instructor",
+    "AI Automation Specialist"
+  ],
+  "professional_summary": "Backend Engineer and Full-Stack Developer with 5+ years of experience building web applications, REST APIs, database-driven systems, business automation solutions, and technology education programs. Skilled in Laravel, Tailwind CSS, MySQL, PostgreSQL, API integrations, technical support, troubleshooting, and system stability.",
+  "contact": {
+    "github": "https://github.com/mwyzer",
+    "gitlab": "https://gitlab.com/mwyzer",
+    "linkedin": "https://www.linkedin.com/in/muhammad-wyzer/",
+    "youtube": "https://www.youtube.com/@wyzer24",
+    "facebook": "https://www.facebook.com/muhammad.wyzer/",
+    "instagram": "https://www.instagram.com/muhammad.wyzer/"
+  },
+  "education": [
+    {
+      "institution": "Syarif Hidayatullah State Islamic University Jakarta",
+      "degree": "B.Sc. in Informatics Engineering",
+      "start_year": 2002,
+      "end_year": 2011
+    },
+    {
+      "institution": "Al-Mukhlishin Islamic Senior High School, Bogor",
+      "start_year": 1999,
+      "end_year": 2002
+    },
+    {
+      "institution": "Al-Mukhlishin Islamic Junior High School, Bogor",
+      "start_year": 1996,
+      "end_year": 1999
+    },
+    {
+      "institution": "Madrasah Ibtidaiyah Darunnajah, South Jakarta",
+      "start_year": 1990,
+      "end_year": 1996
+    }
+  ],
+  "certifications_and_training": [
+    {
+      "year": 2025,
+      "name": "Training of Trainer Mata Pelajaran Koding dan Kecerdasan Artifisial",
+      "organization": "KEMENDIKNAS Indonesia"
+    },
+    {
+      "year": 2007,
+      "name": "Internship",
+      "organization": "PT. Krakatau Steel, Cilegon, Banten"
+    }
+  ],
+  "work_experience": [
+    {
+      "position": "Mentor",
+      "company": "Universitas Tujuh Belas Agustus 1945 Jakarta",
+      "start": "2025-09",
+      "end": "Present",
+      "responsibilities": [
+        "Provided mentoring in Programming Fundamentals and Productivity Tools",
+        "Teach programming, informatics, and computational thinking",
+        "Develop learning materials and practical assignments",
+        "Mentor students in software development projects"
+      ]
+    },
+    {
+      "position": "Mentor",
+      "company": "Ganesha Operation",
+      "start": "2025-12",
+      "end": "Present",
+      "responsibilities": [
+        "Provided mentoring in Informatics and Computational Thinking"
+      ]
+    },
+    {
+      "position": "Facilitator",
+      "company": "PT. Anagata Sisedu Nusantara",
+      "start": "2025-05",
+      "end": "Present",
+      "responsibilities": [
+        "Delivered instruction aligned with the national curriculum on coding and artificial intelligence",
+        "Guided students in logical thinking, problem-solving, and digital literacy skills"
+      ]
+    },
+    {
+      "position": "Full Stack Developer",
+      "company": "PT. Pasifik Wija Teknologi",
+      "location": "North Kalimantan",
+      "start": "2024-08",
+      "end": "2025-02",
+      "projects": [
+        {
+          "name": "Company Profile Website",
+          "technology_stack": [
+            "Laravel 10",
+            "Tailwind CSS",
+            "MySQL"
+          ],
+          "tools": [
+            "Postman",
+            "Laragon",
+            "TablePlus"
+          ]
+        },
+        {
+          "name": "Internet Voucher Sales and Customer Management System",
+          "technology_stack": [
+            "Laravel 10",
+            "MySQL",
+            "Laravel Filament"
+          ],
+          "tools": [
+            "dbdiagram.io",
+            "Postman",
+            "Laragon",
+            "TablePlus"
+          ]
+        }
+      ]
+    },
+    {
+      "position": "Technical Support",
+      "company": "PT. Taman Kreasi Indonesia",
+      "location": "Semarang",
+      "start": "2023-08",
+      "end": "2024-07",
+      "responsibilities": [
+        "Checked incoming cargo logs in the database",
+        "Ensured stable network and database performance",
+        "Developed additional required modules",
+        "Created an employee monitoring project with KPI charts"
+      ],
+      "technology_stacks": [
+        [
+          "Laravel 5.5",
+          "MySQL",
+          "CRUDBooster",
+          "jQuery"
+        ],
+        [
+          "Laravel 8",
+          "PostgreSQL",
+          "jQuery"
+        ]
+      ],
+      "tools": [
+        "Postman",
+        "Laragon",
+        "TablePlus"
+      ]
+    },
+    {
+      "position": "Software Developer",
+      "company": "PT. Tutoria Sentra Edukasi",
+      "location": "East Jakarta",
+      "start": "2022-08-01",
+      "end": "2022-11-30",
+      "responsibilities": [
+        "Developed online tutoring learning modules",
+        "Assisted office IT operations",
+        "Integrated Moodle API with Laravel",
+        "Designed and implemented a web platform connecting courses, tutors, and students",
+        "Performed troubleshooting for networks, computers, and other devices"
+      ],
+      "technology_stack": [
+        "Laravel 7",
+        "MySQL",
+        "jQuery",
+        "Moodle"
+      ],
+      "software": [
+        "Articulate Storyline 3"
+      ],
+      "tools": [
+        "Postman",
+        "Laragon",
+        "HeidiSQL"
+      ]
+    }
+  ],
+  "skills": {
+    "backend": [
+      "Laravel",
+      "PHP",
+      "REST API",
+      "API Integration"
+    ],
+    "frontend": [
+      "React",
+      "Next.js",
+      "Tailwind CSS",
+      "jQuery"
+    ],
+    "database": [
+      "MySQL",
+      "PostgreSQL"
+    ],
+    "ai_and_automation": [
+      "Artificial Intelligence",
+      "AI Automation"
+    ],
+    "other": [
+      "Technical Support",
+      "Network Troubleshooting",
+      "Database Management",
+      "Programming Education",
+      "Computational Thinking"
+    ]
+  },
+  "portfolio_projects": [
+    {
+      "name": "Bread Forecast — Sistem Estimasi Dropping Roti Otomatis",
+      "problem": "Manual bread dropping estimation using Excel was prone to calculation errors, slow, and made return risk difficult to monitor.",
+      "solution": "Web application for uploading D9017F files, processing sales estimation data, calculating return rates, classifying risk, calculating recommended quantities, and exporting detailed and weekly estimates.",
+      "features": [
+        "Upload Excel D9017F",
+        "Automatic validation of thousands of data rows",
+        "Filter by Dropping Day, Week Invoice, and Invoice Day",
+        "Forecast summary dashboard",
+        "Risk classification: Low, Medium, High",
+        "Complete forecast table",
+        "Export Detail Estimasi",
+        "Export Weekly Estimasi",
+        "Configurable threshold and multiplier formula"
+      ],
+      "metrics": {
+        "total_outlets": 105,
+        "total_products": 46,
+        "total_recommended_quantity": 1883,
+        "forecast_results": 1113,
+        "validated_rows": 21763,
+        "low_risk": 692,
+        "medium_risk": 4,
+        "high_risk": 417
+      },
+      "technology_stack": [
+        "Next.js",
+        "React",
+        "TypeScript",
+        "Tailwind CSS",
+        "XLSX Parser",
+        "Chart Components",
+        "Client-side Processing",
+        "Excel Export"
+      ]
+    },
+    {
+      "name": "PropertyHub — Platform Multi-Tenant Listing Properti",
+      "type": "Multi-Tenant Property Listing Platform",
+      "description": "Web-based multi-tenant platform for managing property listings across property agencies, banks, and asset-owning companies.",
+      "target_users": [
+        "Platform Admin",
+        "Tenant Admin",
+        "Salesman",
+        "Buyer"
+      ],
+      "features": [
+        "Role-Based Access Control",
+        "Admin Dashboard",
+        "Tenant Management",
+        "Property Listing Management",
+        "Listing Review and Approval",
+        "Audit Logs",
+        "Profile Management",
+        "Upgrade Request Management"
+      ],
+      "workflow": {
+        "listing_review": [
+          "Salesman creates listing",
+          "Listing enters Draft status",
+          "Salesman submits listing",
+          "Listing enters Pending Review",
+          "Platform Admin reviews listing",
+          "Valid listing becomes Approved",
+          "Invalid listing becomes Rejected"
+        ],
+        "tenant_management": [
+          "Platform Admin creates tenant",
+          "Tenant Admin is created",
+          "Tenant Admin manages salesmen",
+          "Salesman creates property listings",
+          "Platform Admin monitors tenant activity"
+        ],
+        "audit_log": [
+          "User performs an action",
+          "System stores the activity",
+          "Audit log records action, target, user, role, and timestamp"
+        ]
+      },
+      "business_value": [
+        "Property listing marketplace",
+        "Internal property agency dashboard",
+        "Bank asset management system",
+        "Corporate asset listing system",
+        "Multi-tenant property SaaS platform",
+        "Property listing verification system"
+      ],
+      "technology_context": [
+        "Vite development server"
+      ]
+    }
+  ],
+  "community_and_leadership": [
+    {
+      "role": "Facilitator – Coding & Artificial Intelligence (AI)",
+      "location": "Lokus Sukabumi",
+      "year": 2025
+    },
+    {
+      "role": "YouTube Creator",
+      "channel": "@wyzer24"
+    }
+  ],
+  "cover_letter": {
+    "target_position": "Full Stack Developer / Software Engineer",
+    "key_points": [
+      "Strong background in web application development, technical support, and IT education",
+      "Experience with Laravel, Tailwind CSS, MySQL, PostgreSQL, and API integrations",
+      "Built a company profile website and an internet voucher sales and customer management system",
+      "Experience maintaining network and database stability",
+      "Developed an employee monitoring system with KPI dashboards",
+      "Active involvement in programming, informatics, and artificial intelligence education",
+      "Participated in Training of Trainers programs for Coding and Artificial Intelligence",
+      "Strong communication, adaptability, problem-solving, and continuous learning"
+    ],
+    "closing": "Interested in contributing technical skills and experience to an organization's technical goals."
+  },
+  "portfolio_metadata": {
+    "document_type": "Professional Portfolio",
+    "featured_projects": [
+      "Bread Forecast — Sistem Estimasi Dropping Roti Otomatis",
+      "PropertyHub — Platform Multi-Tenant Listing Properti"
+    ]
+  },
+  "source_documents": [
+    "Cover Letter - Muhammad Wyzer.pdf",
+    "CV Muhammad Wyzer English.pdf",
+    "Muhammad_Wyzer_CV_ATS_v2(2).pdf",
+    "PORTFOLIO-MUHAMMAD WYZER.pdf"
+  ]
+}
