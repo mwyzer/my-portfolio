@@ -40,5 +40,6 @@ next-env.d.ts
 scripts/seed-profile.mjs
 
 # personal data files (CV, portfolio, reference docs)
-/files
+/files/*
+!/files/data.json
 .vercel
