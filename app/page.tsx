@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { formatDate } from "@/lib/utils";
 import { ArrowRight, ExternalLink, Github, Linkedin, Gitlab, Mail, Phone, Code2, Database, Palette, Rocket, Layout, Server, Globe } from "lucide-react";
@@ -9,7 +10,23 @@ import DecryptedText from "@/components/decrypted-text";
 import HeroCTA from "@/components/hero-cta";
 import ElectricBorder from "@/components/electric-border";
 
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const params = await searchParams;
+
+  // Redirect magic link / OTP auth params to the auth callback
+  if (params.code || params.token_hash) {
+    const qs = new URLSearchParams();
+    if (params.code) qs.set("code", params.code as string);
+    if (params.token_hash) qs.set("token_hash", params.token_hash as string);
+    if (params.type) qs.set("type", params.type as string);
+    if (params.next) qs.set("next", params.next as string);
+    redirect(`/auth/callback?${qs.toString()}`);
+  }
+
   const supabase = await createServerSupabaseClient();
 
   const { data: profile } = await (supabase
