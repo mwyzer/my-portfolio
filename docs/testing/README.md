@@ -24,6 +24,7 @@ This directory contains the testing documentation and standards for the **My Por
 | [Integration Testing](./integration-testing.md) | API routes, Supabase queries, auth middleware |
 | [Smoke Testing](./smoke-testing.md) | Post-deploy health checks, critical path verification |
 | [E2E Testing](./e2e-testing.md) | Full browser flows with Playwright |
+| [Test Error Log](./test-log.md) | Auto-updated run history with error details & fixes |
 
 ---
 

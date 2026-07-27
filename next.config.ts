@@ -10,7 +10,30 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "**.supabase.co",
       },
+      {
+        protocol: "https",
+        hostname: "gitlab.com",
+      },
+      {
+        protocol: "https",
+        hostname: "**.githubusercontent.com",
+      },
     ],
+  },
+
+  // Security headers applied to all routes
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-XSS-Protection", value: "1; mode=block" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        ],
+      },
+    ];
   },
 
   // Tree-shake icon libraries — lucide-react is in Next.js's built-in

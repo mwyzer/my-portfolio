@@ -55,7 +55,7 @@ test.describe("Important smoke tests", () => {
 
 test.describe("Nice-to-have smoke tests", () => {
   test("favicon is served", async ({ request }) => {
-    const res = await request.get("/favicon.ico");
+    const res = await request.get("/icon.svg");
     expect([200, 304]).toContain(res.status());
   });
 
