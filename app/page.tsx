@@ -10,7 +10,7 @@ import type { PortfolioAbout, PortfolioProject, BlogPost } from "@/types/databas
 import ThemeToggle from "@/components/theme-toggle";
 import AnimateOnScroll from "@/components/animate-on-scroll";
 import DecryptedText from "@/components/decrypted-text";
-import ElectricBorder from "@/components/electric-border";
+import ElectricBorderDeferred from "@/components/deferred/electric-border-deferred";
 
 // HeroCTA wraps SpecularButton which imports ogl (WebGL) — defer it
 // to remove a heavy JS bundle from the critical rendering path.
@@ -108,12 +108,11 @@ export default async function HomePage({
         <div className="max-w-2xl mx-auto px-4 text-center">
           {profile?.avatar_url && (
             <div className="mb-8 inline-block" style={{ overflow: "visible" }}>
-              <ElectricBorder
+              <ElectricBorderDeferred
                 color="#6366f1"
                 speed={0.8}
                 chaos={0.15}
                 borderRadius={9999}
-                style={{ borderRadius: 9999 }}
               >
                 <div className="w-32 h-32 rounded-full p-0.5" style={{ background: "linear-gradient(135deg, var(--color-accent), rgba(99,102,241,0.3))" }}>
                   <Image
@@ -126,7 +125,7 @@ export default async function HomePage({
                     style={{ background: "var(--bg)" }}
                   />
                 </div>
-              </ElectricBorder>
+              </ElectricBorderDeferred>
             </div>
           )}
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-text mb-4">
@@ -410,7 +409,7 @@ async function HomeBelowFold({
           <AnimateOnScroll stagger={0.08} y={30} duration={0.5} staggerSelector=".card-noir">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {/* Static: LMS Mahasiswa */}
-            <ElectricBorder
+            <ElectricBorderDeferred
               color="#6366f1"
               speed={0.6}
               chaos={0.12}
@@ -438,7 +437,7 @@ async function HomeBelowFold({
                 </a>
               </div>
             </div>
-            </ElectricBorder>
+            </ElectricBorderDeferred>
             {/* Dynamic: Supabase projects */}
             {projects?.map((project) => (
               <div key={project.id} className="card-noir flex flex-col">

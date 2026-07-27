@@ -9,7 +9,10 @@ export default function ThemeToggle() {
 
   useEffect(() => {
     setMounted(true);
-    setLight(document.documentElement.classList.contains("light"));
+    const isLight = document.documentElement.classList.contains("light");
+    setLight(isLight);
+    // Sync cookie in case it was set by localStorage but cookie expired
+    document.cookie = `theme=${isLight ? "light" : "dark"}; path=/; max-age=31536000; SameSite=Lax`;
   }, []);
 
   const toggle = () => {
@@ -17,6 +20,7 @@ export default function ThemeToggle() {
     setLight(next);
     document.documentElement.classList.toggle("light", next);
     localStorage.setItem("theme", next ? "light" : "dark");
+    document.cookie = `theme=${next ? "light" : "dark"}; path=/; max-age=31536000; SameSite=Lax`;
   };
 
   if (!mounted) {
