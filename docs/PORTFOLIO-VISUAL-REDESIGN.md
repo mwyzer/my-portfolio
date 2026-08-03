@@ -745,77 +745,77 @@ Mobile should feel intentionally designed, not like a reduced desktop version.
 
 ## Phase 1 — Visual Foundation
 
-- [ ] Remove DaisyUI; port components to raw Tailwind + Radix
-- [ ] Define Noir color tokens (CSS custom properties)
-- [ ] Define typography (display, body, mono)
-- [ ] Redesign navigation (sticky, glassmorphism, Noir) — see Section 5
-- [ ] Redesign buttons (magnetic, accent, outline variants)
-- [ ] Redesign cards (dark surface, border glow, hover tilt)
-- [ ] Improve spacing system
-- [ ] Improve responsive layouts
+- [x] Remove DaisyUI; port components to raw Tailwind + Radix
+- [x] Define Noir color tokens (CSS custom properties)
+- [ ] Define typography (display, body, mono) — still on `system-ui` stack; no Space Grotesk/Sora/Geist or mono font loaded
+- [x] Redesign navigation (sticky, glassmorphism, Noir) — see Section 5
+- [x] Redesign buttons (magnetic, accent, outline variants) — `btn-noir` primary/ghost variants + `SpecularButton` (mouse-follow) for the CTA
+- [ ] Redesign cards (dark surface, border glow, hover tilt) — `card-noir` has dark surface + border-color hover only; no glow/tilt on standard cards
+- [x] Improve spacing system
+- [x] Improve responsive layouts
 
 ## Phase 2 — Hero Experience
 
-- [ ] Redesign hero with Noir visual direction
-- [ ] Add typography reveal animation (Motion)
-- [ ] Add parallax / mouse-follow effect
-- [ ] Add initial 3D Wyzer Orb (React Three Fiber, lazy-loaded)
-- [ ] Add CTA interactions (magnetic buttons, hover glow)
-- [ ] Add "Ask my AI" teaser linking to chat widget
+- [x] Redesign hero with Noir visual direction
+- [x] Add typography reveal animation — implemented via custom `DecryptedText` component rather than the Motion library
+- [x] Add parallax / mouse-follow effect — `SplashCursor` (WebGL fluid cursor) + `SpecularButton` mouse-follow
+- [ ] Add initial 3D Wyzer Orb (React Three Fiber, lazy-loaded) — not started; no R3F/Three.js in the project (only `ogl` for cursor/border effects)
+- [x] Add CTA interactions (magnetic buttons, hover glow) — `SpecularButton` + `ElectricBorder` on the avatar
+- [ ] Add "Ask my AI" teaser linking to chat widget — chat widget exists as a floating bubble, but no explicit hero teaser copy
 
 ## Phase 3 — About & Capabilities
 
-- [ ] Redesign "Who I Am" section as interactive profile (Section 5.2)
-- [ ] Redesign "What I Build" as capability cards (Section 5.3)
-- [ ] Add section entrance reveals
-- [ ] Add hover micro-interactions on capability cards
-- [ ] Data-like text masking animations
+- [ ] Redesign "Who I Am" section as interactive profile (Section 5.2) — no dedicated structured profile block yet
+- [ ] Redesign "What I Build" as capability cards (Section 5.3) — current Tech Stack section groups by data-driven categories (Frontend/Backend), not the AI/Full Stack/Infra/Systems capability framing from spec
+- [x] Add section entrance reveals — `AnimateOnScroll` (GSAP ScrollTrigger) used across Tech Stack, Education, Certifications, Experience, Projects, Blog
+- [x] Add hover micro-interactions on capability cards — `card-noir` hover border-color change
+- [ ] Data-like text masking animations — only the hero name uses a reveal effect (`DecryptedText`)
 
 ## Phase 4 — Motion System
 
-- [ ] Add Motion animations to all sections
-- [ ] Add GSAP ScrollTrigger for complex timelines (hero, timeline)
+- [x] Add Motion animations to all sections — implemented via GSAP (`AnimateOnScroll`) rather than the Motion/Framer Motion library
+- [x] Add GSAP ScrollTrigger for complex timelines (hero, timeline) — used for staggered section/timeline reveals
 - [ ] Add page transitions
-- [ ] Add magnetic buttons
-- [ ] Add custom cursor (desktop only, respects `prefers-reduced-motion`)
+- [x] Add magnetic buttons — `SpecularButton` (`followMouse`, `proximity`)
+- [ ] Add custom cursor (desktop only, respects `prefers-reduced-motion`) — `SplashCursor` exists but doesn't gate on touch devices or `prefers-reduced-motion`
 
 ## Phase 5 — Project Showcase
 
-- [ ] Redesign project cards as case-study cards (Section 6)
+- [ ] Redesign project cards as case-study cards (Section 6) — cards show title/description/tech badges/links, not the numbered case-study format
 - [ ] Add 3D card tilt on hover
-- [ ] Add cursor-following glow
+- [ ] Add cursor-following glow — `ElectricBorder` gives a static animated glow, not cursor-following
 - [ ] Add project-specific visual metaphors
 - [ ] Add case-study detail layout
 - [ ] Add horizontal scroll storytelling (GSAP)
 
 ## Phase 6 — Tech Constellation
 
-- [ ] Create interactive technology graph (Section 7)
+- [ ] Create interactive technology graph (Section 7) — current Tech Stack is a static card grid, not a constellation graph
 - [ ] Add relationship highlighting on hover
 - [ ] Add contextual technology panels
 - [ ] Add connection line animations
 
 ## Phase 7 — Experience Timeline & Blog
 
-- [ ] Redesign experience timeline (Section 8)
-- [ ] Add scroll-driven timeline progression (GSAP ScrollTrigger)
-- [ ] Redesign blog cards as editorial cards (Section 9)
+- [x] Redesign experience timeline (Section 8) — vertical alternating timeline with dot markers for Education/Certifications/Experience
+- [ ] Add scroll-driven timeline progression (GSAP ScrollTrigger) — entrance reveal is scroll-triggered, but no growing line / active-item progression
+- [ ] Redesign blog cards as editorial cards (Section 9) — current cards are simple `card-noir` (title, date, excerpt), not the large-typography editorial format
 - [ ] Add blog hover interactions (image movement, magnetic CTA)
-- [ ] Ensure existing blog CRUD functionality is preserved
+- [x] Ensure existing blog CRUD functionality is preserved — `app/dashboard/blog/page.tsx` intact
 
 ## Phase 8 — Contact & Chat Integration
 
-- [ ] Redesign contact section as minimal final CTA (Section 10)
-- [ ] Integrate Wyzer Orb ending animation (contracts to point)
-- [ ] Restyle ChatWidget to Noir design system
-- [ ] Expand chat system prompt with portfolio context
+- [ ] Redesign contact section as minimal final CTA (Section 10) — contact links currently live in the hero, no dedicated closing CTA section
+- [ ] Integrate Wyzer Orb ending animation (contracts to point) — no Wyzer Orb exists yet
+- [x] Restyle ChatWidget to Noir design system
+- [x] Expand chat system prompt with portfolio context — `buildProfileContext()` reads `files/data.json` + live blog posts into the system prompt
 - [ ] Test chat streaming with new styling
 
 ## Phase 9 — Performance & QA
 
 - [ ] Lighthouse optimization (target ≥ 90)
 - [ ] Bundle size audit (target < 150 KB initial JS gzip)
-- [ ] Code-splitting verification (R3F, GSAP lazy-loaded)
+- [x] Code-splitting verification (R3F, GSAP lazy-loaded) — `SplashCursor`, `ChatWidget`, `ElectricBorder` use `next/dynamic` with `ssr: false`; GSAP is dynamically imported in `AnimateOnScroll`; `HeroCTA` (ogl-based) is deferred too. No R3F in use.
 - [ ] WebGL performance testing (low-end device)
 - [ ] Mobile testing (simplified 3D, no custom cursor)
 - [ ] Reduced-motion testing

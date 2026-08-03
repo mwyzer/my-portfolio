@@ -15,6 +15,7 @@ Personal portfolio website for **Muhammad Wyzer**, built with modern web technol
 | **Forms** | [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) validation |
 | **Primitives** | [Radix UI](https://www.radix-ui.com/) (dialog, dropdown, tabs, toast, select, label, slot) |
 | **Auth / DB** | [Supabase](https://supabase.com/) (Postgres + Auth + SSR helpers) |
+| **AI Chat** | [Vercel AI SDK](https://sdk.vercel.ai/) + [DeepSeek](https://www.deepseek.com/) (`deepseek-v4-flash`) — streaming chat assistant |
 | **Hosting** | [Vercel](https://vercel.com/) (custom domain `wyzer.my.id`) |
 | **Package Manager** | npm |
 
@@ -25,6 +26,7 @@ Personal portfolio website for **Muhammad Wyzer**, built with modern web technol
 - **Dark/light mode toggle** via `data-theme` attribute with `localStorage` persistence
 - **Fully responsive** — mobile-first layout with DaisyUI breakpoints
 - **No flash of unstyled content** — inline theme script before hydration
+- **AI chat widget** (`components/chat/chat-widget.tsx`) — "Wyzer's AI Secretary" answers visitor questions about background, skills, projects, and blog posts, grounded in `files/data.json` + live Supabase blog data (`/api/agent/chat`), streamed via DeepSeek
 
 ## Pages
 
@@ -50,8 +52,8 @@ cd my-portfolio
 npm install
 
 # Set up environment
-cp .env.example .env.local
-# Fill in your Supabase keys
+touch .env.local
+# Fill in the variables listed below
 
 # Dev server
 npm run dev
@@ -69,6 +71,8 @@ npm start
 | `NEXT_PUBLIC_SUPABASE_URL` | ✅ | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ | Supabase anon/publishable key |
 | `SUPABASE_SERVICE_ROLE_KEY` | ✅ | Supabase service role key (server-side only) |
+| `DEEPSEEK_API_KEY` | ✅ | DeepSeek API key for the AI chat widget (`/api/agent/chat`) |
+| `NEXT_PUBLIC_SITE_URL` | ✅ | Public site URL, used for auth redirects |
 
 ## Documentation
 
