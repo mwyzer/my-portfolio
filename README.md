@@ -9,8 +9,8 @@ Personal portfolio website for **Muhammad Wyzer**, built with modern web technol
 | **Framework** | [Next.js 15](https://nextjs.org/) (App Router) |
 | **Language** | [TypeScript](https://www.typescriptlang.org/) (strict mode) |
 | **UI Library** | [React 19](https://react.dev/) |
-| **CSS Framework** | [Tailwind CSS v4](https://tailwindcss.com/) |
-| **Component Library** | [DaisyUI v5](https://daisyui.com/) — semantic components & theme system |
+| **CSS Framework** | [Tailwind CSS v4](https://tailwindcss.com/) — CSS-first config, no `tailwind.config.js` |
+| **Component Library** | Custom `shadcn/ui`-style components (`components/ui/`) on [Radix UI](https://www.radix-ui.com/) primitives |
 | **Icons** | [Lucide React](https://lucide.dev/) |
 | **Forms** | [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/) validation |
 | **Primitives** | [Radix UI](https://www.radix-ui.com/) (dialog, dropdown, tabs, toast, select, label, slot) |
@@ -21,12 +21,22 @@ Personal portfolio website for **Muhammad Wyzer**, built with modern web technol
 
 ## UI & Design
 
-- **DaisyUI** components: `navbar`, `hero`, `card`, `badge`, `btn`, `timeline`, `footer`, `input`, `alert`, `loading`
-- **Custom DaisyUI theme** — `"portfolio"` with oklch color tokens
-- **Dark/light mode toggle** via `data-theme` attribute with `localStorage` persistence
-- **Fully responsive** — mobile-first layout with DaisyUI breakpoints
-- **No flash of unstyled content** — inline theme script before hydration
 - **AI chat widget** (`components/chat/chat-widget.tsx`) — "Wyzer's AI Secretary" answers visitor questions about background, skills, projects, and blog posts, grounded in `files/data.json` + live Supabase blog data (`/api/agent/chat`), streamed via DeepSeek
+- **Fully responsive** — mobile-first layout with Tailwind breakpoints
+- **No flash of unstyled content** — inline theme script before hydration
+
+### CSS / Styling
+
+This project does **not** use a component library like DaisyUI — styling is Tailwind CSS v4 plus a small hand-rolled design system.
+
+| Piece | Where | What it does |
+| --- | --- | --- |
+| **Tailwind CSS v4** | `postcss.config.mjs` (`@tailwindcss/postcss` plugin), `app/globals.css` (`@import "tailwindcss"`) | Utility classes everywhere. v4 is config-in-CSS — there's no `tailwind.config.js`; theme tokens are declared with `@theme { ... }` blocks directly in `globals.css`. |
+| **"Noir" design system** | `app/globals.css` | Hand-written CSS custom properties (`--bg`, `--surface`, `--border`, `--text`, …) define the dark palette on `:root` and a light override under `html.light`. These are re-exposed as Tailwind tokens via a second `@theme { --color-bg: var(--bg); ... }` block, so they're usable as Tailwind classes (`bg-bg`, `text-text-muted`) *and* as raw CSS vars (`style={{ background: "var(--surface)" }}`) — both patterns are used throughout the app. |
+| **Custom utility classes** | `app/globals.css` | Reusable component classes with a `-noir` suffix: `.btn-noir` / `.btn-noir-primary` / `.btn-noir-ghost`, `.card-noir`, `.badge-noir`, plus `.glass` (backdrop blur nav), `.glow` / `.glow-sm` (accent box-shadow), and `.prose` (blog post typography). These are the project's equivalent of a component library, written by hand instead of pulled from DaisyUI/Bootstrap. |
+| **shadcn/ui-style components** | `components/ui/*.tsx` (`button`, `card`, `input`, `label`, `textarea`, `toast`) | Built on [Radix UI](https://www.radix-ui.com/) primitives, variants defined with [`class-variance-authority`](https://cva.style/), classes merged with the `cn()` helper (`lib/utils.ts`) which combines `clsx` + `tailwind-merge`. Used mainly in `/dashboard`; the public site favors the `-noir` utility classes instead. |
+| **Electric border effect** | `components/electric-border.tsx`, `.electric-border` / `.eb-*` classes in `globals.css` | Canvas-animated glow border (project cards, hero CTA) — styling markup lives in `globals.css`, the animation itself is JS driving a `<canvas>`. |
+| **Dark/light theme toggle** | `components/theme-toggle.tsx`, `app/layout.tsx` | Toggled by adding/removing a **`light` class on `<html>`** (not a `data-theme` attribute) — `html.light { ... }` in `globals.css` overrides the custom properties. Persisted to both a `theme` cookie (read server-side in `layout.tsx` so the correct class is set before first paint) and `localStorage` (so a same-browser, different-cookie visit still gets it right) — that's what prevents a flash of the wrong theme. |
 
 ## Pages
 

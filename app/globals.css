@@ -227,6 +227,7 @@ html.light .glass {
 /* ── Electric Border ── */
 .electric-border {
   position: relative;
+  height: 100%;
   border-radius: inherit;
   overflow: visible;
   isolation: isolate;
@@ -247,6 +248,7 @@ html.light .glass {
 
 .eb-content {
   position: relative;
+  height: 100%;
   border-radius: inherit;
   z-index: 1;
 }

@@ -40,6 +40,14 @@ const accentColors = [
 ];
 const accentForIndex = (i: number) => accentColors[i % accentColors.length];
 
+// The "LMS Mahasiswa" project card below is hardcoded (not dashboard-managed).
+// Guard against it rendering twice if the same project ever also gets added
+// to portfolio_projects in Supabase.
+const STATIC_PROJECT_TITLE = "lms mahasiswa";
+
+// Shared glow-border color so every project card (static + dynamic) matches.
+const PROJECT_GLOW_COLOR = "#6366f1";
+
 export default async function HomePage({
   searchParams,
 }: {
@@ -403,68 +411,69 @@ async function HomeBelowFold({
       {/* ── Projects ── */}
       <section id="projects" className="py-20" style={{ background: "var(--surface)" }}>
         <div className="max-w-5xl mx-auto px-4">
-          <AnimateOnScroll y={20} duration={0.6}>
-            <h2 className="text-3xl font-bold text-center text-text mb-12">Projects</h2>
+          <AnimateOnScroll y={15} duration={0.5}>
+            <div className="flex items-center justify-between mb-12">
+              <h2 className="text-3xl font-bold text-text">Projects</h2>
+              <Link href="/projects" className="btn-noir btn-noir-ghost btn-noir-sm">
+                View all <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
           </AnimateOnScroll>
           <AnimateOnScroll stagger={0.08} y={30} duration={0.5} staggerSelector=".card-noir">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {/* Static: LMS Mahasiswa */}
-            <ElectricBorderDeferred
-              color="#6366f1"
-              speed={0.6}
-              chaos={0.12}
-              borderRadius={12}
-            >
-              <div className="card-noir flex flex-col" style={{ borderColor: "transparent" }}>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xl">📚</span>
-                <h3 className="font-semibold text-text text-lg">LMS Mahasiswa</h3>
+            {/* Static: LMS Mahasiswa — kept out of Supabase, so filter it out of the
+                dynamic list below by title to avoid rendering it twice. Every card
+                in this grid (static + dynamic) shares the same glow-border treatment. */}
+            <ElectricBorderDeferred color={PROJECT_GLOW_COLOR} speed={0.6} chaos={0.12} borderRadius={12}>
+              <div className="card-noir flex flex-col h-full" style={{ borderColor: "transparent" }}>
+                <h3 className="font-semibold text-text text-lg mb-2">LMS Mahasiswa</h3>
+                <p className="text-sm text-text-muted mb-4 flex-1">
+                  Full-stack Learning Management System — multi-role (student, instructor, admin), attendance, assignments, quizzes, AI chat assistant, Python playground &amp; PWA support.
+                </p>
+                <div className="flex flex-wrap gap-1.5 mb-4">
+                  {["Nuxt 4","Vue 3","TypeScript","Pinia","Supabase","Nitro","Vite","Vuestic UI","PWA","Vitest","Playwright"].map(t => (
+                    <span key={t} className="badge-noir">{t}</span>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <a href="https://nuxt-lms-mahasiswa.vercel.app" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                    <ExternalLink className="h-4 w-4" /> Live
+                  </a>
+                  <a href="https://github.com/mwyzer/vue-lms-mahasiswa" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                    <Github className="h-4 w-4" /> Code
+                  </a>
+                </div>
               </div>
-              <p className="text-sm text-text-muted mb-4 flex-1">
-                Full-stack Learning Management System — multi-role (student, instructor, admin), attendance, assignments, quizzes, AI chat assistant, Python playground &amp; PWA support.
-              </p>
-              <div className="flex flex-wrap gap-1.5 mb-4">
-                {["Nuxt 4","Vue 3","TypeScript","Pinia","Supabase","Nitro","Vite","Vuestic UI","PWA","Vitest","Playwright"].map(t => (
-                  <span key={t} className="badge-noir">{t}</span>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <a href="https://nuxt-lms-mahasiswa.vercel.app" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-                  <ExternalLink className="h-4 w-4" /> Live
-                </a>
-                <a href="https://github.com/mwyzer/vue-lms-mahasiswa" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-                  <Github className="h-4 w-4" /> Code
-                </a>
-              </div>
-            </div>
             </ElectricBorderDeferred>
             {/* Dynamic: Supabase projects */}
-            {projects?.map((project) => (
-              <div key={project.id} className="card-noir flex flex-col">
-                <h3 className="font-semibold text-text text-lg mb-2">{project.title}</h3>
-                <p className="text-sm text-text-muted mb-4 flex-1">{project.description}</p>
-                {project.technologies && project.technologies.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mb-4">
-                    {project.technologies.map((tech) => (
-                      <span key={tech} className="badge-noir">{tech}</span>
-                    ))}
-                  </div>
-                )}
-                {(project.live_url || project.github_url) && (
-                  <div className="flex gap-2">
-                    {project.live_url && (
-                      <a href={project.live_url} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-                        <ExternalLink className="h-4 w-4" /> Live
-                      </a>
-                    )}
-                    {project.github_url && (
-                      <a href={project.github_url} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-                        <Github className="h-4 w-4" /> Code
-                      </a>
-                    )}
-                  </div>
-                )}
-              </div>
+            {projects?.filter((p) => p.title.trim().toLowerCase() !== STATIC_PROJECT_TITLE).map((project) => (
+              <ElectricBorderDeferred key={project.id} color={PROJECT_GLOW_COLOR} speed={0.6} chaos={0.12} borderRadius={12}>
+                <div className="card-noir flex flex-col h-full" style={{ borderColor: "transparent" }}>
+                  <h3 className="font-semibold text-text text-lg mb-2">{project.title}</h3>
+                  <p className="text-sm text-text-muted mb-4 flex-1">{project.description}</p>
+                  {project.technologies && project.technologies.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      {project.technologies.map((tech) => (
+                        <span key={tech} className="badge-noir">{tech}</span>
+                      ))}
+                    </div>
+                  )}
+                  {(project.live_url || project.github_url) && (
+                    <div className="flex gap-2">
+                      {project.live_url && (
+                        <a href={project.live_url} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                          <ExternalLink className="h-4 w-4" /> Live
+                        </a>
+                      )}
+                      {project.github_url && (
+                        <a href={project.github_url} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                          <Github className="h-4 w-4" /> Code
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </ElectricBorderDeferred>
             ))}
           </div>
           </AnimateOnScroll>
