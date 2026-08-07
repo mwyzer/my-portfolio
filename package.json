@@ -15,7 +15,7 @@
     "test:log": "node scripts/test-logger.mjs"
   },
   "dependencies": {
-    "@ai-sdk/deepseek": "^3.0.13",
+    "@ai-sdk/google": "^4.0.36",
     "@ai-sdk/react": "^4.0.40",
     "@hookform/resolvers": "^5.0.1",
     "@radix-ui/react-dialog": "^1.1.6",
@@ -71,7 +71,7 @@
     "happy-dom": "^20.11.1",
     "msw": "^2.15.0",
     "tailwindcss": "^4.1.4",
-    "typescript": "^5.8.3",
+    "typescript": "5.8.2",
     "vitest": "^4.1.10"
   }
 }

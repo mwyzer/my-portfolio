@@ -1,7 +1,7 @@
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { readDataJson } from "@/lib/extract-pdfs";
 import { streamText } from "ai";
-import { deepseek } from "@ai-sdk/deepseek";
+import { google } from "@ai-sdk/google";
 
 export const runtime = "nodejs";
 
@@ -95,7 +95,7 @@ export async function POST(req: Request) {
 ${context}`;
 
     const result = streamText({
-      model: deepseek("deepseek-v4-flash"),
+      model: google("gemini-2.5-flash"),
       system: systemPrompt,
       messages: coreMessages,
     });
