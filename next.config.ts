@@ -23,6 +23,27 @@ const nextConfig: NextConfig = {
 
   // Security headers applied to all routes
   async headers() {
+    // script-src/style-src need 'unsafe-inline' because: Next.js App Router
+    // streams RSC payloads via inline <script> tags on every page, and this
+    // app sets colors/layout through inline `style={{...}}` props throughout.
+    // A nonce-based CSP would let us drop 'unsafe-inline' from script-src,
+    // but that requires generating a per-request nonce in middleware and
+    // widening its route matcher to run on every page (currently scoped to
+    // /dashboard, /api/agent, /api/settings to avoid the extra Supabase
+    // session-refresh latency on public pages) — a larger, separate change.
+    const csp = [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline'",
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: https://*.supabase.co https://*.githubusercontent.com https://gitlab.com",
+      "font-src 'self' data:",
+      "connect-src 'self' https://*.supabase.co",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'none'",
+    ].join("; ");
+
     return [
       {
         source: "/(.*)",
@@ -31,6 +52,7 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           { key: "X-XSS-Protection", value: "1; mode=block" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Content-Security-Policy", value: csp },
         ],
       },
     ];

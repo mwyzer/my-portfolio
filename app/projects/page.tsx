@@ -1,9 +1,17 @@
 import Link from "next/link";
-import { ExternalLink, Github } from "lucide-react";
+import { ArrowRight, ExternalLink, Github, Youtube } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
-import type { PortfolioProject } from "@/types/database";
+import type { PortfolioProject, CaseStudy } from "@/types/database";
 import ThemeToggle from "@/components/theme-toggle";
 import ElectricBorderDeferred from "@/components/deferred/electric-border-deferred";
+import { sanitizeUrl } from "@/lib/sanitize";
+
+// A project only gets a "View Case Study" link once Problem/Solution/Architecture
+// has actually been filled in via the dashboard.
+const hasCaseStudy = (project: PortfolioProject) => {
+  const cs = project.case_study as CaseStudy | null;
+  return !!(cs && (cs.problem || cs.solution || cs.architecture));
+};
 
 export const metadata = {
   title: "Projects",
@@ -83,21 +91,31 @@ export default async function ProjectsPage() {
                 <p className="text-sm text-text-muted mb-4 flex-1">{project.description}</p>
                 {project.technologies && project.technologies.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mb-4">
-                    {project.technologies.map((tech) => (
-                      <span key={tech} className="badge-noir">{tech}</span>
+                    {project.technologies.map((tech, i) => (
+                      <span key={`${tech}-${i}`} className="badge-noir">{tech}</span>
                     ))}
                   </div>
                 )}
-                {(project.live_url || project.github_url) && (
+                {hasCaseStudy(project) && (
+                  <Link href={`/projects/${project.id}`} className="btn-noir btn-noir-ghost btn-noir-sm mb-2 self-start">
+                    View Case Study <ArrowRight className="h-4 w-4" />
+                  </Link>
+                )}
+                {(sanitizeUrl(project.live_url) || sanitizeUrl(project.github_url) || sanitizeUrl(project.youtube_url)) && (
                   <div className="flex gap-2">
-                    {project.live_url && (
-                      <a href={project.live_url} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                    {sanitizeUrl(project.live_url) && (
+                      <a href={sanitizeUrl(project.live_url)} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
                         <ExternalLink className="h-4 w-4" /> Live
                       </a>
                     )}
-                    {project.github_url && (
-                      <a href={project.github_url} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                    {sanitizeUrl(project.github_url) && (
+                      <a href={sanitizeUrl(project.github_url)} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
                         <Github className="h-4 w-4" /> Code
+                      </a>
+                    )}
+                    {sanitizeUrl(project.youtube_url) && (
+                      <a href={sanitizeUrl(project.youtube_url)} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                        <Youtube className="h-4 w-4" /> Video
                       </a>
                     )}
                   </div>

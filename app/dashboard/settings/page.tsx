@@ -50,6 +50,7 @@ export default function DashboardSettingsPage() {
   const [githubUrl, setGithubUrl] = useState(DEFAULT_LINKS.github);
   const [email, setEmail] = useState(DEFAULT_LINKS.email);
   const [phone, setPhone] = useState(DEFAULT_LINKS.phone);
+  const [availability, setAvailability] = useState("");
 
   // Education
   const [education, setEducation] = useState("");
@@ -83,6 +84,7 @@ export default function DashboardSettingsPage() {
       setGithubUrl(links.github || DEFAULT_LINKS.github);
       setEmail(links.email || DEFAULT_LINKS.email);
       setPhone(links.phone || DEFAULT_LINKS.phone);
+      setAvailability(links.availability || "");
       setEducation(links.education || "");
       setCertifications(links.certifications || "");
       setExperience(links.experience || "");
@@ -98,6 +100,7 @@ export default function DashboardSettingsPage() {
     github: githubUrl || null,
     email: email || null,
     phone: phone || null,
+    availability: availability || null,
     education: education || null,
     certifications: certifications || null,
     experience: experience || null,
@@ -248,6 +251,11 @@ export default function DashboardSettingsPage() {
                     <Label htmlFor="gitlab">GitLab URL</Label>
                     <Input id="gitlab" value={gitlabUrl} onChange={(e) => setGitlabUrl(e.target.value)} placeholder="https://gitlab.com/..." />
                   </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="availability">Availability status</Label>
+                  <Input id="availability" value={availability} onChange={(e) => setAvailability(e.target.value)} placeholder="Freelance · Remote · Contract" />
+                  <p className="text-xs text-muted-foreground">Shown in the hero as &quot;Available for ...&quot;. Leave blank to use the default.</p>
                 </div>
               </>
             )}

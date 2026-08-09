@@ -5,6 +5,7 @@ import { formatDate } from "@/lib/utils";
 import { ArrowLeft } from "lucide-react";
 import type { BlogPost } from "@/types/database";
 import ThemeToggle from "@/components/theme-toggle";
+import { markdownToSafeHtml, sanitizeUrl } from "@/lib/sanitize";
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
@@ -42,24 +43,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   if (!post) notFound();
 
-  // Simple Markdown to HTML conversion (basic)
-  const htmlContent = post.content
-    .replace(/^### (.+)$/gm, "<h3>$1</h3>")
-    .replace(/^## (.+)$/gm, "<h2>$1</h2>")
-    .replace(/^# (.+)$/gm, "<h1>$1</h1>")
-    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*(.+?)\*/g, "<em>$1</em>")
-    .replace(/```([\s\S]*?)```/g, "<pre><code>$1</code></pre>")
-    .replace(/`(.+?)`/g, "<code>$1</code>")
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer">$1</a>')
-    .replace(/^- (.+)$/gm, "<li>$1</li>")
-    .replace(/(<li>.*<\/li>\n?)+/g, "<ul>$&</ul>")
-    .replace(/\n\n/g, "</p><p>")
-    .replace(/^(?!<[a-z])/gm, "")
-    .replace(/^(.+)$/gm, (match) => {
-      if (match.startsWith("<")) return match;
-      return `<p>${match}</p>`;
-    });
+  // Markdown to HTML — escapes raw HTML and validates link schemes so
+  // dangerouslySetInnerHTML below can't be used to inject scripts. See lib/sanitize.ts.
+  const htmlContent = markdownToSafeHtml(post.content);
 
   return (
     <div className="min-h-screen" style={{ background: "var(--bg)", color: "var(--text)" }}>
@@ -93,9 +79,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           </div>
         </header>
 
-        {post.cover_image && (
+        {sanitizeUrl(post.cover_image) && (
           <img
-            src={post.cover_image}
+            src={sanitizeUrl(post.cover_image)}
             alt={post.title}
             className="mb-8 w-full rounded-lg object-cover max-h-96"
           />

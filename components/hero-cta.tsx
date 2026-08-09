@@ -1,10 +1,14 @@
 "use client";
 
+import Link from "next/link";
 import SpecularButton from "@/components/specular-button";
 
 export default function HeroCTA() {
   return (
-    <div className="mt-8 flex justify-center">
+    <div className="mt-8 flex flex-wrap justify-center gap-3">
+      <Link href="/#projects" className="btn-noir btn-noir-primary btn-noir-lg">
+        View my work
+      </Link>
       <SpecularButton
         size="lg"
         radius={18}

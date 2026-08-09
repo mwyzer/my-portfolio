@@ -13,9 +13,11 @@ export interface Database {
           image_url: string | null;
           live_url: string | null;
           github_url: string | null;
+          youtube_url: string | null;
           technologies: string[];
           featured: boolean;
           order: number;
+          case_study: Json | null;
         };
         Insert: {
           id?: string;
@@ -26,9 +28,11 @@ export interface Database {
           image_url?: string | null;
           live_url?: string | null;
           github_url?: string | null;
+          youtube_url?: string | null;
           technologies?: string[];
           featured?: boolean;
           order?: number;
+          case_study?: Json | null;
         };
         Update: {
           id?: string;
@@ -39,9 +43,11 @@ export interface Database {
           image_url?: string | null;
           live_url?: string | null;
           github_url?: string | null;
+          youtube_url?: string | null;
           technologies?: string[];
           featured?: boolean;
           order?: number;
+          case_study?: Json | null;
         };
       };
       portfolio_about: {
@@ -154,3 +160,17 @@ export type PortfolioProject = Database["public"]["Tables"]["portfolio_projects"
 export type PortfolioAbout = Database["public"]["Tables"]["portfolio_about"]["Row"];
 export type BlogPost = Database["public"]["Tables"]["blog_posts"]["Row"];
 export type SiteSetting = Database["public"]["Tables"]["site_settings"]["Row"];
+
+export interface CaseStudyCapabilities {
+  fullStackEngineering: string[];
+  backendData: string[];
+  aiEngineering: string[];
+  deliveryQuality: string[];
+}
+
+export interface CaseStudy {
+  problem: string;
+  solution: string;
+  architecture: string;
+  capabilities: CaseStudyCapabilities;
+}

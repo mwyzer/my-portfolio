@@ -20,6 +20,12 @@ import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
+// Single-owner site — the real enforcement is the RLS policies (see
+// supabase/migrations/00004_restrict_writes_to_owner.sql), which scope every
+// write to this email regardless of what the client sends. This check just
+// avoids showing a broken dashboard to a non-owner account and signs them out.
+const OWNER_EMAIL = "muhammad.wyzer@gmail.com";
+
 const sidebarLinks = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
   { href: "/dashboard/portfolio", label: "Portfolio", icon: FolderKanban },
@@ -56,6 +62,14 @@ export default function DashboardLayout({
 
       if (error || !user) {
         // Session exists locally but is invalid on the server — clean up and redirect
+        await supabase.auth.signOut();
+        router.replace("/auth/login");
+        return;
+      }
+
+      if (user.email !== OWNER_EMAIL) {
+        // Valid Supabase account, but not the site owner — RLS would reject
+        // every write anyway, so don't even show the dashboard.
         await supabase.auth.signOut();
         router.replace("/auth/login");
         return;

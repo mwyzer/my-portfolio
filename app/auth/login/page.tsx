@@ -59,6 +59,9 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
+        // This is a single-owner admin login, not a public sign-up form —
+        // never let signInWithOtp silently create a new account.
+        shouldCreateUser: false,
         emailRedirectTo: `${siteUrl}/auth/callback?next=/dashboard`,
       },
     });
@@ -106,7 +109,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center p-4" style={{ background: "var(--bg)" }}>
-      <div className="card-noir w-full max-w-sm !p-6">
+      <div className="card-noir w-full max-w-sm p-6!">
         <h2 className="text-2xl font-bold text-center text-text mb-1">{modeLabel}</h2>
         <p className="text-sm text-text-muted text-center mb-4">{modeDescription}</p>
 

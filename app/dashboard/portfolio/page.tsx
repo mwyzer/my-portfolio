@@ -9,7 +9,14 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
 import { Plus, Pencil, Trash2, GripVertical } from "lucide-react";
-import type { PortfolioProject } from "@/types/database";
+import type { PortfolioProject, CaseStudy } from "@/types/database";
+
+const EMPTY_CAPABILITIES = {
+  fullStackEngineering: "",
+  backendData: "",
+  aiEngineering: "",
+  deliveryQuality: "",
+};
 
 export default function DashboardPortfolioPage() {
   const [projects, setProjects] = useState<PortfolioProject[]>([]);
@@ -24,7 +31,14 @@ export default function DashboardPortfolioPage() {
   const [technologies, setTechnologies] = useState("");
   const [liveUrl, setLiveUrl] = useState("");
   const [githubUrl, setGithubUrl] = useState("");
+  const [youtubeUrl, setYoutubeUrl] = useState("");
   const [featured, setFeatured] = useState(false);
+
+  // Case study
+  const [problem, setProblem] = useState("");
+  const [solution, setSolution] = useState("");
+  const [architecture, setArchitecture] = useState("");
+  const [capabilities, setCapabilities] = useState(EMPTY_CAPABILITIES);
 
   useEffect(() => {
     loadProjects();
@@ -44,7 +58,12 @@ export default function DashboardPortfolioPage() {
     setTechnologies("");
     setLiveUrl("");
     setGithubUrl("");
+    setYoutubeUrl("");
     setFeatured(false);
+    setProblem("");
+    setSolution("");
+    setArchitecture("");
+    setCapabilities(EMPTY_CAPABILITIES);
     setEditing(null);
   };
 
@@ -54,9 +73,41 @@ export default function DashboardPortfolioPage() {
     setTechnologies(project.technologies?.join(", ") || "");
     setLiveUrl(project.live_url || "");
     setGithubUrl(project.github_url || "");
+    setYoutubeUrl(project.youtube_url || "");
     setFeatured(project.featured);
+
+    const cs = project.case_study as CaseStudy | null;
+    setProblem(cs?.problem || "");
+    setSolution(cs?.solution || "");
+    setArchitecture(cs?.architecture || "");
+    setCapabilities({
+      fullStackEngineering: cs?.capabilities?.fullStackEngineering?.join(", ") || "",
+      backendData: cs?.capabilities?.backendData?.join(", ") || "",
+      aiEngineering: cs?.capabilities?.aiEngineering?.join(", ") || "",
+      deliveryQuality: cs?.capabilities?.deliveryQuality?.join(", ") || "",
+    });
+
     setEditing(project);
     setShowForm(true);
+  };
+
+  const splitList = (s: string) => s.split(",").map((v) => v.trim()).filter(Boolean);
+
+  // case_study is only saved when at least one of Problem/Solution/Architecture
+  // is filled in — otherwise the "View Case Study" link stays hidden on the site.
+  const buildCaseStudy = (): CaseStudy | null => {
+    if (!problem.trim() && !solution.trim() && !architecture.trim()) return null;
+    return {
+      problem: problem.trim(),
+      solution: solution.trim(),
+      architecture: architecture.trim(),
+      capabilities: {
+        fullStackEngineering: splitList(capabilities.fullStackEngineering),
+        backendData: splitList(capabilities.backendData),
+        aiEngineering: splitList(capabilities.aiEngineering),
+        deliveryQuality: splitList(capabilities.deliveryQuality),
+      },
+    };
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -74,7 +125,9 @@ export default function DashboardPortfolioPage() {
       technologies: techArray,
       live_url: liveUrl || null,
       github_url: githubUrl || null,
+      youtube_url: youtubeUrl || null,
       featured,
+      case_study: buildCaseStudy(),
     };
 
     if (editing) {
@@ -150,7 +203,7 @@ export default function DashboardPortfolioPage() {
                 <Label htmlFor="tech">Technologies (comma-separated)</Label>
                 <Input id="tech" value={technologies} onChange={(e) => setTechnologies(e.target.value)} placeholder="React, Node.js, TypeScript" />
               </div>
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-3">
                 <div className="space-y-2">
                   <Label htmlFor="live">Live URL</Label>
                   <Input id="live" value={liveUrl} onChange={(e) => setLiveUrl(e.target.value)} placeholder="https://..." />
@@ -159,11 +212,76 @@ export default function DashboardPortfolioPage() {
                   <Label htmlFor="github">GitHub URL</Label>
                   <Input id="github" value={githubUrl} onChange={(e) => setGithubUrl(e.target.value)} placeholder="https://github.com/..." />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="youtube">YouTube URL</Label>
+                  <Input id="youtube" value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} placeholder="https://youtube.com/..." />
+                </div>
               </div>
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} className="rounded" />
                 Featured project
               </label>
+
+              <div className="border-t pt-4 space-y-4">
+                <div>
+                  <h3 className="text-sm font-semibold">Case Study</h3>
+                  <p className="text-xs text-muted-foreground">Optional — fill these in to enable a &quot;View Case Study&quot; page for this project.</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="problem">Problem</Label>
+                  <Textarea id="problem" value={problem} onChange={(e) => setProblem(e.target.value)} rows={3} placeholder="What problem did this project solve?" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="solution">Solution</Label>
+                  <Textarea id="solution" value={solution} onChange={(e) => setSolution(e.target.value)} rows={3} placeholder="How did you solve it?" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="architecture">Architecture Solution</Label>
+                  <Textarea id="architecture" value={architecture} onChange={(e) => setArchitecture(e.target.value)} rows={3} placeholder="System design, data flow, key technical decisions" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Capabilities (comma-separated per category)</Label>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="space-y-1">
+                      <Label htmlFor="cap-fullstack" className="text-xs font-normal text-muted-foreground">Full Stack Engineering</Label>
+                      <Input
+                        id="cap-fullstack"
+                        value={capabilities.fullStackEngineering}
+                        onChange={(e) => setCapabilities((c) => ({ ...c, fullStackEngineering: e.target.value }))}
+                        placeholder="Next.js, React, TypeScript"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="cap-backend" className="text-xs font-normal text-muted-foreground">Backend &amp; Data</Label>
+                      <Input
+                        id="cap-backend"
+                        value={capabilities.backendData}
+                        onChange={(e) => setCapabilities((c) => ({ ...c, backendData: e.target.value }))}
+                        placeholder="PostgreSQL, REST API, Auth"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="cap-ai" className="text-xs font-normal text-muted-foreground">AI Engineering</Label>
+                      <Input
+                        id="cap-ai"
+                        value={capabilities.aiEngineering}
+                        onChange={(e) => setCapabilities((c) => ({ ...c, aiEngineering: e.target.value }))}
+                        placeholder="RAG, LLM APIs, Embeddings"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="cap-delivery" className="text-xs font-normal text-muted-foreground">Delivery &amp; Quality</Label>
+                      <Input
+                        id="cap-delivery"
+                        value={capabilities.deliveryQuality}
+                        onChange={(e) => setCapabilities((c) => ({ ...c, deliveryQuality: e.target.value }))}
+                        placeholder="Testing, CI/CD, Documentation"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="flex gap-2">
                 <Button type="submit" disabled={loading}>
                   {loading ? "Saving..." : editing ? "Update" : "Create"}

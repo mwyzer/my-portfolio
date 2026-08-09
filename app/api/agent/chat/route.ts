@@ -1,9 +1,47 @@
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { readDataJson } from "@/lib/extract-pdfs";
-import { streamText } from "ai";
+import { streamText, type ModelMessage } from "ai";
 import { google } from "@ai-sdk/google";
+import { deepseek } from "@ai-sdk/deepseek";
+import { openai } from "@ai-sdk/openai";
 
 export const runtime = "nodejs";
+
+// Tried in order; first provider with an API key configured AND a successful
+// response wins. Add/remove providers here as keys become available.
+const PROVIDERS = [
+  { name: "gemini", envVar: "GOOGLE_GENERATIVE_AI_API_KEY", model: () => google("gemini-2.5-flash") },
+  { name: "openai", envVar: "OPENAI_API_KEY", model: () => openai("gpt-4o-mini") },
+  { name: "deepseek", envVar: "DEEPSEEK_API_KEY", model: () => deepseek("deepseek-chat") },
+] as const;
+
+// Tries each configured provider in order. A provider "fails" if the call
+// throws OR if generation completes with an error status — both surface only
+// once the stream is fully awaited, which is why we drain `.text` here before
+// declaring success. This costs the full generation once per attempted
+// provider, but `streamText`'s internal stream is teeable, so the same result
+// can still be handed to the client via toUIMessageStreamResponse() below
+// without a second, duplicate request to the winning provider.
+async function streamWithFallback(system: string, messages: ModelMessage[]) {
+  const available = PROVIDERS.filter((p) => !!process.env[p.envVar]);
+  if (available.length === 0) {
+    throw new Error("No AI provider is configured (missing all API keys)");
+  }
+
+  let lastError: unknown;
+  for (const provider of available) {
+    try {
+      const result = streamText({ model: provider.model(), system, messages });
+      await result.text; // force provider errors (auth/rate-limit/etc.) to surface now
+      console.log(`[agent] provider used: ${provider.name}`);
+      return result;
+    } catch (err) {
+      console.error(`[agent] provider ${provider.name} failed, trying next:`, err);
+      lastError = err;
+    }
+  }
+  throw lastError ?? new Error("All configured AI providers failed");
+}
 
 // GET is required by DefaultChatTransport / useChat for initial connection
 export async function GET() {
@@ -94,11 +132,7 @@ export async function POST(req: Request) {
 ## Profile Context
 ${context}`;
 
-    const result = streamText({
-      model: google("gemini-2.5-flash"),
-      system: systemPrompt,
-      messages: coreMessages,
-    });
+    const result = await streamWithFallback(systemPrompt, coreMessages);
 
     return result.toUIMessageStreamResponse();
   } catch (err) {

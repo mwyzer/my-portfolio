@@ -5,8 +5,9 @@ import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { formatDate } from "@/lib/utils";
-import { ArrowRight, ExternalLink, Github, Linkedin, Gitlab, Mail, Phone, Code2, Database, Palette, Rocket, Layout, Server, Globe } from "lucide-react";
-import type { PortfolioAbout, PortfolioProject, BlogPost } from "@/types/database";
+import { ArrowRight, ExternalLink, Github, Youtube, Linkedin, Gitlab, Mail, Phone, Code2, Database, Palette, Rocket, Layout, Server, Globe } from "lucide-react";
+import type { PortfolioAbout, PortfolioProject, BlogPost, CaseStudy } from "@/types/database";
+import { sanitizeUrl } from "@/lib/sanitize";
 import ThemeToggle from "@/components/theme-toggle";
 import AnimateOnScroll from "@/components/animate-on-scroll";
 import DecryptedText from "@/components/decrypted-text";
@@ -39,6 +40,13 @@ const accentColors = [
   "text-[#ef4444]",
 ];
 const accentForIndex = (i: number) => accentColors[i % accentColors.length];
+
+// A project only gets a "View Case Study" link once Problem/Solution/Architecture
+// has actually been filled in via the dashboard.
+const hasCaseStudy = (project: PortfolioProject) => {
+  const cs = project.case_study as CaseStudy | null;
+  return !!(cs && (cs.problem || cs.solution || cs.architecture));
+};
 
 // The "LMS Mahasiswa" project card below is hardcoded (not dashboard-managed).
 // Guard against it rendering twice if the same project ever also gets added
@@ -101,10 +109,11 @@ export default async function HomePage({
             <span className="font-semibold text-lg">{profile?.name || "Portfolio"}</span>
           </Link>
           <div className="flex items-center gap-1">
-            <Link href="/#projects" className="btn-noir btn-noir-ghost btn-noir-sm">Projects</Link>
+            <Link href="/#projects" className="btn-noir btn-noir-ghost btn-noir-sm">Work</Link>
+            <Link href="/#experience" className="btn-noir btn-noir-ghost btn-noir-sm">Experience</Link>
             <Link href="/blog" className="btn-noir btn-noir-ghost btn-noir-sm">Blog</Link>
-            {profile?.resume_url && (
-              <a href={profile.resume_url} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">Resume</a>
+            {sanitizeUrl(profile?.resume_url) && (
+              <a href={sanitizeUrl(profile?.resume_url)} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">Resume</a>
             )}
             <ThemeToggle />
           </div>
@@ -136,54 +145,52 @@ export default async function HomePage({
               </ElectricBorderDeferred>
             </div>
           )}
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-text mb-4">
+          <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-text mb-6">
             <DecryptedText
-              text={profile?.name || "Welcome"}
+              text={profile?.name || "Muhammad Wyzer"}
               speed={40}
               className="text-text"
             />
           </h1>
-          <p className="text-lg md:text-xl text-text-muted mb-2">{profile?.title || ""}</p>
-          <p className="text-text-muted max-w-lg mx-auto leading-relaxed">{profile?.bio || ""}</p>
+          <p className="text-text-muted max-w-lg mx-auto leading-relaxed">
+            {profile?.bio || "I build production-ready web applications, enterprise workflow systems, and AI-powered platforms."}
+          </p>
 
-          {profile?.skills && profile.skills.length > 0 && (
-            <div className="flex flex-wrap justify-center gap-2 mt-8">
-              {profile.skills.map((skill) => (
-                <span key={skill} className="badge-noir">{skill}</span>
-              ))}
-            </div>
-          )}
+          <HeroCTA />
+
+          <p className="mt-6 text-sm text-text-dim">
+            Available for <span className="text-text-muted">{social?.availability || "Freelance · Remote · Contract"}</span>
+          </p>
 
           {social && (
             <div className="flex flex-wrap justify-center gap-2 mt-6">
               {social.email && (
-                <a href={`mailto:${social.email}`} className="btn-noir btn-noir-ghost btn-noir-sm">
-                  <Mail className="h-4 w-4" /> Email
+                <a href={`mailto:${social.email}`} aria-label="Email" className="btn-noir btn-noir-ghost btn-noir-sm px-2.5!">
+                  <Mail className="h-4 w-4" />
                 </a>
               )}
               {social.phone && (
-                <a href={`https://wa.me/${social.phone.replace(/[^\d]/g, "")}`} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-                  <Phone className="h-4 w-4" /> WhatsApp
+                <a href={`https://wa.me/${social.phone.replace(/[^\d]/g, "")}`} target="_blank" rel="noreferrer" aria-label="WhatsApp" className="btn-noir btn-noir-ghost btn-noir-sm px-2.5!">
+                  <Phone className="h-4 w-4" />
                 </a>
               )}
-              {social.github && (
-                <a href={social.github} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-                  <Github className="h-4 w-4" /> GitHub
+              {sanitizeUrl(social.github) && (
+                <a href={sanitizeUrl(social.github)} target="_blank" rel="noreferrer" aria-label="GitHub" className="btn-noir btn-noir-ghost btn-noir-sm px-2.5!">
+                  <Github className="h-4 w-4" />
                 </a>
               )}
-              {social.linkedin && (
-                <a href={social.linkedin} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-                  <Linkedin className="h-4 w-4" /> LinkedIn
+              {sanitizeUrl(social.linkedin) && (
+                <a href={sanitizeUrl(social.linkedin)} target="_blank" rel="noreferrer" aria-label="LinkedIn" className="btn-noir btn-noir-ghost btn-noir-sm px-2.5!">
+                  <Linkedin className="h-4 w-4" />
                 </a>
               )}
-              {social.gitlab && (
-                <a href={social.gitlab} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-                  <Gitlab className="h-4 w-4" /> GitLab
+              {sanitizeUrl(social.gitlab) && (
+                <a href={sanitizeUrl(social.gitlab)} target="_blank" rel="noreferrer" aria-label="GitLab" className="btn-noir btn-noir-ghost btn-noir-sm px-2.5!">
+                  <Gitlab className="h-4 w-4" />
                 </a>
               )}
             </div>
           )}
-          <HeroCTA />
         </div>
       </section>
 
@@ -249,11 +256,93 @@ async function HomeBelowFold({
 
   return (
     <>
-      {/* ── Tech Stack ── */}
-      <section className="py-20" style={{ background: "var(--surface)" }}>
+      {/* ── Featured Projects ── */}
+      <section id="projects" className="py-20" style={{ background: "var(--surface)" }}>
+        <div className="max-w-5xl mx-auto px-4">
+          <AnimateOnScroll y={15} duration={0.5}>
+            <div className="flex items-center justify-between mb-12">
+              <h2 className="text-3xl font-bold text-text">Featured Projects</h2>
+              <Link href="/projects" className="btn-noir btn-noir-ghost btn-noir-sm">
+                View all <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </AnimateOnScroll>
+          <AnimateOnScroll stagger={0.08} y={30} duration={0.5} staggerSelector=".card-noir">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Static: LMS Mahasiswa — kept out of Supabase, so filter it out of the
+                dynamic list below by title to avoid rendering it twice. Every card
+                in this grid (static + dynamic) shares the same glow-border treatment. */}
+            <ElectricBorderDeferred color={PROJECT_GLOW_COLOR} speed={0.6} chaos={0.12} borderRadius={12}>
+              <div className="card-noir flex flex-col h-full" style={{ borderColor: "transparent" }}>
+                <h3 className="font-semibold text-text text-lg mb-2">LMS Mahasiswa</h3>
+                <p className="text-sm text-text-muted mb-4 flex-1">
+                  Full-stack Learning Management System — multi-role (student, instructor, admin), attendance, assignments, quizzes, AI chat assistant, Python playground &amp; PWA support.
+                </p>
+                <div className="flex flex-wrap gap-1.5 mb-4">
+                  {["Nuxt 4","Vue 3","TypeScript","Pinia","Supabase","Nitro","Vite","Vuestic UI","PWA","Vitest","Playwright"].map(t => (
+                    <span key={t} className="badge-noir">{t}</span>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <a href="https://nuxt-lms-mahasiswa.vercel.app" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                    <ExternalLink className="h-4 w-4" /> Live
+                  </a>
+                  <a href="https://github.com/mwyzer/vue-lms-mahasiswa" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                    <Github className="h-4 w-4" /> Code
+                  </a>
+                </div>
+              </div>
+            </ElectricBorderDeferred>
+            {/* Dynamic: Supabase projects */}
+            {projects?.filter((p) => p.title.trim().toLowerCase() !== STATIC_PROJECT_TITLE).map((project) => (
+              <ElectricBorderDeferred key={project.id} color={PROJECT_GLOW_COLOR} speed={0.6} chaos={0.12} borderRadius={12}>
+                <div className="card-noir flex flex-col h-full" style={{ borderColor: "transparent" }}>
+                  <h3 className="font-semibold text-text text-lg mb-2">{project.title}</h3>
+                  <p className="text-sm text-text-muted mb-4 flex-1">{project.description}</p>
+                  {project.technologies && project.technologies.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-4">
+                      {project.technologies.map((tech, k) => (
+                        <span key={`${tech}-${k}`} className="badge-noir">{tech}</span>
+                      ))}
+                    </div>
+                  )}
+                  {hasCaseStudy(project) && (
+                    <Link href={`/projects/${project.id}`} className="btn-noir btn-noir-ghost btn-noir-sm mb-2 self-start">
+                      View Case Study <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  )}
+                  {(sanitizeUrl(project.live_url) || sanitizeUrl(project.github_url) || sanitizeUrl(project.youtube_url)) && (
+                    <div className="flex gap-2">
+                      {sanitizeUrl(project.live_url) && (
+                        <a href={sanitizeUrl(project.live_url)} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                          <ExternalLink className="h-4 w-4" /> Live
+                        </a>
+                      )}
+                      {sanitizeUrl(project.github_url) && (
+                        <a href={sanitizeUrl(project.github_url)} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                          <Github className="h-4 w-4" /> Code
+                        </a>
+                      )}
+                      {sanitizeUrl(project.youtube_url) && (
+                        <a href={sanitizeUrl(project.youtube_url)} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                          <Youtube className="h-4 w-4" /> Video
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </ElectricBorderDeferred>
+            ))}
+          </div>
+          </AnimateOnScroll>
+        </div>
+      </section>
+
+      {/* ── Engineering Stack ── */}
+      <section className="py-20">
         <div className="max-w-5xl mx-auto px-4">
           <AnimateOnScroll y={20} duration={0.6}>
-            <h2 className="text-3xl font-bold text-center text-text mb-3">Tech Stack</h2>
+            <h2 className="text-3xl font-bold text-center text-text mb-3">Engineering Stack</h2>
             <p className="text-center text-text-dim text-sm mb-12">Tools &amp; technologies I use across my projects</p>
           </AnimateOnScroll>
           <AnimateOnScroll stagger={0.04} y={30} duration={0.5} staggerSelector=".card-noir">
@@ -262,14 +351,14 @@ async function HomeBelowFold({
               const Icon = iconForCategory(group.category);
               const accent = accentForIndex(i);
               return (
-                <div key={group.category} className="card-noir">
+                <div key={`${group.category}-${i}`} className="card-noir">
                   <div className="flex items-center gap-2 mb-4">
                     <Icon className={`h-5 w-5 ${accent}`} />
                     <h3 className="font-semibold text-text">{group.category}</h3>
                   </div>
                   <div className="flex flex-wrap gap-x-3 gap-y-1.5">
-                    {group.items.map((item) => (
-                      <span key={item} className="text-sm text-text-muted">{item}</span>
+                    {group.items.map((item, j) => (
+                      <span key={`${item}-${j}`} className="text-sm text-text-muted">{item}</span>
                     ))}
                   </div>
                 </div>
@@ -295,6 +384,49 @@ async function HomeBelowFold({
           </AnimateOnScroll>
         </div>
       </section>
+
+      {/* ── Work Experience ── */}
+      {experienceEntries.length > 0 && (
+        <section id="experience" className="py-20" style={{ background: "var(--surface)" }}>
+          <div className="max-w-3xl mx-auto px-4">
+            <AnimateOnScroll y={20} duration={0.6}>
+              <h2 className="text-3xl font-bold text-center text-text mb-12">Work Experience</h2>
+            </AnimateOnScroll>
+            <AnimateOnScroll stagger={0.15} y={25} duration={0.5} triggerStart="top 80%">
+            <div className="relative">
+              <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px md:-translate-x-px" style={{ background: "var(--border)" }} />
+              <div className="space-y-8">
+                {experienceEntries.map((entry, i) => {
+                  const lines = entry.split("\n").filter(Boolean);
+                  const period = lines[0] || "";
+                  const role = lines[1] || "";
+                  const bullets = lines.slice(2).filter(l => l.startsWith("•") || l.startsWith("·") || l.startsWith("-"));
+                  const isLeft = i % 2 === 0;
+                  return (
+                    <div key={i} className={`relative flex items-start gap-6 ${isLeft ? "md:flex-row" : "md:flex-row-reverse"}`}>
+                      <div className="absolute left-4 md:left-1/2 w-3 h-3 rounded-full -translate-x-1/2 mt-1.5 z-10" style={{ background: "var(--color-accent)", boxShadow: "0 0 8px var(--color-accent-glow)" }} />
+                      <div className={`ml-10 md:ml-0 md:w-1/2 ${isLeft ? "md:pr-8 md:text-right" : "md:pl-8"}`}>
+                        <div className="card-noir !p-4">
+                          {period && <p className="text-sm text-text-dim">{period}</p>}
+                          {role && <h3 className="font-semibold text-text text-base mt-0.5">{role}</h3>}
+                          {bullets.length > 0 && (
+                            <ul className="list-disc pl-5 text-sm text-text-muted space-y-1 mt-2">
+                              {bullets.map((b, j) => (
+                                <li key={j}>{b.replace(/^[•·-]\s*/, "")}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            </AnimateOnScroll>
+          </div>
+        </section>
+      )}
 
       {/* ── Education ── */}
       {educationEntries.length > 0 && (
@@ -365,121 +497,6 @@ async function HomeBelowFold({
         </section>
       )}
 
-      {/* ── Work Experience ── */}
-      {experienceEntries.length > 0 && (
-        <section className="py-20">
-          <div className="max-w-3xl mx-auto px-4">
-            <AnimateOnScroll y={20} duration={0.6}>
-              <h2 className="text-3xl font-bold text-center text-text mb-12">Work Experience</h2>
-            </AnimateOnScroll>
-            <AnimateOnScroll stagger={0.15} y={25} duration={0.5} triggerStart="top 80%">
-            <div className="relative">
-              <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px md:-translate-x-px" style={{ background: "var(--border)" }} />
-              <div className="space-y-8">
-                {experienceEntries.map((entry, i) => {
-                  const lines = entry.split("\n").filter(Boolean);
-                  const period = lines[0] || "";
-                  const role = lines[1] || "";
-                  const bullets = lines.slice(2).filter(l => l.startsWith("•") || l.startsWith("·") || l.startsWith("-"));
-                  const isLeft = i % 2 === 0;
-                  return (
-                    <div key={i} className={`relative flex items-start gap-6 ${isLeft ? "md:flex-row" : "md:flex-row-reverse"}`}>
-                      <div className="absolute left-4 md:left-1/2 w-3 h-3 rounded-full -translate-x-1/2 mt-1.5 z-10" style={{ background: "var(--color-accent)", boxShadow: "0 0 8px var(--color-accent-glow)" }} />
-                      <div className={`ml-10 md:ml-0 md:w-1/2 ${isLeft ? "md:pr-8 md:text-right" : "md:pl-8"}`}>
-                        <div className="card-noir !p-4">
-                          {period && <p className="text-sm text-text-dim">{period}</p>}
-                          {role && <h3 className="font-semibold text-text text-base mt-0.5">{role}</h3>}
-                          {bullets.length > 0 && (
-                            <ul className="list-disc pl-5 text-sm text-text-muted space-y-1 mt-2">
-                              {bullets.map((b, j) => (
-                                <li key={j}>{b.replace(/^[•·-]\s*/, "")}</li>
-                              ))}
-                            </ul>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-            </AnimateOnScroll>
-          </div>
-        </section>
-      )}
-
-      {/* ── Projects ── */}
-      <section id="projects" className="py-20" style={{ background: "var(--surface)" }}>
-        <div className="max-w-5xl mx-auto px-4">
-          <AnimateOnScroll y={15} duration={0.5}>
-            <div className="flex items-center justify-between mb-12">
-              <h2 className="text-3xl font-bold text-text">Projects</h2>
-              <Link href="/projects" className="btn-noir btn-noir-ghost btn-noir-sm">
-                View all <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-          </AnimateOnScroll>
-          <AnimateOnScroll stagger={0.08} y={30} duration={0.5} staggerSelector=".card-noir">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {/* Static: LMS Mahasiswa — kept out of Supabase, so filter it out of the
-                dynamic list below by title to avoid rendering it twice. Every card
-                in this grid (static + dynamic) shares the same glow-border treatment. */}
-            <ElectricBorderDeferred color={PROJECT_GLOW_COLOR} speed={0.6} chaos={0.12} borderRadius={12}>
-              <div className="card-noir flex flex-col h-full" style={{ borderColor: "transparent" }}>
-                <h3 className="font-semibold text-text text-lg mb-2">LMS Mahasiswa</h3>
-                <p className="text-sm text-text-muted mb-4 flex-1">
-                  Full-stack Learning Management System — multi-role (student, instructor, admin), attendance, assignments, quizzes, AI chat assistant, Python playground &amp; PWA support.
-                </p>
-                <div className="flex flex-wrap gap-1.5 mb-4">
-                  {["Nuxt 4","Vue 3","TypeScript","Pinia","Supabase","Nitro","Vite","Vuestic UI","PWA","Vitest","Playwright"].map(t => (
-                    <span key={t} className="badge-noir">{t}</span>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <a href="https://nuxt-lms-mahasiswa.vercel.app" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-                    <ExternalLink className="h-4 w-4" /> Live
-                  </a>
-                  <a href="https://github.com/mwyzer/vue-lms-mahasiswa" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-                    <Github className="h-4 w-4" /> Code
-                  </a>
-                </div>
-              </div>
-            </ElectricBorderDeferred>
-            {/* Dynamic: Supabase projects */}
-            {projects?.filter((p) => p.title.trim().toLowerCase() !== STATIC_PROJECT_TITLE).map((project) => (
-              <ElectricBorderDeferred key={project.id} color={PROJECT_GLOW_COLOR} speed={0.6} chaos={0.12} borderRadius={12}>
-                <div className="card-noir flex flex-col h-full" style={{ borderColor: "transparent" }}>
-                  <h3 className="font-semibold text-text text-lg mb-2">{project.title}</h3>
-                  <p className="text-sm text-text-muted mb-4 flex-1">{project.description}</p>
-                  {project.technologies && project.technologies.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mb-4">
-                      {project.technologies.map((tech) => (
-                        <span key={tech} className="badge-noir">{tech}</span>
-                      ))}
-                    </div>
-                  )}
-                  {(project.live_url || project.github_url) && (
-                    <div className="flex gap-2">
-                      {project.live_url && (
-                        <a href={project.live_url} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-                          <ExternalLink className="h-4 w-4" /> Live
-                        </a>
-                      )}
-                      {project.github_url && (
-                        <a href={project.github_url} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-                          <Github className="h-4 w-4" /> Code
-                        </a>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </ElectricBorderDeferred>
-            ))}
-          </div>
-          </AnimateOnScroll>
-        </div>
-      </section>
-
       {/* ── Blog ── */}
       {posts && posts.length > 0 && (
         <section className="py-20">
@@ -509,6 +526,43 @@ async function HomeBelowFold({
         </section>
       )}
 
+      {/* ── Contact / CTA ── */}
+      <section className="py-24" style={{ background: "var(--surface)" }}>
+        <div className="max-w-xl mx-auto px-4 text-center">
+          <AnimateOnScroll y={15} duration={0.5}>
+            <h2 className="text-3xl md:text-4xl font-bold text-text mb-4">Let&apos;s build something.</h2>
+            <p className="text-text-muted mb-8">Have a project, role, or idea in mind? Reach out.</p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {social.email && (
+                <a href={`mailto:${social.email}`} className="btn-noir btn-noir-primary btn-noir-sm">
+                  <Mail className="h-4 w-4" /> Email
+                </a>
+              )}
+              {social.phone && (
+                <a href={`https://wa.me/${social.phone.replace(/[^\d]/g, "")}`} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                  <Phone className="h-4 w-4" /> WhatsApp
+                </a>
+              )}
+              {sanitizeUrl(social.github) && (
+                <a href={sanitizeUrl(social.github)} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                  <Github className="h-4 w-4" /> GitHub
+                </a>
+              )}
+              {sanitizeUrl(social.linkedin) && (
+                <a href={sanitizeUrl(social.linkedin)} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                  <Linkedin className="h-4 w-4" /> LinkedIn
+                </a>
+              )}
+              {sanitizeUrl(social.gitlab) && (
+                <a href={sanitizeUrl(social.gitlab)} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                  <Gitlab className="h-4 w-4" /> GitLab
+                </a>
+              )}
+            </div>
+          </AnimateOnScroll>
+        </div>
+      </section>
+
       {/* ── Footer ── */}
       <footer className="py-10 text-center border-t" style={{ borderColor: "var(--border)" }}>
         <p className="text-sm text-text-dim" suppressHydrationWarning>
@@ -523,21 +577,21 @@ async function HomeBelowFold({
 function BelowFoldSkeleton() {
   return (
     <div className="animate-pulse space-y-20 py-20">
-      {/* Tech Stack skeleton */}
-      <div className="max-w-5xl mx-auto px-4">
-        <div className="h-8 w-48 bg-[var(--surface-hover)] rounded mx-auto mb-12" />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-40 rounded-xl bg-[var(--surface-hover)]" />
-          ))}
-        </div>
-      </div>
       {/* Projects skeleton */}
       <div className="max-w-5xl mx-auto px-4">
         <div className="h-8 w-32 bg-[var(--surface-hover)] rounded mx-auto mb-12" />
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="h-56 rounded-xl bg-[var(--surface-hover)]" />
+          ))}
+        </div>
+      </div>
+      {/* Engineering Stack skeleton */}
+      <div className="max-w-5xl mx-auto px-4">
+        <div className="h-8 w-48 bg-[var(--surface-hover)] rounded mx-auto mb-12" />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-40 rounded-xl bg-[var(--surface-hover)]" />
           ))}
         </div>
       </div>
