@@ -2,16 +2,29 @@
 
 import { useEffect, useRef, type ReactNode, type ElementType } from "react";
 
-// GSAP + ScrollTrigger are deferred to first idle callback.
-// They're ~400 KiB combined and only needed for scroll animations
-// in below-fold sections — wasteful on the critical path.
+// GSAP + ScrollTrigger are deferred to first idle callback. They're ~400 KiB
+// combined and only needed for scroll animations in below-fold sections —
+// wasteful on the critical path, so the import itself (not just its usage)
+// waits until the browser has spare cycles after hydration.
+function scheduleIdle(cb: () => void) {
+  if (typeof window.requestIdleCallback === "function") {
+    window.requestIdleCallback(cb, { timeout: 2000 });
+  } else {
+    setTimeout(cb, 200);
+  }
+}
+
 let gsapPromise: Promise<typeof import("gsap")> | null = null;
 function getGsap() {
   if (!gsapPromise) {
-    gsapPromise = import("gsap").then(async (m) => {
-      const { ScrollTrigger } = await import("gsap/ScrollTrigger");
-      m.default.registerPlugin(ScrollTrigger);
-      return m;
+    gsapPromise = new Promise((resolve) => {
+      scheduleIdle(() => {
+        import("gsap").then(async (m) => {
+          const { ScrollTrigger } = await import("gsap/ScrollTrigger");
+          m.default.registerPlugin(ScrollTrigger);
+          resolve(m);
+        });
+      });
     });
   }
   return gsapPromise;
