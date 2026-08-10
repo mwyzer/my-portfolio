@@ -11,6 +11,7 @@ import ThemeToggle from "@/components/theme-toggle";
 import AnimateOnScroll from "@/components/animate-on-scroll";
 import DecryptedText from "@/components/decrypted-text";
 import HeroCTA from "@/components/hero-cta";
+import ProjectPreview from "@/components/project-preview";
 
 // ── Module-level helpers (hoisted out to avoid re-creating per render) ──
 const iconForCategory = (cat: string) => {
@@ -274,7 +275,13 @@ async function HomeBelowFold({
               </div>
             </div>
             {/* Dynamic: Supabase projects */}
-            {projects?.filter((p) => p.title.trim().toLowerCase() !== STATIC_PROJECT_TITLE).map((project) => (
+            {projects?.filter((p) => p.title.trim().toLowerCase() !== STATIC_PROJECT_TITLE).map((project) => {
+              const caseStudy = project.case_study as CaseStudy | null;
+              const excerpt = caseStudy?.solution || caseStudy?.problem;
+              const capabilities = caseStudy?.capabilities
+                ? Object.values(caseStudy.capabilities).flat()
+                : [];
+              return (
               <div key={project.id} className="card-noir flex flex-col h-full">
                 <h3 className="font-semibold text-text text-lg mb-2">{project.title}</h3>
                 <p className="text-sm text-text-muted mb-4 flex-1">{project.description}</p>
@@ -285,10 +292,30 @@ async function HomeBelowFold({
                     ))}
                   </div>
                 )}
+                {excerpt && (
+                  <p className="text-xs italic mb-3 line-clamp-2" style={{ color: "var(--text-dim)" }}>
+                    {excerpt}
+                  </p>
+                )}
+                {capabilities.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    {capabilities.slice(0, 4).map((item, i) => (
+                      <span key={`${item}-${i}`} className="badge-noir" style={{ borderColor: "var(--color-accent)", color: "var(--color-accent)" }}>
+                        {item}
+                      </span>
+                    ))}
+                    {capabilities.length > 4 && (
+                      <span className="badge-noir">+{capabilities.length - 4} more</span>
+                    )}
+                  </div>
+                )}
                 {hasCaseStudy(project) && (
-                  <Link href={`/projects/${project.id}`} className="btn-noir btn-noir-ghost btn-noir-sm mb-2 self-start">
-                    View Case Study <ArrowRight className="h-4 w-4" />
-                  </Link>
+                  <div className="flex items-center gap-2 mb-2 self-start">
+                    <Link href={`/projects/${project.id}`} className="btn-noir btn-noir-ghost btn-noir-sm">
+                      View Case Study <ArrowRight className="h-4 w-4" />
+                    </Link>
+                    {caseStudy && <ProjectPreview projectId={project.id} title={project.title} caseStudy={caseStudy} />}
+                  </div>
                 )}
                 {(sanitizeUrl(project.live_url) || sanitizeUrl(project.github_url) || sanitizeUrl(project.youtube_url)) && (
                   <div className="flex gap-2">
@@ -310,7 +337,8 @@ async function HomeBelowFold({
                   </div>
                 )}
               </div>
-            ))}
+              );
+            })}
           </div>
           </AnimateOnScroll>
         </div>

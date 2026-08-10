@@ -3,6 +3,7 @@ import { ArrowRight, ExternalLink, Github, Youtube } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import type { PortfolioProject, CaseStudy } from "@/types/database";
 import ThemeToggle from "@/components/theme-toggle";
+import ProjectPreview from "@/components/project-preview";
 import { sanitizeUrl } from "@/lib/sanitize";
 
 // A project only gets a "View Case Study" link once Problem/Solution/Architecture
@@ -77,7 +78,13 @@ export default async function ProjectsPage() {
           </div>
 
           {/* Dynamic: all Supabase projects */}
-          {projects.map((project) => (
+          {projects.map((project) => {
+            const caseStudy = project.case_study as CaseStudy | null;
+            const excerpt = caseStudy?.solution || caseStudy?.problem;
+            const capabilities = caseStudy?.capabilities
+              ? Object.values(caseStudy.capabilities).flat()
+              : [];
+            return (
             <div key={project.id} className="card-noir flex flex-col h-full">
               <h3 className="font-semibold text-text text-lg mb-2">{project.title}</h3>
               <p className="text-sm text-text-muted mb-4 flex-1">{project.description}</p>
@@ -88,10 +95,30 @@ export default async function ProjectsPage() {
                   ))}
                 </div>
               )}
+              {excerpt && (
+                <p className="text-xs italic mb-3 line-clamp-2" style={{ color: "var(--text-dim)" }}>
+                  {excerpt}
+                </p>
+              )}
+              {capabilities.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-4">
+                  {capabilities.slice(0, 4).map((item, i) => (
+                    <span key={`${item}-${i}`} className="badge-noir" style={{ borderColor: "var(--color-accent)", color: "var(--color-accent)" }}>
+                      {item}
+                    </span>
+                  ))}
+                  {capabilities.length > 4 && (
+                    <span className="badge-noir">+{capabilities.length - 4} more</span>
+                  )}
+                </div>
+              )}
               {hasCaseStudy(project) && (
-                <Link href={`/projects/${project.id}`} className="btn-noir btn-noir-ghost btn-noir-sm mb-2 self-start">
-                  View Case Study <ArrowRight className="h-4 w-4" />
-                </Link>
+                <div className="flex items-center gap-2 mb-2 self-start">
+                  <Link href={`/projects/${project.id}`} className="btn-noir btn-noir-ghost btn-noir-sm">
+                    View Case Study <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  {caseStudy && <ProjectPreview projectId={project.id} title={project.title} caseStudy={caseStudy} />}
+                </div>
               )}
               {(sanitizeUrl(project.live_url) || sanitizeUrl(project.github_url) || sanitizeUrl(project.youtube_url)) && (
                 <div className="flex gap-2">
@@ -113,7 +140,8 @@ export default async function ProjectsPage() {
                 </div>
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
