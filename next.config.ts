@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
+import { PHASE_DEVELOPMENT_SERVER } from "next/constants";
 
-const nextConfig: NextConfig = {
+const buildConfig = (phase: string): NextConfig => ({
   images: {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
@@ -31,9 +32,19 @@ const nextConfig: NextConfig = {
     // widening its route matcher to run on every page (currently scoped to
     // /dashboard, /api/agent, /api/settings to avoid the extra Supabase
     // session-refresh latency on public pages) — a larger, separate change.
+    // Next.js's Fast Refresh runtime uses eval() to apply hot-reloaded
+    // modules — required for `next dev` to boot at all, irrelevant to what
+    // ships in a production build. Relaxed in dev only. Gated on the `phase`
+    // argument (not NODE_ENV) since NODE_ENV can be pinned by the shell and
+    // isn't reliably "development" under `next dev` in every environment.
+    const isDev = phase === PHASE_DEVELOPMENT_SERVER;
+    const scriptSrc = isDev
+      ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+      : "script-src 'self' 'unsafe-inline'";
+
     const csp = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline'",
+      scriptSrc,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: https://*.supabase.co https://*.githubusercontent.com https://gitlab.com",
       "font-src 'self' data:",
@@ -68,6 +79,6 @@ const nextConfig: NextConfig = {
   // Prevent unnecessary redirects that add latency to first request
   skipTrailingSlashRedirect: true,
   skipMiddlewareUrlNormalize: true,
-};
+});
 
-export default nextConfig;
+export default buildConfig;

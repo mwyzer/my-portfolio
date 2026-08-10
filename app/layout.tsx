@@ -51,7 +51,11 @@ export default async function RootLayout({
         {children}
         <ChatWidgetDeferred />
         <Toaster />
-        <AnalyticsDeferred />
+        {/* /_vercel/insights/script.js only resolves when actually served through
+            Vercel's edge network — under `next start` outside Vercel it 404s as
+            HTML, which Chrome then refuses to execute (logged as both a console
+            error and a CSP/MIME "Issue"), dinging the Best Practices score. */}
+        {process.env.VERCEL === "1" && <AnalyticsDeferred />}
       </body>
     </html>
   );
