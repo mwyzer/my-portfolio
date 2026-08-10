@@ -25,7 +25,7 @@
   --border-hover: #3f3f46;
   --text: #fafafa;
   --text-muted: #a1a1aa;
-  --text-dim: #71717a;
+  --text-dim: #7c7c85; /* AA contrast (4.6:1) against --bg per Lighthouse a11y audit */
 }
 
 /* ── Light override ── */
@@ -173,13 +173,14 @@ html.light .glass {
   transform: scale(0.98);
 }
 .btn-noir-primary {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
+  /* Darkened from --color-accent: white text on the raw accent is 4.46:1, just under AA (4.5:1) */
+  background: color-mix(in srgb, var(--color-accent) 100%, black 14%);
+  border-color: color-mix(in srgb, var(--color-accent) 100%, black 14%);
   color: #fff;
 }
 .btn-noir-primary:hover {
-  background: var(--color-accent-hover);
-  border-color: var(--color-accent-hover);
+  background: color-mix(in srgb, var(--color-accent) 100%, black 4%);
+  border-color: color-mix(in srgb, var(--color-accent) 100%, black 4%);
 }
 .btn-noir-ghost {
   background: transparent;
@@ -222,72 +223,4 @@ html.light .glass {
   color: var(--text-muted);
   background: var(--surface);
   white-space: nowrap;
-}
-
-/* ── Electric Border ── */
-.electric-border {
-  position: relative;
-  height: 100%;
-  border-radius: inherit;
-  overflow: visible;
-  isolation: isolate;
-}
-
-.eb-canvas-container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  z-index: 2;
-}
-
-.eb-canvas {
-  display: block;
-}
-
-.eb-content {
-  position: relative;
-  height: 100%;
-  border-radius: inherit;
-  z-index: 1;
-}
-
-.eb-layers {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.eb-glow-1,
-.eb-glow-2,
-.eb-background-glow {
-  position: absolute;
-  inset: -12px;
-  border-radius: inherit;
-  pointer-events: none;
-  box-sizing: border-box;
-}
-
-.eb-glow-1 {
-  border: 2px solid var(--electric-border-color);
-  filter: blur(3px);
-  opacity: 0.4;
-}
-
-.eb-glow-2 {
-  border: 2px solid var(--electric-border-color);
-  filter: blur(8px);
-  opacity: 0.25;
-}
-
-.eb-background-glow {
-  z-index: -1;
-  inset: -24px;
-  transform: scale(1);
-  filter: blur(32px);
-  opacity: 0.2;
-  background: var(--electric-border-color);
 }

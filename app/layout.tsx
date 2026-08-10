@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-import SplashCursorDeferred from "@/components/deferred/splash-cursor-deferred";
 import ChatWidgetDeferred from "@/components/deferred/chat-widget-deferred";
 import AnalyticsDeferred from "@/components/deferred/analytics-deferred";
 
@@ -50,7 +49,6 @@ export default async function RootLayout({
       </head>
       <body className="min-h-screen antialiased" suppressHydrationWarning>
         {children}
-        <SplashCursorDeferred />
         <ChatWidgetDeferred />
         <Toaster />
         <AnalyticsDeferred />

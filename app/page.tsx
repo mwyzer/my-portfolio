@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { formatDate } from "@/lib/utils";
@@ -11,13 +10,7 @@ import { sanitizeUrl } from "@/lib/sanitize";
 import ThemeToggle from "@/components/theme-toggle";
 import AnimateOnScroll from "@/components/animate-on-scroll";
 import DecryptedText from "@/components/decrypted-text";
-import ElectricBorderDeferred from "@/components/deferred/electric-border-deferred";
-
-// HeroCTA wraps SpecularButton which imports ogl (WebGL) — defer it
-// to remove a heavy JS bundle from the critical rendering path.
-const HeroCTA = dynamic(() => import("@/components/hero-cta"), {
-  loading: () => <div className="mt-8 h-12" />,
-});
+import HeroCTA from "@/components/hero-cta";
 
 // ── Module-level helpers (hoisted out to avoid re-creating per render) ──
 const iconForCategory = (cat: string) => {
@@ -52,9 +45,6 @@ const hasCaseStudy = (project: PortfolioProject) => {
 // Guard against it rendering twice if the same project ever also gets added
 // to portfolio_projects in Supabase.
 const STATIC_PROJECT_TITLE = "lms mahasiswa";
-
-// Shared glow-border color so every project card (static + dynamic) matches.
-const PROJECT_GLOW_COLOR = "#6366f1";
 
 export default async function HomePage({
   searchParams,
@@ -124,25 +114,18 @@ export default async function HomePage({
       <section className="py-24 md:py-32">
         <div className="max-w-2xl mx-auto px-4 text-center">
           {profile?.avatar_url && (
-            <div className="mb-8 inline-block" style={{ overflow: "visible" }}>
-              <ElectricBorderDeferred
-                color="#6366f1"
-                speed={0.8}
-                chaos={0.15}
-                borderRadius={9999}
-              >
-                <div className="w-32 h-32 rounded-full p-0.5" style={{ background: "linear-gradient(135deg, var(--color-accent), rgba(99,102,241,0.3))" }}>
-                  <Image
-                    src={profile.avatar_url}
-                    alt={profile.name || "Avatar"}
-                    width={128}
-                    height={128}
-                    priority
-                    className="w-full h-full rounded-full object-cover"
-                    style={{ background: "var(--bg)" }}
-                  />
-                </div>
-              </ElectricBorderDeferred>
+            <div className="mb-8 inline-block rounded-full glow">
+              <div className="w-32 h-32 rounded-full p-0.5" style={{ background: "linear-gradient(135deg, var(--color-accent), rgba(99,102,241,0.3))" }}>
+                <Image
+                  src={profile.avatar_url}
+                  alt={profile.name || "Avatar"}
+                  width={128}
+                  height={128}
+                  priority
+                  className="w-full h-full rounded-full object-cover"
+                  style={{ background: "var(--bg)" }}
+                />
+              </div>
             </div>
           )}
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-text mb-6">
@@ -270,68 +253,63 @@ async function HomeBelowFold({
           <AnimateOnScroll stagger={0.08} y={30} duration={0.5} staggerSelector=".card-noir">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {/* Static: LMS Mahasiswa — kept out of Supabase, so filter it out of the
-                dynamic list below by title to avoid rendering it twice. Every card
-                in this grid (static + dynamic) shares the same glow-border treatment. */}
-            <ElectricBorderDeferred color={PROJECT_GLOW_COLOR} speed={0.6} chaos={0.12} borderRadius={12}>
-              <div className="card-noir flex flex-col h-full" style={{ borderColor: "transparent" }}>
-                <h3 className="font-semibold text-text text-lg mb-2">LMS Mahasiswa</h3>
-                <p className="text-sm text-text-muted mb-4 flex-1">
-                  Full-stack Learning Management System — multi-role (student, instructor, admin), attendance, assignments, quizzes, AI chat assistant, Python playground &amp; PWA support.
-                </p>
-                <div className="flex flex-wrap gap-1.5 mb-4">
-                  {["Nuxt 4","Vue 3","TypeScript","Pinia","Supabase","Nitro","Vite","Vuestic UI","PWA","Vitest","Playwright"].map(t => (
-                    <span key={t} className="badge-noir">{t}</span>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <a href="https://nuxt-lms-mahasiswa.vercel.app" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-                    <ExternalLink className="h-4 w-4" /> Live
-                  </a>
-                  <a href="https://github.com/mwyzer/vue-lms-mahasiswa" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-                    <Github className="h-4 w-4" /> Code
-                  </a>
-                </div>
+                dynamic list below by title to avoid rendering it twice. */}
+            <div className="card-noir flex flex-col h-full">
+              <h3 className="font-semibold text-text text-lg mb-2">LMS Mahasiswa</h3>
+              <p className="text-sm text-text-muted mb-4 flex-1">
+                Full-stack Learning Management System — multi-role (student, instructor, admin), attendance, assignments, quizzes, AI chat assistant, Python playground &amp; PWA support.
+              </p>
+              <div className="flex flex-wrap gap-1.5 mb-4">
+                {["Nuxt 4","Vue 3","TypeScript","Pinia","Supabase","Nitro","Vite","Vuestic UI","PWA","Vitest","Playwright"].map(t => (
+                  <span key={t} className="badge-noir">{t}</span>
+                ))}
               </div>
-            </ElectricBorderDeferred>
+              <div className="flex gap-2">
+                <a href="https://nuxt-lms-mahasiswa.vercel.app" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                  <ExternalLink className="h-4 w-4" /> Live
+                </a>
+                <a href="https://github.com/mwyzer/vue-lms-mahasiswa" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                  <Github className="h-4 w-4" /> Code
+                </a>
+              </div>
+            </div>
             {/* Dynamic: Supabase projects */}
             {projects?.filter((p) => p.title.trim().toLowerCase() !== STATIC_PROJECT_TITLE).map((project) => (
-              <ElectricBorderDeferred key={project.id} color={PROJECT_GLOW_COLOR} speed={0.6} chaos={0.12} borderRadius={12}>
-                <div className="card-noir flex flex-col h-full" style={{ borderColor: "transparent" }}>
-                  <h3 className="font-semibold text-text text-lg mb-2">{project.title}</h3>
-                  <p className="text-sm text-text-muted mb-4 flex-1">{project.description}</p>
-                  {project.technologies && project.technologies.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mb-4">
-                      {project.technologies.map((tech, k) => (
-                        <span key={`${tech}-${k}`} className="badge-noir">{tech}</span>
-                      ))}
-                    </div>
-                  )}
-                  {hasCaseStudy(project) && (
-                    <Link href={`/projects/${project.id}`} className="btn-noir btn-noir-ghost btn-noir-sm mb-2 self-start">
-                      View Case Study <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  )}
-                  {(sanitizeUrl(project.live_url) || sanitizeUrl(project.github_url) || sanitizeUrl(project.youtube_url)) && (
-                    <div className="flex gap-2">
-                      {sanitizeUrl(project.live_url) && (
-                        <a href={sanitizeUrl(project.live_url)} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-                          <ExternalLink className="h-4 w-4" /> Live
-                        </a>
-                      )}
-                      {sanitizeUrl(project.github_url) && (
-                        <a href={sanitizeUrl(project.github_url)} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-                          <Github className="h-4 w-4" /> Code
-                        </a>
-                      )}
-                      {sanitizeUrl(project.youtube_url) && (
-                        <a href={sanitizeUrl(project.youtube_url)} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-                          <Youtube className="h-4 w-4" /> Video
-                        </a>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </ElectricBorderDeferred>
+              <div key={project.id} className="card-noir flex flex-col h-full">
+                <h3 className="font-semibold text-text text-lg mb-2">{project.title}</h3>
+                <p className="text-sm text-text-muted mb-4 flex-1">{project.description}</p>
+                {project.technologies && project.technologies.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    {project.technologies.map((tech, k) => (
+                      <span key={`${tech}-${k}`} className="badge-noir">{tech}</span>
+                    ))}
+                  </div>
+                )}
+                {hasCaseStudy(project) && (
+                  <Link href={`/projects/${project.id}`} className="btn-noir btn-noir-ghost btn-noir-sm mb-2 self-start">
+                    View Case Study <ArrowRight className="h-4 w-4" />
+                  </Link>
+                )}
+                {(sanitizeUrl(project.live_url) || sanitizeUrl(project.github_url) || sanitizeUrl(project.youtube_url)) && (
+                  <div className="flex gap-2">
+                    {sanitizeUrl(project.live_url) && (
+                      <a href={sanitizeUrl(project.live_url)} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                        <ExternalLink className="h-4 w-4" /> Live
+                      </a>
+                    )}
+                    {sanitizeUrl(project.github_url) && (
+                      <a href={sanitizeUrl(project.github_url)} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                        <Github className="h-4 w-4" /> Code
+                      </a>
+                    )}
+                    {sanitizeUrl(project.youtube_url) && (
+                      <a href={sanitizeUrl(project.youtube_url)} target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                        <Youtube className="h-4 w-4" /> Video
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
             ))}
           </div>
           </AnimateOnScroll>
