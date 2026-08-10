@@ -2,8 +2,9 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import Link from "next/link";
-import { Eye, X, ArrowRight, Layout, Database, Sparkles, Rocket } from "lucide-react";
+import { X, ArrowRight, Layout, Database, Sparkles, Rocket } from "lucide-react";
 import type { CaseStudy } from "@/types/database";
+import type { ReactNode } from "react";
 
 const CAPABILITY_GROUPS: { key: keyof CaseStudy["capabilities"]; label: string; icon: typeof Layout }[] = [
   { key: "fullStackEngineering", label: "Full Stack Engineering", icon: Layout },
@@ -16,19 +17,14 @@ interface ProjectPreviewProps {
   projectId: string;
   title: string;
   caseStudy: CaseStudy;
+  /** The trigger element — e.g. the card title or an icon button. Rendered as-is via Dialog.Trigger's asChild. */
+  children: ReactNode;
 }
 
-export default function ProjectPreview({ projectId, title, caseStudy }: ProjectPreviewProps) {
+export default function ProjectPreview({ projectId, title, caseStudy, children }: ProjectPreviewProps) {
   return (
     <Dialog.Root>
-      <Dialog.Trigger asChild>
-        <button
-          className="btn-noir btn-noir-ghost btn-noir-sm px-2.5!"
-          aria-label={`Preview case study for ${title}`}
-        >
-          <Eye className="h-4 w-4" />
-        </button>
-      </Dialog.Trigger>
+      <Dialog.Trigger asChild>{children}</Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay
           className="fixed inset-0 z-[60]"

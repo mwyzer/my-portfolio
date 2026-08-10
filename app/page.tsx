@@ -4,7 +4,7 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import { formatDate } from "@/lib/utils";
-import { ArrowRight, ExternalLink, Github, Youtube, Linkedin, Gitlab, Mail, Phone, Code2, Database, Palette, Rocket, Layout, Server, Globe } from "lucide-react";
+import { ArrowRight, ExternalLink, Github, Youtube, Linkedin, Gitlab, Mail, Phone, Code2, Database, Palette, Rocket, Layout, Server, Globe, Eye } from "lucide-react";
 import type { PortfolioAbout, PortfolioProject, BlogPost, CaseStudy } from "@/types/database";
 import { sanitizeUrl } from "@/lib/sanitize";
 import ThemeToggle from "@/components/theme-toggle";
@@ -283,7 +283,15 @@ async function HomeBelowFold({
                 : [];
               return (
               <div key={project.id} className="card-noir flex flex-col h-full">
-                <h3 className="font-semibold text-text text-lg mb-2">{project.title}</h3>
+                {caseStudy ? (
+                  <ProjectPreview projectId={project.id} title={project.title} caseStudy={caseStudy}>
+                    <h3 className="font-semibold text-text text-lg mb-2 text-left cursor-pointer hover:text-accent transition-colors">
+                      {project.title}
+                    </h3>
+                  </ProjectPreview>
+                ) : (
+                  <h3 className="font-semibold text-text text-lg mb-2">{project.title}</h3>
+                )}
                 <p className="text-sm text-text-muted mb-4 flex-1">{project.description}</p>
                 {project.technologies && project.technologies.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mb-4">
@@ -314,7 +322,16 @@ async function HomeBelowFold({
                     <Link href={`/projects/${project.id}`} className="btn-noir btn-noir-ghost btn-noir-sm">
                       View Case Study <ArrowRight className="h-4 w-4" />
                     </Link>
-                    {caseStudy && <ProjectPreview projectId={project.id} title={project.title} caseStudy={caseStudy} />}
+                    {caseStudy && (
+                      <ProjectPreview projectId={project.id} title={project.title} caseStudy={caseStudy}>
+                        <button
+                          className="btn-noir btn-noir-ghost btn-noir-sm px-2.5!"
+                          aria-label={`Preview case study for ${project.title}`}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+                      </ProjectPreview>
+                    )}
                   </div>
                 )}
                 {(sanitizeUrl(project.live_url) || sanitizeUrl(project.github_url) || sanitizeUrl(project.youtube_url)) && (
