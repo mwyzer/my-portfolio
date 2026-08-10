@@ -15,7 +15,7 @@ export default function HeroCTA() {
         tint="#ffffff"
         tintOpacity={0}
         blur={0}
-        textColor="#f5f5f5"
+        textColor="#000000"
         lineColor="#6366f1"
         baseColor="#27272a"
         intensity={1}
