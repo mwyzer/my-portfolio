@@ -46,7 +46,7 @@ const buildConfig = (phase: string): NextConfig => ({
       "default-src 'self'",
       scriptSrc,
       "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: https://*.supabase.co https://*.githubusercontent.com https://gitlab.com",
+      "img-src 'self' data: https://*.supabase.co https://*.githubusercontent.com https://gitlab.com https://*.googleusercontent.com",
       "font-src 'self' data:",
       "connect-src 'self' https://*.supabase.co",
       "object-src 'none'",
