@@ -5,6 +5,7 @@ import Link from "next/link";
 import { X, ArrowRight, Layout, Database, Sparkles, Rocket } from "lucide-react";
 import type { CaseStudy } from "@/types/database";
 import type { ReactNode } from "react";
+import { sanitizeUrl } from "@/lib/sanitize";
 
 const CAPABILITY_GROUPS: { key: keyof CaseStudy["capabilities"]; label: string; icon: typeof Layout }[] = [
   { key: "fullStackEngineering", label: "Full Stack Engineering", icon: Layout },
@@ -60,10 +61,16 @@ export default function ProjectPreview({ projectId, title, caseStudy, children }
                 <p className="text-sm text-text-muted leading-relaxed whitespace-pre-line">{caseStudy.solution}</p>
               </section>
             )}
-            {caseStudy.architecture && (
+            {sanitizeUrl(caseStudy.architecture) && (
               <section>
                 <h3 className="text-sm font-semibold text-text mb-2">Architecture Solution</h3>
-                <p className="text-sm text-text-muted leading-relaxed whitespace-pre-line">{caseStudy.architecture}</p>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={sanitizeUrl(caseStudy.architecture)}
+                  alt="Architecture solution diagram"
+                  className="w-full rounded-lg border"
+                  style={{ borderColor: "var(--border)" }}
+                />
               </section>
             )}
             {caseStudy.capabilities && CAPABILITY_GROUPS.some((g) => caseStudy.capabilities[g.key]?.length > 0) && (

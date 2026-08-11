@@ -117,10 +117,16 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               </section>
             )}
 
-            {caseStudy.architecture && (
+            {sanitizeUrl(caseStudy.architecture) && (
               <section>
                 <h2 className="text-xl font-bold text-text mb-3">Architecture Solution</h2>
-                <p className="text-text-muted leading-relaxed whitespace-pre-line">{caseStudy.architecture}</p>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={sanitizeUrl(caseStudy.architecture)}
+                  alt="Architecture solution diagram"
+                  className="w-full rounded-lg border"
+                  style={{ borderColor: "var(--border)" }}
+                />
               </section>
             )}
 

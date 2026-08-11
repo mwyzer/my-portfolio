@@ -236,8 +236,12 @@ export default function DashboardPortfolioPage() {
                   <Textarea id="solution" value={solution} onChange={(e) => setSolution(e.target.value)} rows={3} placeholder="How did you solve it?" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="architecture">Architecture Solution</Label>
-                  <Textarea id="architecture" value={architecture} onChange={(e) => setArchitecture(e.target.value)} rows={3} placeholder="System design, data flow, key technical decisions" />
+                  <Label htmlFor="architecture">Architecture Solution (Image URL)</Label>
+                  <Input id="architecture" value={architecture} onChange={(e) => setArchitecture(e.target.value)} placeholder="https://... (architecture diagram)" />
+                  {architecture.trim() && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={architecture.trim()} alt="Architecture solution preview" className="mt-2 max-h-40 rounded-md border" />
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label>Capabilities (comma-separated per category)</Label>
