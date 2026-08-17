@@ -7,7 +7,14 @@ export async function GET(request: Request) {
   const code = searchParams.get("code");
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type");
-  const next = searchParams.get("next") ?? "/dashboard";
+
+  // `next` is attacker-controllable (it's a URL query param on a link that
+  // gets emailed out), so only ever treat it as a same-origin path. Anything
+  // else — an absolute URL, a protocol-relative "//evil.com", or a "@evil.com"
+  // userinfo trick that turns "${origin}${next}" into a cross-origin redirect
+  // — falls back to /dashboard instead.
+  const rawNext = searchParams.get("next");
+  const next = rawNext && /^\/(?!\/)/.test(rawNext) ? rawNext : "/dashboard";
 
   const cookieStore = await cookies();
   const supabase = createServerClient(

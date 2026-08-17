@@ -29,8 +29,11 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
+  let user: Awaited<ReturnType<typeof supabase.auth.getUser>>["data"]["user"] = null;
+
   try {
-    await supabase.auth.getUser();
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
   } catch {
     // Refresh token is invalid or expired — clear auth cookies and continue
     const authCookieNames = request.cookies
@@ -46,5 +49,5 @@ export async function updateSession(request: NextRequest) {
     });
   }
 
-  return supabaseResponse;
+  return { response: supabaseResponse, user };
 }
