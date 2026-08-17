@@ -24,16 +24,18 @@ All routes receive these headers (configured in `next.config.ts`):
 | `X-Frame-Options` | `DENY` | Blocks clickjacking / framing |
 | `X-XSS-Protection` | `1; mode=block` | Enables browser XSS filter |
 | `Referrer-Policy` | `strict-origin-when-cross-origin` | Controls referrer leakage |
+| `Content-Security-Policy` | see below | Restricts script/style/image/connect origins |
 
-> **TODO:** Add a Content-Security-Policy header. This requires auditing all inline scripts / styles and third-party resources. See [#CSP] below.
+A `Content-Security-Policy` is configured in `next.config.ts` (`img-src` allows `self`, `data:`, `*.supabase.co`, `*.githubusercontent.com`, `gitlab.com`, `*.googleusercontent.com`; `script-src`/`style-src` need `'unsafe-inline'` because the App Router streams RSC payloads via inline `<script>` and this app sets layout/color via inline `style={{...}}` throughout — see the comment above the `headers()` function for the full rationale and the nonce-based approach that would remove it). `'unsafe-eval'` is added to `script-src` in dev only (Next.js Fast Refresh requires it), gated on build `phase`, not `NODE_ENV`. See the [CSP Roadmap](#csp-roadmap) below for what's left.
 
 ### 2. Authentication (Supabase SSR)
 
 - **Session management:** Supabase SSR with `@supabase/ssr` — HTTP-only cookies, server-side validation.
-- **Auth middleware** (`lib/supabase/middleware.ts`): Runs on all protected routes (`/dashboard/*`, `/api/agent/*`, `/api/settings/*`). Refreshes tokens transparently and clears stale auth cookies on failure.
-- **Magic link / OTP:** Tokens are single-use, time-limited, validated server-side in `/auth/callback`.
+- **Auth middleware** (`middleware.ts` + `lib/supabase/middleware.ts`): runs on `/dashboard/*`, `/api/agent/*`, `/api/settings/*`. For `/dashboard/*` specifically, it redirects unauthenticated requests to `/auth/login` and authenticated-but-non-owner accounts to `/forbidden` — this is real server-side enforcement, not just a session-cookie refresh. `/api/agent/*` (the visitor-facing AI chat widget) is intentionally left public; `/api/settings/*` is reserved in the matcher but no route exists there yet.
+- **Magic link / OTP:** Tokens are single-use, time-limited, validated server-side in `/auth/callback`. The post-auth redirect target (`?next=`) is restricted to same-origin paths (must start with a single `/`) to prevent an open redirect via the `Location` header.
 - **OAuth flow:** Code exchange for session happens server-side — no access tokens exposed to the client.
 - **Sign-out:** Destroys session server-side via `/auth/signout`.
+- **Single-owner enforcement:** `/dashboard/*` is gated to one email (`OWNER_EMAIL`, currently set in both `middleware.ts` and `app/dashboard/layout.tsx`) — non-owner authenticated accounts are redirected to `/forbidden`. This is UX/defense-in-depth; the actual data-layer enforcement is the RLS policies in `supabase/migrations/00004_restrict_writes_to_owner.sql`, which scope every write to that same email regardless of what the client sends.
 
 ### 3. Route Protection
 
@@ -43,10 +45,11 @@ All routes receive these headers (configured in `next.config.ts`):
 | `/blog` | Public | — |
 | `/blog/[slug]` | Public | — |
 | `/auth/login` | Public | — |
-| `/auth/callback` | Public | PKCE code / OTP exchange |
-| `/dashboard/*` | Authenticated only | Supabase SSR middleware |
-| `/api/agent/*` | Authenticated only | Supabase SSR middleware |
-| `/api/settings/*` | Authenticated only | Supabase SSR middleware |
+| `/auth/callback` | Public | PKCE code / OTP exchange, sanitized redirect target |
+| `/forbidden` | Public | 403 page — reached via middleware redirect, not directly gated |
+| `/dashboard/*` | Owner only | `middleware.ts`: unauthenticated → `/auth/login`, wrong account → `/forbidden` |
+| `/api/agent/*` | Public (intentional) | No rate limiting yet — see Known Gaps |
+| `/api/settings/*` | N/A | No route currently implemented; matcher entry is reserved for future use |
 
 ### 4. Environment Variables & Secrets
 
@@ -101,19 +104,26 @@ We will acknowledge receipt, investigate, and deploy a fix. Public disclosure ha
 
 ## CSP Roadmap
 
-A Content-Security-Policy is **not yet configured**. Before adding one:
+A baseline CSP is live (see Security Headers above). Remaining work to tighten it:
 
-1. Audit all inline `<script>` and `<style>` tags.
-2. List all external origins (images, fonts, scripts, APIs).
-3. Choose a strict policy (e.g. `strict-dynamic`-based).
-4. Deploy with `Content-Security-Policy-Report-Only` first, then enforce.
+1. Move to a nonce-based `script-src`/`style-src` to drop `'unsafe-inline'` — requires generating a per-request nonce in middleware and widening its route matcher to run on every page (currently scoped to `/dashboard`, `/api/agent`, `/api/settings` to avoid the extra Supabase session-refresh latency on public pages).
+2. Re-audit `img-src`/`connect-src` allowlists whenever a new external origin is added (e.g. the `*.googleusercontent.com` addition for Google Drive-hosted case-study images).
+
+---
+
+## Known Gaps
+
+- **`/api/agent/chat` has no rate limiting.** It's intentionally public (visitor-facing AI chat widget) and calls paid LLM providers (Gemini/OpenAI/DeepSeek fallback chain) using this project's own API keys. There's currently no per-IP/per-session throttle or message-size cap, so a scripted client could drive up API costs. Needs a rate-limit policy decision before fixing.
+- **`next dev`'s local Edge Runtime sandbox** throws `EvalError: Code generation from strings disallowed for this context` when middleware runs against `/dashboard/*` routes, because `@supabase/ssr` pulls in the Realtime client, which uses `eval`/`Function()` internally. Confirmed **not** present in production builds (`next build && next start`) — it's a `next dev`-only quirk, not a deployed bug. Avoid diagnosing "middleware doesn't work" reports using `next dev` alone; verify against a production build.
 
 ---
 
 ## Related Docs
 
-- [Middleware](../middleware.ts) — Auth middleware source
+- [Middleware](../middleware.ts) — Auth middleware source, `/dashboard` gating
 - [Supabase Middleware](../lib/supabase/middleware.ts) — Session refresh & cleanup
-- [next.config.ts](../next.config.ts) — Security headers & remote patterns
+- [Auth Callback](../app/auth/callback/route.ts) — OTP/OAuth exchange, redirect sanitization
+- [Forbidden Page](../app/forbidden/page.tsx) — 403 page
+- [next.config.ts](../next.config.ts) — Security headers, CSP & remote patterns
 - [Testing Overview](./testing/README.md) — Security header smoke tests
 - [VERSIONING.md](./VERSIONING.md) — Versioning & dependency update policy
