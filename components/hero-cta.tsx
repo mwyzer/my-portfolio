@@ -8,7 +8,7 @@ export default function HeroCTA() {
       </Link>
       <a
         href="/Muhammad_Wyzer_CV_ATS_v2.pdf"
-        download="Muhammad_Wyzer_CV.pdf"
+        download="CV_Muhammad_Wyzer.pdf"
         className="btn-noir btn-noir-lg"
       >
         Download CV
