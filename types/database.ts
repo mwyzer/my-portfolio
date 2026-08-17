@@ -18,6 +18,7 @@ export interface Database {
           featured: boolean;
           order: number;
           case_study: Json | null;
+          category: "personal" | "work" | "freelance" | null;
         };
         Insert: {
           id?: string;
@@ -33,6 +34,7 @@ export interface Database {
           featured?: boolean;
           order?: number;
           case_study?: Json | null;
+          category?: "personal" | "work" | "freelance" | null;
         };
         Update: {
           id?: string;
@@ -48,6 +50,7 @@ export interface Database {
           featured?: boolean;
           order?: number;
           case_study?: Json | null;
+          category?: "personal" | "work" | "freelance" | null;
         };
       };
       portfolio_about: {

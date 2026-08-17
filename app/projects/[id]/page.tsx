@@ -69,6 +69,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         </Link>
 
         <header className="mb-8">
+          {project.category && (
+            <span className="badge-noir mb-3 capitalize">{project.category}</span>
+          )}
           <h1 className="text-4xl font-bold text-text mb-3">{project.title}</h1>
           <p className="text-text-muted leading-relaxed">{project.description}</p>
 

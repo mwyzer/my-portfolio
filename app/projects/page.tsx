@@ -86,6 +86,9 @@ export default async function ProjectsPage() {
               : [];
             return (
             <div key={project.id} className="card-noir flex flex-col h-full">
+              {project.category && (
+                <span className="badge-noir self-start mb-2 capitalize">{project.category}</span>
+              )}
               {caseStudy ? (
                 <ProjectPreview projectId={project.id} title={project.title} caseStudy={caseStudy}>
                   <h3 className="font-semibold text-text text-lg mb-2 text-left cursor-pointer hover:text-accent transition-colors">

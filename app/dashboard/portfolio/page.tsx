@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
@@ -32,6 +33,7 @@ export default function DashboardPortfolioPage() {
   const [liveUrl, setLiveUrl] = useState("");
   const [githubUrl, setGithubUrl] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [category, setCategory] = useState<"" | "personal" | "work" | "freelance">("");
   const [featured, setFeatured] = useState(false);
 
   // Case study
@@ -59,6 +61,7 @@ export default function DashboardPortfolioPage() {
     setLiveUrl("");
     setGithubUrl("");
     setYoutubeUrl("");
+    setCategory("");
     setFeatured(false);
     setProblem("");
     setSolution("");
@@ -74,6 +77,7 @@ export default function DashboardPortfolioPage() {
     setLiveUrl(project.live_url || "");
     setGithubUrl(project.github_url || "");
     setYoutubeUrl(project.youtube_url || "");
+    setCategory(project.category || "");
     setFeatured(project.featured);
 
     const cs = project.case_study as CaseStudy | null;
@@ -126,6 +130,7 @@ export default function DashboardPortfolioPage() {
       live_url: liveUrl || null,
       github_url: githubUrl || null,
       youtube_url: youtubeUrl || null,
+      category: category || null,
       featured,
       case_study: buildCaseStudy(),
     };
@@ -216,6 +221,15 @@ export default function DashboardPortfolioPage() {
                   <Label htmlFor="youtube">YouTube URL</Label>
                   <Input id="youtube" value={youtubeUrl} onChange={(e) => setYoutubeUrl(e.target.value)} placeholder="https://youtube.com/..." />
                 </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="category">Category</Label>
+                <Select id="category" value={category} onChange={(e) => setCategory(e.target.value as typeof category)}>
+                  <option value="">No category</option>
+                  <option value="personal">Personal</option>
+                  <option value="work">Work</option>
+                  <option value="freelance">Freelance</option>
+                </Select>
               </div>
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} className="rounded" />
