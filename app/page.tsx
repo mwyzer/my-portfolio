@@ -42,11 +42,6 @@ const hasCaseStudy = (project: PortfolioProject) => {
   return !!(cs && (cs.problem || cs.solution || cs.architecture));
 };
 
-// The "LMS Mahasiswa" project card below is hardcoded (not dashboard-managed).
-// Guard against it rendering twice if the same project ever also gets added
-// to portfolio_projects in Supabase.
-const STATIC_PROJECT_TITLE = "lms mahasiswa";
-
 export default async function HomePage({
   searchParams,
 }: {
@@ -240,6 +235,22 @@ async function HomeBelowFold({
 
   return (
     <>
+      {/* ── Skills ── */}
+      {profile?.skills && profile.skills.length > 0 && (
+        <section className="py-16">
+          <div className="max-w-3xl mx-auto px-4">
+            <AnimateOnScroll y={15} duration={0.5}>
+              <h2 className="text-2xl font-bold text-center text-text mb-8">Skills</h2>
+              <div className="flex flex-wrap justify-center gap-2">
+                {profile.skills.map((skill) => (
+                  <span key={skill} className="badge-noir">{skill}</span>
+                ))}
+              </div>
+            </AnimateOnScroll>
+          </div>
+        </section>
+      )}
+
       {/* ── Featured Projects ── */}
       <section id="projects" className="py-20" style={{ background: "var(--surface)" }}>
         <div className="max-w-5xl mx-auto px-4">
@@ -253,29 +264,7 @@ async function HomeBelowFold({
           </AnimateOnScroll>
           <AnimateOnScroll stagger={0.08} y={30} duration={0.5} staggerSelector=".card-noir">
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {/* Static: LMS Mahasiswa — kept out of Supabase, so filter it out of the
-                dynamic list below by title to avoid rendering it twice. */}
-            <div className="card-noir flex flex-col h-full">
-              <h3 className="font-semibold text-text text-lg mb-2">LMS Mahasiswa</h3>
-              <p className="text-sm text-text-muted mb-4 flex-1">
-                Full-stack Learning Management System — multi-role (student, instructor, admin), attendance, assignments, quizzes, AI chat assistant, Python playground &amp; PWA support.
-              </p>
-              <div className="flex flex-wrap gap-1.5 mb-4">
-                {["Nuxt 4","Vue 3","TypeScript","Pinia","Supabase","Nitro","Vite","Vuestic UI","PWA","Vitest","Playwright"].map(t => (
-                  <span key={t} className="badge-noir">{t}</span>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <a href="https://nuxt-lms-mahasiswa.vercel.app" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-                  <ExternalLink className="h-4 w-4" /> Live
-                </a>
-                <a href="https://github.com/mwyzer/vue-lms-mahasiswa" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-                  <Github className="h-4 w-4" /> Code
-                </a>
-              </div>
-            </div>
-            {/* Dynamic: Supabase projects */}
-            {projects?.filter((p) => p.title.trim().toLowerCase() !== STATIC_PROJECT_TITLE).map((project) => {
+            {projects?.map((project) => {
               const caseStudy = project.case_study as CaseStudy | null;
               const excerpt = caseStudy?.solution || caseStudy?.problem;
               const capabilities = caseStudy?.capabilities
@@ -390,22 +379,6 @@ async function HomeBelowFold({
                 </div>
               );
             })}
-          </div>
-          </AnimateOnScroll>
-          <AnimateOnScroll y={15} duration={0.5} delay={0.3}>
-          <div className="flex flex-wrap justify-center gap-2 mt-8">
-            <a href="https://github.com/mwyzer/vue-lms-mahasiswa" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-              <Github className="h-4 w-4" /> LMS Mahasiswa
-            </a>
-            <a href="https://nuxt-lms-mahasiswa.vercel.app" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-              <ExternalLink className="h-4 w-4" /> Live Demo
-            </a>
-            <a href="https://github.com/mwyzer/portal-helpdesk" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-              <Github className="h-4 w-4" /> AI Helpdesk
-            </a>
-            <a href="https://github.com/mwyzer/99999" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-              <Github className="h-4 w-4" /> 99999
-            </a>
           </div>
           </AnimateOnScroll>
         </div>
