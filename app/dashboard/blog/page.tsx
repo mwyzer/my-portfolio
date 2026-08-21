@@ -31,6 +31,10 @@ export default function DashboardBlogPage() {
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) setUserId(data.user.id);
+    }).catch(() => {
+      // Stale/invalid refresh token — the dashboard layout's own auth check
+      // will already be redirecting to login, this just avoids an unhandled
+      // rejection in the meantime.
     });
     loadPosts();
   }, []);

@@ -48,36 +48,46 @@ export default function DashboardLayout({
   useEffect(() => {
     const supabase = createClient();
 
-    // 1. Fast check — read session from cookie (no network request)
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!session) {
-        // No session at all — redirect to login
+    const checkAuth = async () => {
+      try {
+        // 1. Fast check — read session from cookie (no network request)
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          // No session at all — redirect to login
+          await supabase.auth.signOut();
+          router.replace("/auth/login");
+          return;
+        }
+
+        // 2. Verify session is still valid with Supabase
+        const { data: { user }, error } = await supabase.auth.getUser();
+
+        if (error || !user) {
+          // Session exists locally but is invalid on the server — clean up and redirect
+          await supabase.auth.signOut();
+          router.replace("/auth/login");
+          return;
+        }
+
+        if (user.email !== OWNER_EMAIL) {
+          // Valid Supabase account, but not the site owner — RLS would reject
+          // every write anyway, so don't even show the dashboard.
+          await supabase.auth.signOut();
+          router.replace("/auth/login");
+          return;
+        }
+
+        setUser(user);
+        setChecking(false);
+      } catch {
+        // Stale/invalid refresh token (e.g. "Refresh Token Not Found") throws
+        // rather than resolving with an error — treat it the same as no session.
         await supabase.auth.signOut();
         router.replace("/auth/login");
-        return;
       }
+    };
 
-      // 2. Verify session is still valid with Supabase
-      const { data: { user }, error } = await supabase.auth.getUser();
-
-      if (error || !user) {
-        // Session exists locally but is invalid on the server — clean up and redirect
-        await supabase.auth.signOut();
-        router.replace("/auth/login");
-        return;
-      }
-
-      if (user.email !== OWNER_EMAIL) {
-        // Valid Supabase account, but not the site owner — RLS would reject
-        // every write anyway, so don't even show the dashboard.
-        await supabase.auth.signOut();
-        router.replace("/auth/login");
-        return;
-      }
-
-      setUser(user);
-      setChecking(false);
-    });
+    checkAuth();
   }, []);
 
   useEffect(() => {
