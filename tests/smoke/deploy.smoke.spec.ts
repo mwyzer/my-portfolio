@@ -27,6 +27,22 @@ test.describe("Critical smoke tests", () => {
     expect(res?.status()).toBe(404);
     await expect(page.locator("body")).not.toBeEmpty();
   });
+
+  // Regression test for "Invalid Refresh Token: Refresh Token Not Found"
+  // crashing HomePage — see lib/supabase-server.ts. A stale/garbage cookie
+  // shaped like a Supabase auth-token session must never turn into a 500;
+  // createServerSupabaseClient() is responsible for swallowing that failure.
+  test("homepage survives a stale/invalid Supabase auth cookie", async ({ request }) => {
+    const res = await request.get("/", {
+      headers: {
+        Cookie:
+          "sb-portfolio-auth-token=base64-eyJhY2Nlc3NfdG9rZW4iOiJkZWFkIiwicmVmcmVzaF90b2tlbiI6ImRlYWQiLCJleHBpcmVzX2F0IjoxfQ==",
+      },
+    });
+    expect(res.status()).toBe(200);
+    const body = await res.text();
+    expect(body.length).toBeGreaterThan(0);
+  });
 });
 
 // ── Tier 2: Important ───────────────────────────────────────
