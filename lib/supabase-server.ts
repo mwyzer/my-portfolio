@@ -1,7 +1,17 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { cache } from "react";
 
-export async function createServerSupabaseClient() {
+// Request-scoped: every call within a single request/render returns the
+// same client instance instead of a fresh one. Without this, independent
+// callers (e.g. HomePage + its Suspense-streamed HomeBelowFold, or
+// generateMetadata + the page component, which Next.js can run concurrently)
+// each read the same incoming cookies and, if the access token is expired,
+// can each try to refresh with the same refresh token. Supabase rotates
+// refresh tokens on use, so whichever call loses that race gets "Invalid
+// Refresh Token: Refresh Token Not Found" — a single shared client avoids
+// the race since concurrent refreshes on one GoTrueClient are serialized.
+export const createServerSupabaseClient = cache(async () => {
   const cookieStore = await cookies();
 
   return createServerClient(
@@ -25,4 +35,4 @@ export async function createServerSupabaseClient() {
       },
     }
   );
-}
+});
