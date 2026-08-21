@@ -14,7 +14,7 @@ import { cache } from "react";
 export const createServerSupabaseClient = cache(async () => {
   const cookieStore = await cookies();
 
-  return createServerClient(
+  const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -35,4 +35,28 @@ export const createServerSupabaseClient = cache(async () => {
       },
     }
   );
+
+  // Defense in depth: a dead/revoked refresh token makes getUser() throw
+  // rather than resolve with an error. Postgrest's own internal session
+  // resolution already tolerates this in practice (falls back to the anon
+  // key), but that's undocumented library behavior, not a guarantee — so
+  // resolve it explicitly once here (this factory is cache()'d, so it only
+  // runs once per request either way) and clear the dead cookie so the
+  // browser stops resending a token that's never going to work again.
+  try {
+    await supabase.auth.getUser();
+  } catch {
+    cookieStore
+      .getAll()
+      .filter((c) => c.name.includes("sb-") && c.name.includes("auth-token"))
+      .forEach((c) => {
+        try {
+          cookieStore.set(c.name, "", { maxAge: 0, path: "/" });
+        } catch {
+          // Same Server Component restriction as setAll above.
+        }
+      });
+  }
+
+  return supabase;
 });
