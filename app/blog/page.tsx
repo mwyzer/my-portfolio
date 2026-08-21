@@ -32,7 +32,7 @@ export default async function BlogPage() {
         </div>
       </nav>
 
-      <div className="max-w-5xl mx-auto px-4 py-16">
+      <main className="max-w-5xl mx-auto px-4 py-16">
         <h1 className="mb-2 text-4xl font-bold text-text">Blog</h1>
         <p className="mb-10 text-text-muted">
           Thoughts, tutorials, and insights
@@ -66,7 +66,7 @@ export default async function BlogPage() {
             <p className="text-text-muted">No posts published yet. Check back soon!</p>
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }

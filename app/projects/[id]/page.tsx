@@ -63,6 +63,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         </div>
       </nav>
 
+      <main>
       <article className="max-w-3xl mx-auto px-4 py-16">
         <Link href="/projects" className="btn-noir btn-noir-ghost btn-noir-sm mb-8">
           <ArrowLeft className="h-4 w-4" /> Back to projects
@@ -163,6 +164,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           </p>
         )}
       </article>
+      </main>
     </div>
   );
 }

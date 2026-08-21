@@ -49,7 +49,7 @@ export default async function ProjectsPage() {
         </div>
       </nav>
 
-      <div className="max-w-5xl mx-auto px-4 py-16">
+      <main className="max-w-5xl mx-auto px-4 py-16">
         <h1 className="mb-2 text-4xl font-bold text-text">Projects</h1>
         <p className="mb-10 text-text-muted">
           Everything I&apos;ve built, in one place
@@ -163,7 +163,7 @@ export default async function ProjectsPage() {
             );
           })}
         </div>
-      </div>
+      </main>
     </div>
   );
 }

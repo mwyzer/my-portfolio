@@ -106,87 +106,89 @@ export default async function HomePage({
         </div>
       </nav>
 
-      {/* ── Hero ── */}
-      <section className="py-24 md:py-32">
-        <div className="max-w-2xl mx-auto px-4 text-center">
-          {profile?.avatar_url && (
-            <div className="mb-8 inline-block rounded-full glow">
-              <div className="w-32 h-32 rounded-full p-0.5" style={{ background: "linear-gradient(135deg, var(--color-accent), rgba(99,102,241,0.3))" }}>
-                <Image
-                  src={profile.avatar_url}
-                  alt={profile.name || "Avatar"}
-                  width={128}
-                  height={128}
-                  priority
-                  className="w-full h-full rounded-full object-cover"
-                  style={{ background: "var(--bg)" }}
-                />
+      <main>
+        {/* ── Hero ── */}
+        <section className="py-24 md:py-32">
+          <div className="max-w-2xl mx-auto px-4 text-center">
+            {profile?.avatar_url && (
+              <div className="mb-8 inline-block rounded-full glow">
+                <div className="w-32 h-32 rounded-full p-0.5" style={{ background: "linear-gradient(135deg, var(--color-accent), rgba(99,102,241,0.3))" }}>
+                  <Image
+                    src={profile.avatar_url}
+                    alt={profile.name || "Avatar"}
+                    width={128}
+                    height={128}
+                    priority
+                    className="w-full h-full rounded-full object-cover"
+                    style={{ background: "var(--bg)" }}
+                  />
+                </div>
               </div>
-            </div>
-          )}
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-text mb-6">
-            <DecryptedText
-              text={profile?.name || "Muhammad Wyzer"}
-              speed={40}
-              className="text-text"
-            />
-          </h1>
-          <p className="text-text-muted max-w-lg mx-auto leading-relaxed">
-            {profile?.bio || "I build production-ready web applications, enterprise workflow systems, and AI-powered platforms."}
-          </p>
+            )}
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-text mb-6">
+              <DecryptedText
+                text={profile?.name || "Muhammad Wyzer"}
+                speed={40}
+                className="text-text"
+              />
+            </h1>
+            <p className="text-text-muted max-w-lg mx-auto leading-relaxed">
+              {profile?.bio || "I build production-ready web applications, enterprise workflow systems, and AI-powered platforms."}
+            </p>
 
-          <HeroCTA />
+            <HeroCTA />
 
-          <p className="mt-6 text-sm text-text-dim">
-            Available for <span className="text-text-muted">{social?.availability || "Freelance · Remote · Contract"}</span>
-          </p>
+            <p className="mt-6 text-sm text-text-dim">
+              Available for <span className="text-text-muted">{social?.availability || "Freelance · Remote · Contract"}</span>
+            </p>
 
-          {social && (
-            <div className="flex flex-wrap justify-center gap-2 mt-6">
-              {social.email && (
-                <a href={`mailto:${social.email}`} aria-label="Email" className="btn-noir btn-noir-ghost btn-noir-sm px-2.5!">
-                  <Mail className="h-4 w-4" />
-                </a>
-              )}
-              {social.phone && (
-                <a href={`https://wa.me/${social.phone.replace(/[^\d]/g, "")}`} target="_blank" rel="noreferrer" aria-label="WhatsApp" className="btn-noir btn-noir-ghost btn-noir-sm px-2.5!">
-                  <Phone className="h-4 w-4" />
-                </a>
-              )}
-              {sanitizeUrl(social.github) && (
-                <a href={sanitizeUrl(social.github)} target="_blank" rel="noreferrer" aria-label="GitHub" className="btn-noir btn-noir-ghost btn-noir-sm px-2.5!">
-                  <Github className="h-4 w-4" />
-                </a>
-              )}
-              {sanitizeUrl(social.linkedin) && (
-                <a href={sanitizeUrl(social.linkedin)} target="_blank" rel="noreferrer" aria-label="LinkedIn" className="btn-noir btn-noir-ghost btn-noir-sm px-2.5!">
-                  <Linkedin className="h-4 w-4" />
-                </a>
-              )}
-              {sanitizeUrl(social.gitlab) && (
-                <a href={sanitizeUrl(social.gitlab)} target="_blank" rel="noreferrer" aria-label="GitLab" className="btn-noir btn-noir-ghost btn-noir-sm px-2.5!">
-                  <Gitlab className="h-4 w-4" />
-                </a>
-              )}
-            </div>
-          )}
-        </div>
-      </section>
+            {social && (
+              <div className="flex flex-wrap justify-center gap-2 mt-6">
+                {social.email && (
+                  <a href={`mailto:${social.email}`} aria-label="Email" className="btn-noir btn-noir-ghost btn-noir-sm px-2.5!">
+                    <Mail className="h-4 w-4" />
+                  </a>
+                )}
+                {social.phone && (
+                  <a href={`https://wa.me/${social.phone.replace(/[^\d]/g, "")}`} target="_blank" rel="noreferrer" aria-label="WhatsApp" className="btn-noir btn-noir-ghost btn-noir-sm px-2.5!">
+                    <Phone className="h-4 w-4" />
+                  </a>
+                )}
+                {sanitizeUrl(social.github) && (
+                  <a href={sanitizeUrl(social.github)} target="_blank" rel="noreferrer" aria-label="GitHub" className="btn-noir btn-noir-ghost btn-noir-sm px-2.5!">
+                    <Github className="h-4 w-4" />
+                  </a>
+                )}
+                {sanitizeUrl(social.linkedin) && (
+                  <a href={sanitizeUrl(social.linkedin)} target="_blank" rel="noreferrer" aria-label="LinkedIn" className="btn-noir btn-noir-ghost btn-noir-sm px-2.5!">
+                    <Linkedin className="h-4 w-4" />
+                  </a>
+                )}
+                {sanitizeUrl(social.gitlab) && (
+                  <a href={sanitizeUrl(social.gitlab)} target="_blank" rel="noreferrer" aria-label="GitLab" className="btn-noir btn-noir-ghost btn-noir-sm px-2.5!">
+                    <Gitlab className="h-4 w-4" />
+                  </a>
+                )}
+              </div>
+            )}
+          </div>
+        </section>
 
-      {/* ── Below-fold: streamed via Suspense ──
-          Projects & blog posts are fetched in parallel inside
-          HomeBelowFold, so the hero section streams to the browser
-          immediately after the single profile query completes. */}
-      <Suspense fallback={<BelowFoldSkeleton />}>
-        <HomeBelowFold
-          profile={profile}
-          social={social}
-          educationEntries={educationEntries}
-          certEntries={certEntries}
-          experienceEntries={experienceEntries}
-          techStack={techStack}
-        />
-      </Suspense>
+        {/* ── Below-fold: streamed via Suspense ──
+            Projects & blog posts are fetched in parallel inside
+            HomeBelowFold, so the hero section streams to the browser
+            immediately after the single profile query completes. */}
+        <Suspense fallback={<BelowFoldSkeleton />}>
+          <HomeBelowFold
+            profile={profile}
+            social={social}
+            educationEntries={educationEntries}
+            certEntries={certEntries}
+            experienceEntries={experienceEntries}
+            techStack={techStack}
+          />
+        </Suspense>
+      </main>
     </div>
   );
 }
