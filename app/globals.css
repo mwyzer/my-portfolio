@@ -52,6 +52,7 @@ html.light {
   --color-text: var(--text);
   --color-text-muted: var(--text-muted);
   --color-text-dim: var(--text-dim);
+  --font-display: var(--font-space-mono), ui-monospace, "SF Mono", Menlo, monospace;
 }
 
 /* ── Base ── */
@@ -61,6 +62,13 @@ body {
   font-family: system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Display face — headings only. Space Mono's fixed width also keeps
+   DecryptedText's scramble from jittering as characters reveal. ── */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
 }
 
 /* ── Selection ── */

@@ -1,6 +1,17 @@
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import { Space_Mono } from "next/font/google";
 import "./globals.css";
+
+// Display face for headings — monospace ties into the terminal/decrypt
+// identity of the hero's character-scramble animation, and its fixed
+// character width keeps that animation from jittering as it reveals.
+const spaceMono = Space_Mono({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-space-mono",
+  display: "swap",
+});
 import { Toaster } from "@/components/ui/toaster";
 import ChatWidgetDeferred from "@/components/deferred/chat-widget-deferred";
 import AnalyticsDeferred from "@/components/deferred/analytics-deferred";
@@ -23,7 +34,7 @@ export default async function RootLayout({
   const themeClass = themeCookie === "light" ? "light" : "";
 
   return (
-    <html lang="en" className={themeClass} suppressHydrationWarning>
+    <html lang="en" className={`${themeClass} ${spaceMono.variable}`} suppressHydrationWarning>
       <head>
         {/* Preconnect to Supabase — API + Storage images.
             SUPABASE_URL is inlined at build time by Next.js (NEXT_PUBLIC_*).
