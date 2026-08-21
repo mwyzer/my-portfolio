@@ -35,7 +35,9 @@ export default function DecryptedText({
   const frameRef = useRef(0);
 
   useEffect(() => {
-    if (!animate) {
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (!animate || reducedMotion) {
       setDisplay(text);
       return;
     }

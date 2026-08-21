@@ -70,6 +70,10 @@ export default function AnimateOnScroll({
     const el = ref.current;
     if (!el) return;
 
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+
     let cancelled = false;
 
     getGsap().then((gsap) => {
