@@ -51,6 +51,7 @@ export default function DashboardSettingsPage() {
   const [email, setEmail] = useState(DEFAULT_LINKS.email);
   const [phone, setPhone] = useState(DEFAULT_LINKS.phone);
   const [availability, setAvailability] = useState("");
+  const [heroProof, setHeroProof] = useState("");
 
   // Education
   const [education, setEducation] = useState("");
@@ -85,6 +86,7 @@ export default function DashboardSettingsPage() {
       setEmail(links.email || DEFAULT_LINKS.email);
       setPhone(links.phone || DEFAULT_LINKS.phone);
       setAvailability(links.availability || "");
+      setHeroProof(Array.isArray(links.heroProof) ? links.heroProof.join("\n") : "");
       setEducation(links.education || "");
       setCertifications(links.certifications || "");
       setExperience(links.experience || "");
@@ -101,6 +103,7 @@ export default function DashboardSettingsPage() {
     email: email || null,
     phone: phone || null,
     availability: availability || null,
+    heroProof: heroProof.split("\n").map((s) => s.trim()).filter(Boolean),
     education: education || null,
     certifications: certifications || null,
     experience: experience || null,
@@ -201,12 +204,13 @@ export default function DashboardSettingsPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="title">Title / Tagline</Label>
-                    <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+                    <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="AI Engineer & Full-Stack Developer" required />
+                    <p className="text-xs text-muted-foreground">Shown as the role headline right under your name in the hero.</p>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="bio">Bio</Label>
-                  <Textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} rows={4} required />
+                  <Textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} rows={4} placeholder="I build production-ready business applications, AI workflows, and RAG systems." required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="skills">Skills (comma-separated)</Label>
@@ -256,6 +260,17 @@ export default function DashboardSettingsPage() {
                   <Label htmlFor="availability">Availability status</Label>
                   <Input id="availability" value={availability} onChange={(e) => setAvailability(e.target.value)} placeholder="Freelance · Remote · Contract" />
                   <p className="text-xs text-muted-foreground">Shown in the hero as &quot;Available for ...&quot;. Leave blank to use the default.</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="hero-proof">Hero proof lines (one per line)</Label>
+                  <Textarea
+                    id="hero-proof"
+                    value={heroProof}
+                    onChange={(e) => setHeroProof(e.target.value)}
+                    rows={3}
+                    placeholder={"Full-Stack · Laravel / .NET / React / Vue\nAI Engineering · RAG / Agents / LangGraph / pgvector\nProduction · Docker / PostgreSQL / Redis / CI/CD"}
+                  />
+                  <p className="text-xs text-muted-foreground">Quick-scan proof shown under the hero bio. Leave blank to use the default.</p>
                 </div>
               </>
             )}
@@ -342,21 +357,10 @@ export default function DashboardSettingsPage() {
 
 function getDefaultTechStack() {
   return [
-    {
-      category: "Frontend",
-      items: [
-        "Next.js 15", "Nuxt 4", "React 18/19", "Vue 3", "TypeScript", "Pinia",
-        "Tailwind CSS", "DaisyUI", "shadcn/ui", "Vuestic UI", "Radix UI",
-        "Lucide Icons", "Recharts", "PWA", "Zustand", "TanStack Query", "Axios",
-        "React Hook Form", "Zod",
-      ],
-    },
-    {
-      category: "Backend",
-      items: [
-        "ASP.NET Core", "Supabase", "PostgreSQL", "EF Core", "pgvector",
-        "Nitro", "SignalR", "Docker", "Vite", "Vitest", "Playwright", "xUnit",
-      ],
-    },
+    { category: "Backend", items: ["Laravel", "ASP.NET Core", "FastAPI", "Supabase"] },
+    { category: "Frontend", items: ["React", "Next.js", "Vue", "TypeScript"] },
+    { category: "Database", items: ["PostgreSQL", "MySQL", "Redis", "pgvector"] },
+    { category: "AI", items: ["RAG", "LangGraph", "LangChain", "MCP", "LLM APIs"] },
+    { category: "Infrastructure", items: ["Docker", "CI/CD", "vLLM", "Ollama"] },
   ];
 }

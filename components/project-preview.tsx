@@ -2,7 +2,7 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import Link from "next/link";
-import { X, ArrowRight, Layout, Database, Sparkles, Rocket } from "lucide-react";
+import { X, ArrowRight, Layout, Database, Sparkles, Rocket, CheckCircle2 } from "lucide-react";
 import type { CaseStudy } from "@/types/database";
 import type { ReactNode } from "react";
 import { sanitizeUrl } from "@/lib/sanitize";
@@ -61,16 +61,36 @@ export default function ProjectPreview({ projectId, title, caseStudy, children }
                 <p className="text-sm text-text-muted leading-relaxed whitespace-pre-line">{caseStudy.solution}</p>
               </section>
             )}
-            {sanitizeUrl(caseStudy.architecture) && (
+            {caseStudy.highlights && caseStudy.highlights.length > 0 && (
               <section>
-                <h3 className="text-sm font-semibold text-text mb-2">Architecture Solution</h3>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={sanitizeUrl(caseStudy.architecture)}
-                  alt="Architecture solution diagram"
-                  className="w-full rounded-lg border"
-                  style={{ borderColor: "var(--border)" }}
-                />
+                <h3 className="text-sm font-semibold text-text mb-2">What I Built</h3>
+                <ul className="space-y-1.5">
+                  {caseStudy.highlights.map((item, i) => (
+                    <li key={`${item}-${i}`} className="flex items-start gap-2 text-sm text-text-muted">
+                      <CheckCircle2 className="h-3.5 w-3.5 mt-0.5 shrink-0 text-accent" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+            {(sanitizeUrl(caseStudy.architecture) || caseStudy.architectureDiagram) && (
+              <section>
+                <h3 className="text-sm font-semibold text-text mb-2">Architecture</h3>
+                {caseStudy.architectureDiagram && (
+                  <pre className="card-noir overflow-x-auto whitespace-pre font-mono text-[11px] text-text-muted leading-relaxed">
+                    {caseStudy.architectureDiagram}
+                  </pre>
+                )}
+                {sanitizeUrl(caseStudy.architecture) && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={sanitizeUrl(caseStudy.architecture)}
+                    alt="Architecture diagram"
+                    className={`w-full rounded-lg border ${caseStudy.architectureDiagram ? "mt-3" : ""}`}
+                    style={{ borderColor: "var(--border)" }}
+                  />
+                )}
               </section>
             )}
             {caseStudy.images && caseStudy.images.filter((url) => sanitizeUrl(url)).length > 0 && (
@@ -111,6 +131,23 @@ export default function ProjectPreview({ projectId, title, caseStudy, children }
                       </div>
                     );
                   })}
+                </div>
+              </section>
+            )}
+
+            {caseStudy.metrics && caseStudy.metrics.length > 0 && (
+              <section>
+                <h3 className="text-sm font-semibold text-text mb-2">Results</h3>
+                <div className="flex flex-wrap gap-1.5">
+                  {caseStudy.metrics.map((item, i) => (
+                    <span
+                      key={`${item}-${i}`}
+                      className="badge-noir"
+                      style={{ borderColor: "var(--color-accent)", color: "var(--color-accent)" }}
+                    >
+                      {item}
+                    </span>
+                  ))}
                 </div>
               </section>
             )}

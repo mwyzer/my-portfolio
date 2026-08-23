@@ -25,6 +25,14 @@ const iconForCategory = (cat: string) => {
   return Globe;
 };
 
+const DEFAULT_TECH_STACK: { category: string; items: string[] }[] = [
+  { category: "Backend", items: ["Laravel", "ASP.NET Core", "FastAPI", "Supabase"] },
+  { category: "Frontend", items: ["React", "Next.js", "Vue", "TypeScript"] },
+  { category: "Database", items: ["PostgreSQL", "MySQL", "Redis", "pgvector"] },
+  { category: "AI", items: ["RAG", "LangGraph", "LangChain", "MCP", "LLM APIs"] },
+  { category: "Infrastructure", items: ["Docker", "CI/CD", "vLLM", "Ollama"] },
+];
+
 const accentColors = [
   "text-[#6366f1]",
   "text-[#22c55e]",
@@ -69,22 +77,20 @@ export default async function HomePage({
     .single() as unknown as Promise<{ data: PortfolioAbout | null; error: any }>);
 
   const social = (profile?.social_links as Record<string, any> | null) ?? {};
+  const heroProof: string[] = Array.isArray(social?.heroProof) && social.heroProof.length > 0
+    ? social.heroProof
+    : [
+        "Full-Stack · Laravel / .NET / React / Vue",
+        "AI Engineering · RAG / Agents / LangGraph / pgvector",
+        "Production · Docker / PostgreSQL / Redis / CI/CD",
+      ];
   const educationEntries: string[] = (typeof social?.education === "string" ? social.education.split("\n\n").filter(Boolean) : []);
   const certEntries: string[] = (typeof social?.certifications === "string" ? social.certifications.split("\n\n").filter(Boolean) : []);
   const experienceEntries: string[] = (typeof social?.experience === "string" ? social.experience.split("\n\n").filter(Boolean) : []);
 
   const techStack: { category: string; items: string[] }[] = Array.isArray(social?.techstack)
     ? social.techstack
-    : [
-        {
-          category: "Frontend",
-          items: ["Next.js 15","Nuxt 4","React 18/19","Vue 3","TypeScript","Pinia","Tailwind CSS","DaisyUI","shadcn/ui","Vuestic UI","Radix UI","Lucide Icons","Recharts","PWA","Zustand","TanStack Query","Axios","React Hook Form","Zod"],
-        },
-        {
-          category: "Backend",
-          items: ["ASP.NET Core","Supabase","PostgreSQL","EF Core","pgvector","Nitro","SignalR","Docker","Vite","Vitest","Playwright","xUnit"],
-        },
-      ];
+    : DEFAULT_TECH_STACK;
 
   return (
     <div className="min-h-screen" style={{ background: "var(--bg)", color: "var(--text)" }}>
@@ -125,16 +131,27 @@ export default async function HomePage({
                 </div>
               </div>
             )}
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-text mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-text mb-3">
               <DecryptedText
                 text={profile?.name || "Muhammad Wyzer"}
                 speed={40}
                 className="text-text"
               />
             </h1>
-            <p className="text-text-muted max-w-lg mx-auto leading-relaxed">
-              {profile?.bio || "I build production-ready web applications, enterprise workflow systems, and AI-powered platforms."}
+            <p className="text-lg md:text-xl font-semibold mb-4" style={{ color: "var(--color-accent)" }}>
+              {profile?.title || "AI Engineer & Full-Stack Developer"}
             </p>
+            <p className="text-text-muted max-w-lg mx-auto leading-relaxed">
+              {profile?.bio || "I build production-ready business applications, AI workflows, and RAG systems."}
+            </p>
+
+            {heroProof.length > 0 && (
+              <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 mt-4 text-sm text-text-dim">
+                {heroProof.map((line, i) => (
+                  <span key={i}>{line}</span>
+                ))}
+              </div>
+            )}
 
             <HeroCTA />
 
@@ -274,19 +291,29 @@ async function HomeBelowFold({
                 : [];
               return (
               <div key={project.id} className="card-noir flex flex-col h-full">
-                {project.category && (
-                  <span className="badge-noir self-start mb-2 capitalize">{project.category}</span>
-                )}
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  {project.category ? (
+                    <span className="badge-noir capitalize">{project.category}</span>
+                  ) : <span />}
+                  {project.views > 0 && (
+                    <span className="flex items-center gap-1 text-xs text-text-dim shrink-0">
+                      <Eye className="h-3.5 w-3.5" /> {project.views.toLocaleString()}
+                    </span>
+                  )}
+                </div>
                 {caseStudy ? (
                   <ProjectPreview projectId={project.id} title={project.title} caseStudy={caseStudy}>
-                    <h3 className="font-semibold text-text text-lg mb-2 text-left cursor-pointer hover:text-accent transition-colors">
+                    <h3 className="font-semibold text-text text-lg text-left cursor-pointer hover:text-accent transition-colors">
                       {project.title}
                     </h3>
                   </ProjectPreview>
                 ) : (
-                  <h3 className="font-semibold text-text text-lg mb-2">{project.title}</h3>
+                  <h3 className="font-semibold text-text text-lg">{project.title}</h3>
                 )}
-                <p className="text-sm text-text-muted mb-4 flex-1">{project.description}</p>
+                {project.subtitle && (
+                  <p className="text-sm text-text-dim mb-2">{project.subtitle}</p>
+                )}
+                <p className="text-sm text-text-muted mb-4 flex-1 mt-2">{project.description}</p>
                 {project.technologies && project.technologies.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mb-4">
                     {project.technologies.map((tech, k) => (

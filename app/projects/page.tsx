@@ -86,19 +86,29 @@ export default async function ProjectsPage() {
               : [];
             return (
             <div key={project.id} className="card-noir flex flex-col h-full">
-              {project.category && (
-                <span className="badge-noir self-start mb-2 capitalize">{project.category}</span>
-              )}
+              <div className="flex items-start justify-between gap-2 mb-2">
+                {project.category ? (
+                  <span className="badge-noir capitalize">{project.category}</span>
+                ) : <span />}
+                {project.views > 0 && (
+                  <span className="flex items-center gap-1 text-xs text-text-dim shrink-0">
+                    <Eye className="h-3.5 w-3.5" /> {project.views.toLocaleString()}
+                  </span>
+                )}
+              </div>
               {caseStudy ? (
                 <ProjectPreview projectId={project.id} title={project.title} caseStudy={caseStudy}>
-                  <h3 className="font-semibold text-text text-lg mb-2 text-left cursor-pointer hover:text-accent transition-colors">
+                  <h3 className="font-semibold text-text text-lg text-left cursor-pointer hover:text-accent transition-colors">
                     {project.title}
                   </h3>
                 </ProjectPreview>
               ) : (
-                <h3 className="font-semibold text-text text-lg mb-2">{project.title}</h3>
+                <h3 className="font-semibold text-text text-lg">{project.title}</h3>
               )}
-              <p className="text-sm text-text-muted mb-4 flex-1">{project.description}</p>
+              {project.subtitle && (
+                <p className="text-sm text-text-dim mb-2">{project.subtitle}</p>
+              )}
+              <p className="text-sm text-text-muted mb-4 flex-1 mt-2">{project.description}</p>
               {project.technologies && project.technologies.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mb-4">
                   {project.technologies.map((tech, i) => (

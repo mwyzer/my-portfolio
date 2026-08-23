@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
+import { after } from "next/server";
 import Link from "next/link";
-import { ArrowLeft, ExternalLink, Github, Youtube, Layout, Database, Sparkles, Rocket } from "lucide-react";
+import { ArrowLeft, ExternalLink, Github, Youtube, Layout, Database, Sparkles, Rocket, CheckCircle2, UserCircle2, Eye } from "lucide-react";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import type { PortfolioProject, CaseStudy } from "@/types/database";
 import ThemeToggle from "@/components/theme-toggle";
@@ -47,6 +48,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   if (!project) notFound();
 
+  // Fire after the response is sent so the view-count write never delays render.
+  after(() => supabase.rpc("increment_project_views", { project_id: project.id }));
+
   const caseStudy = project.case_study as CaseStudy | null;
 
   return (
@@ -70,11 +74,21 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         </Link>
 
         <header className="mb-8">
-          {project.category && (
-            <span className="badge-noir mb-3 capitalize">{project.category}</span>
+          <div className="flex items-center justify-between gap-2 mb-3">
+            {project.category ? (
+              <span className="badge-noir capitalize">{project.category}</span>
+            ) : <span />}
+            {project.views > 0 && (
+              <span className="flex items-center gap-1 text-xs text-text-dim">
+                <Eye className="h-3.5 w-3.5" /> {project.views.toLocaleString()} views
+              </span>
+            )}
+          </div>
+          <h1 className="text-4xl font-bold text-text mb-1">{project.title}</h1>
+          {project.subtitle && (
+            <p className="text-lg text-text-dim mb-3">{project.subtitle}</p>
           )}
-          <h1 className="text-4xl font-bold text-text mb-3">{project.title}</h1>
-          <p className="text-text-muted leading-relaxed">{project.description}</p>
+          <p className="text-text-muted leading-relaxed mt-3">{project.description}</p>
 
           {project.technologies && project.technologies.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-4">
@@ -121,16 +135,37 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               </section>
             )}
 
-            {sanitizeUrl(caseStudy.architecture) && (
+            {caseStudy.highlights && caseStudy.highlights.length > 0 && (
               <section>
-                <h2 className="text-xl font-bold text-text mb-3">Architecture Solution</h2>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={sanitizeUrl(caseStudy.architecture)}
-                  alt="Architecture solution diagram"
-                  className="w-full rounded-lg border"
-                  style={{ borderColor: "var(--border)" }}
-                />
+                <h2 className="text-xl font-bold text-text mb-3">What I Built</h2>
+                <ul className="space-y-2">
+                  {caseStudy.highlights.map((item, i) => (
+                    <li key={`${item}-${i}`} className="flex items-start gap-2 text-text-muted">
+                      <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0 text-accent" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {(sanitizeUrl(caseStudy.architecture) || caseStudy.architectureDiagram) && (
+              <section>
+                <h2 className="text-xl font-bold text-text mb-3">Architecture</h2>
+                {caseStudy.architectureDiagram && (
+                  <pre className="card-noir overflow-x-auto whitespace-pre font-mono text-xs text-text-muted leading-relaxed">
+                    {caseStudy.architectureDiagram}
+                  </pre>
+                )}
+                {sanitizeUrl(caseStudy.architecture) && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={sanitizeUrl(caseStudy.architecture)}
+                    alt="Architecture diagram"
+                    className={`w-full rounded-lg border ${caseStudy.architectureDiagram ? "mt-4" : ""}`}
+                    style={{ borderColor: "var(--border)" }}
+                  />
+                )}
               </section>
             )}
 
@@ -172,6 +207,63 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                       </div>
                     );
                   })}
+                </div>
+              </section>
+            )}
+
+            {caseStudy.engineeringDecisions && caseStudy.engineeringDecisions.length > 0 && (
+              <section>
+                <h2 className="text-xl font-bold text-text mb-3">Engineering Decisions</h2>
+                <div className="overflow-x-auto rounded-lg border" style={{ borderColor: "var(--border)" }}>
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b text-left text-text-dim" style={{ borderColor: "var(--border)" }}>
+                        <th className="px-4 py-2.5 font-medium">Problem</th>
+                        <th className="px-4 py-2.5 font-medium">Decision</th>
+                        <th className="px-4 py-2.5 font-medium">Reason</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {caseStudy.engineeringDecisions.map((d, i) => (
+                        <tr key={i} className={i > 0 ? "border-t" : ""} style={{ borderColor: "var(--border)" }}>
+                          <td className="px-4 py-2.5 text-text-muted">{d.problem}</td>
+                          <td className="px-4 py-2.5 text-text font-medium">{d.decision}</td>
+                          <td className="px-4 py-2.5 text-text-muted">{d.reason}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            )}
+
+            {caseStudy.contribution && caseStudy.contribution.length > 0 && (
+              <section>
+                <h2 className="text-xl font-bold text-text mb-3">My Contribution</h2>
+                <ul className="space-y-2">
+                  {caseStudy.contribution.map((item, i) => (
+                    <li key={`${item}-${i}`} className="flex items-start gap-2 text-text-muted">
+                      <UserCircle2 className="h-4 w-4 mt-0.5 shrink-0 text-accent" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {caseStudy.metrics && caseStudy.metrics.length > 0 && (
+              <section>
+                <h2 className="text-xl font-bold text-text mb-3">Results</h2>
+                <div className="flex flex-wrap gap-2">
+                  {caseStudy.metrics.map((item, i) => (
+                    <span
+                      key={`${item}-${i}`}
+                      className="badge-noir"
+                      style={{ borderColor: "var(--color-accent)", color: "var(--color-accent)" }}
+                    >
+                      {item}
+                    </span>
+                  ))}
                 </div>
               </section>
             )}

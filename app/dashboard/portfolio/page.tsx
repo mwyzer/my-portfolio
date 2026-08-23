@@ -9,8 +9,8 @@ import { Select } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
-import { Plus, Pencil, Trash2, GripVertical, X, Loader2 } from "lucide-react";
-import type { PortfolioProject, CaseStudy } from "@/types/database";
+import { Plus, Pencil, Trash2, GripVertical, X, Loader2, Eye } from "lucide-react";
+import type { PortfolioProject, CaseStudy, EngineeringDecision } from "@/types/database";
 
 const EMPTY_CAPABILITIES = {
   fullStackEngineering: "",
@@ -28,6 +28,7 @@ export default function DashboardPortfolioPage() {
 
   // Form state
   const [title, setTitle] = useState("");
+  const [subtitle, setSubtitle] = useState("");
   const [description, setDescription] = useState("");
   const [technologies, setTechnologies] = useState("");
   const [liveUrl, setLiveUrl] = useState("");
@@ -43,6 +44,11 @@ export default function DashboardPortfolioPage() {
   const [capabilities, setCapabilities] = useState(EMPTY_CAPABILITIES);
   const [images, setImages] = useState<string[]>([]);
   const [uploadingImages, setUploadingImages] = useState(false);
+  const [highlights, setHighlights] = useState("");
+  const [architectureDiagram, setArchitectureDiagram] = useState("");
+  const [engineeringDecisions, setEngineeringDecisions] = useState("");
+  const [contribution, setContribution] = useState("");
+  const [metrics, setMetrics] = useState("");
 
   useEffect(() => {
     loadProjects();
@@ -58,6 +64,7 @@ export default function DashboardPortfolioPage() {
 
   const resetForm = () => {
     setTitle("");
+    setSubtitle("");
     setDescription("");
     setTechnologies("");
     setLiveUrl("");
@@ -70,11 +77,17 @@ export default function DashboardPortfolioPage() {
     setArchitecture("");
     setCapabilities(EMPTY_CAPABILITIES);
     setImages([]);
+    setHighlights("");
+    setArchitectureDiagram("");
+    setEngineeringDecisions("");
+    setContribution("");
+    setMetrics("");
     setEditing(null);
   };
 
   const openEdit = (project: PortfolioProject) => {
     setTitle(project.title);
+    setSubtitle(project.subtitle || "");
     setDescription(project.description);
     setTechnologies(project.technologies?.join(", ") || "");
     setLiveUrl(project.live_url || "");
@@ -94,12 +107,25 @@ export default function DashboardPortfolioPage() {
       deliveryQuality: cs?.capabilities?.deliveryQuality?.join(", ") || "",
     });
     setImages(cs?.images || []);
+    setHighlights(cs?.highlights?.join("\n") || "");
+    setArchitectureDiagram(cs?.architectureDiagram || "");
+    setEngineeringDecisions(
+      cs?.engineeringDecisions?.map((d) => `${d.problem} | ${d.decision} | ${d.reason}`).join("\n") || ""
+    );
+    setContribution(cs?.contribution?.join("\n") || "");
+    setMetrics(cs?.metrics?.join(", ") || "");
 
     setEditing(project);
     setShowForm(true);
   };
 
   const splitList = (s: string) => s.split(",").map((v) => v.trim()).filter(Boolean);
+  const splitLines = (s: string) => s.split("\n").map((v) => v.trim()).filter(Boolean);
+  const parseDecisions = (s: string): EngineeringDecision[] =>
+    splitLines(s)
+      .map((line) => line.split("|").map((v) => v.trim()))
+      .filter((parts) => parts[0])
+      .map(([problem, decision, reason]) => ({ problem, decision: decision || "", reason: reason || "" }));
 
   // case_study is only saved when at least one of Problem/Solution/Architecture
   // is filled in — otherwise the "View Case Study" link stays hidden on the site.
@@ -116,6 +142,11 @@ export default function DashboardPortfolioPage() {
         deliveryQuality: splitList(capabilities.deliveryQuality),
       },
       images,
+      highlights: splitLines(highlights),
+      architectureDiagram: architectureDiagram.trim(),
+      engineeringDecisions: parseDecisions(engineeringDecisions),
+      contribution: splitLines(contribution),
+      metrics: splitList(metrics),
     };
   };
 
@@ -160,6 +191,7 @@ export default function DashboardPortfolioPage() {
 
     const projectData = {
       title,
+      subtitle: subtitle.trim() || null,
       description,
       technologies: techArray,
       live_url: liveUrl || null,
@@ -233,7 +265,11 @@ export default function DashboardPortfolioPage() {
             <form onSubmit={handleSave} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="title">Title</Label>
-                <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+                <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="DEMS" required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="subtitle">Subtitle</Label>
+                <Input id="subtitle" value={subtitle} onChange={(e) => setSubtitle(e.target.value)} placeholder="Document Eligibility Management System" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="desc">Description</Label>
@@ -285,12 +321,34 @@ export default function DashboardPortfolioPage() {
                   <Textarea id="solution" value={solution} onChange={(e) => setSolution(e.target.value)} rows={3} placeholder="How did you solve it?" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="architecture">Architecture Solution (Image URL)</Label>
+                  <Label htmlFor="highlights">What I Built (one per line)</Label>
+                  <Textarea
+                    id="highlights"
+                    value={highlights}
+                    onChange={(e) => setHighlights(e.target.value)}
+                    rows={4}
+                    placeholder={"Document submission workflow\nReviewer approval/revision flow\nRBAC\nAI document classification"}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="architecture">Architecture Diagram (Image URL)</Label>
                   <Input id="architecture" value={architecture} onChange={(e) => setArchitecture(e.target.value)} placeholder="https://... (architecture diagram)" />
                   {architecture.trim() && (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={architecture.trim()} alt="Architecture solution preview" className="mt-2 max-h-40 rounded-md border" />
                   )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="architecture-text">Architecture Diagram (Text, optional)</Label>
+                  <Textarea
+                    id="architecture-text"
+                    value={architectureDiagram}
+                    onChange={(e) => setArchitectureDiagram(e.target.value)}
+                    rows={6}
+                    className="font-mono text-xs"
+                    placeholder={"Vue / Quasar\n   ↓\nLaravel API\n   ↓\nPostgreSQL + Redis"}
+                  />
+                  <p className="text-xs text-muted-foreground">Rendered as a monospace block. Use instead of, or alongside, the image above.</p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="images">Gallery Images</Label>
@@ -367,6 +425,37 @@ export default function DashboardPortfolioPage() {
                     </div>
                   </div>
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="decisions">Engineering Decisions (one per line: Problem | Decision | Reason)</Label>
+                  <Textarea
+                    id="decisions"
+                    value={engineeringDecisions}
+                    onChange={(e) => setEngineeringDecisions(e.target.value)}
+                    rows={4}
+                    className="font-mono text-xs"
+                    placeholder={"AI response latency | Streaming | Improve UX\nBackground AI jobs | Celery | Avoid blocking API"}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="contribution">My Contribution (one per line)</Label>
+                  <Textarea
+                    id="contribution"
+                    value={contribution}
+                    onChange={(e) => setContribution(e.target.value)}
+                    rows={4}
+                    placeholder={"Designed backend architecture\nImplemented RBAC\nBuilt AI ticket categorization"}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="metrics">Metrics (comma-separated)</Label>
+                  <Input
+                    id="metrics"
+                    value={metrics}
+                    onChange={(e) => setMetrics(e.target.value)}
+                    placeholder="5 business modules, 20+ API endpoints, 9 automated smoke tests"
+                  />
+                  <p className="text-xs text-muted-foreground">Only use real numbers — leave blank if you don&apos;t have them.</p>
+                </div>
               </div>
 
               <div className="flex gap-2">
@@ -393,7 +482,13 @@ export default function DashboardPortfolioPage() {
                   {project.featured && (
                     <span className="rounded bg-primary/10 px-2 py-0.5 text-xs text-primary">Featured</span>
                   )}
+                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Eye className="h-3 w-3" /> {project.views.toLocaleString()}
+                  </span>
                 </div>
+                {project.subtitle && (
+                  <p className="text-sm text-muted-foreground">{project.subtitle}</p>
+                )}
                 <p className="mt-1 text-sm text-muted-foreground line-clamp-1">{project.description}</p>
               </div>
               <div className="flex gap-2">

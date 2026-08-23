@@ -9,6 +9,7 @@ export interface Database {
           created_at: string;
           updated_at: string;
           title: string;
+          subtitle: string | null;
           description: string;
           image_url: string | null;
           live_url: string | null;
@@ -19,12 +20,14 @@ export interface Database {
           order: number;
           case_study: Json | null;
           category: "personal" | "work" | "freelance" | null;
+          views: number;
         };
         Insert: {
           id?: string;
           created_at?: string;
           updated_at?: string;
           title: string;
+          subtitle?: string | null;
           description: string;
           image_url?: string | null;
           live_url?: string | null;
@@ -35,12 +38,14 @@ export interface Database {
           order?: number;
           case_study?: Json | null;
           category?: "personal" | "work" | "freelance" | null;
+          views?: number;
         };
         Update: {
           id?: string;
           created_at?: string;
           updated_at?: string;
           title?: string;
+          subtitle?: string | null;
           description?: string;
           image_url?: string | null;
           live_url?: string | null;
@@ -51,6 +56,7 @@ export interface Database {
           order?: number;
           case_study?: Json | null;
           category?: "personal" | "work" | "freelance" | null;
+          views?: number;
         };
       };
       portfolio_about: {
@@ -171,10 +177,25 @@ export interface CaseStudyCapabilities {
   deliveryQuality: string[];
 }
 
+export interface EngineeringDecision {
+  problem: string;
+  decision: string;
+  reason: string;
+}
+
 export interface CaseStudy {
   problem: string;
   solution: string;
   architecture: string;
   capabilities: CaseStudyCapabilities;
   images?: string[];
+  /** "What I built" — the concrete feature/module list. */
+  highlights?: string[];
+  /** Text/ASCII architecture diagram, rendered alongside the architecture image. */
+  architectureDiagram?: string;
+  engineeringDecisions?: EngineeringDecision[];
+  /** "My Contribution" — what this person specifically did, for interview credibility. */
+  contribution?: string[];
+  /** Freeform quantified results, e.g. "5 business modules", "20+ API endpoints". */
+  metrics?: string[];
 }
