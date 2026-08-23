@@ -134,6 +134,24 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               </section>
             )}
 
+            {caseStudy.images && caseStudy.images.filter((url) => sanitizeUrl(url)).length > 0 && (
+              <section>
+                <h2 className="text-xl font-bold text-text mb-3">Gallery</h2>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  {caseStudy.images.filter((url) => sanitizeUrl(url)).map((url, i) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      key={`${url}-${i}`}
+                      src={sanitizeUrl(url)}
+                      alt={`${project.title} screenshot ${i + 1}`}
+                      className="w-full rounded-lg border"
+                      style={{ borderColor: "var(--border)" }}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+
             {caseStudy.capabilities && CAPABILITY_GROUPS.some((g) => caseStudy.capabilities[g.key]?.length > 0) && (
               <section>
                 <h2 className="text-xl font-bold text-text mb-4">Capabilities</h2>

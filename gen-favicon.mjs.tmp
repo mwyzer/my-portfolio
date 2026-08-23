@@ -1,0 +1,49 @@
+import sharp from "sharp";
+import { writeFileSync, readFileSync } from "fs";
+
+const svgPath = "app/icon.svg";
+const svg = readFileSync(svgPath);
+
+// ICO container that embeds PNG-compressed images (valid since Vista,
+// supported by every modern browser and by Google/Bing's favicon fetchers).
+function buildIco(pngBuffers) {
+  const count = pngBuffers.length;
+  const headerSize = 6 + count * 16;
+  let offset = headerSize;
+  const header = Buffer.alloc(6);
+  header.writeUInt16LE(0, 0); // reserved
+  header.writeUInt16LE(1, 2); // type: icon
+  header.writeUInt16LE(count, 4);
+
+  const dirEntries = [];
+  for (const { size, buf } of pngBuffers) {
+    const entry = Buffer.alloc(16);
+    entry.writeUInt8(size === 256 ? 0 : size, 0); // width (0 = 256)
+    entry.writeUInt8(size === 256 ? 0 : size, 1); // height (0 = 256)
+    entry.writeUInt8(0, 2); // color palette
+    entry.writeUInt8(0, 3); // reserved
+    entry.writeUInt16LE(1, 4); // color planes
+    entry.writeUInt16LE(32, 6); // bits per pixel
+    entry.writeUInt32LE(buf.length, 8); // image data size
+    entry.writeUInt32LE(offset, 12); // offset
+    offset += buf.length;
+    dirEntries.push(entry);
+  }
+
+  return Buffer.concat([header, ...dirEntries, ...pngBuffers.map((p) => p.buf)]);
+}
+
+const sizes = [16, 32, 48];
+const pngBuffers = [];
+for (const size of sizes) {
+  const buf = await sharp(svg, { density: 384 }).resize(size, size).png().toBuffer();
+  pngBuffers.push({ size, buf });
+}
+
+const ico = buildIco(pngBuffers);
+writeFileSync("app/favicon.ico", ico);
+console.log("Wrote app/favicon.ico:", ico.length, "bytes");
+
+const appleIcon = await sharp(svg, { density: 384 }).resize(180, 180).png().toBuffer();
+writeFileSync("app/apple-icon.png", appleIcon);
+console.log("Wrote app/apple-icon.png:", appleIcon.length, "bytes");

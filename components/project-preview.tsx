@@ -73,6 +73,24 @@ export default function ProjectPreview({ projectId, title, caseStudy, children }
                 />
               </section>
             )}
+            {caseStudy.images && caseStudy.images.filter((url) => sanitizeUrl(url)).length > 0 && (
+              <section>
+                <h3 className="text-sm font-semibold text-text mb-2">Gallery</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {caseStudy.images.filter((url) => sanitizeUrl(url)).map((url, i) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      key={`${url}-${i}`}
+                      src={sanitizeUrl(url)}
+                      alt={`${title} screenshot ${i + 1}`}
+                      className="w-full rounded-lg border"
+                      style={{ borderColor: "var(--border)" }}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+
             {caseStudy.capabilities && CAPABILITY_GROUPS.some((g) => caseStudy.capabilities[g.key]?.length > 0) && (
               <section>
                 <h3 className="text-sm font-semibold text-text mb-3">Capabilities</h3>

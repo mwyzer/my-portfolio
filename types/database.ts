@@ -176,4 +176,5 @@ export interface CaseStudy {
   solution: string;
   architecture: string;
   capabilities: CaseStudyCapabilities;
+  images?: string[];
 }

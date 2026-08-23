@@ -9,7 +9,7 @@ import { Select } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
-import { Plus, Pencil, Trash2, GripVertical } from "lucide-react";
+import { Plus, Pencil, Trash2, GripVertical, X, Loader2 } from "lucide-react";
 import type { PortfolioProject, CaseStudy } from "@/types/database";
 
 const EMPTY_CAPABILITIES = {
@@ -41,6 +41,8 @@ export default function DashboardPortfolioPage() {
   const [solution, setSolution] = useState("");
   const [architecture, setArchitecture] = useState("");
   const [capabilities, setCapabilities] = useState(EMPTY_CAPABILITIES);
+  const [images, setImages] = useState<string[]>([]);
+  const [uploadingImages, setUploadingImages] = useState(false);
 
   useEffect(() => {
     loadProjects();
@@ -67,6 +69,7 @@ export default function DashboardPortfolioPage() {
     setSolution("");
     setArchitecture("");
     setCapabilities(EMPTY_CAPABILITIES);
+    setImages([]);
     setEditing(null);
   };
 
@@ -90,6 +93,7 @@ export default function DashboardPortfolioPage() {
       aiEngineering: cs?.capabilities?.aiEngineering?.join(", ") || "",
       deliveryQuality: cs?.capabilities?.deliveryQuality?.join(", ") || "",
     });
+    setImages(cs?.images || []);
 
     setEditing(project);
     setShowForm(true);
@@ -100,7 +104,7 @@ export default function DashboardPortfolioPage() {
   // case_study is only saved when at least one of Problem/Solution/Architecture
   // is filled in — otherwise the "View Case Study" link stays hidden on the site.
   const buildCaseStudy = (): CaseStudy | null => {
-    if (!problem.trim() && !solution.trim() && !architecture.trim()) return null;
+    if (!problem.trim() && !solution.trim() && !architecture.trim() && images.length === 0) return null;
     return {
       problem: problem.trim(),
       solution: solution.trim(),
@@ -111,7 +115,38 @@ export default function DashboardPortfolioPage() {
         aiEngineering: splitList(capabilities.aiEngineering),
         deliveryQuality: splitList(capabilities.deliveryQuality),
       },
+      images,
     };
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    e.target.value = "";
+    if (files.length === 0) return;
+
+    setUploadingImages(true);
+    const uploaded: string[] = [];
+
+    for (const file of files) {
+      const ext = file.name.split(".").pop();
+      const path = `${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage.from("project-images").upload(path, file);
+
+      if (error) {
+        toast({ title: "Upload failed", description: error.message, variant: "destructive" });
+        continue;
+      }
+
+      const { data } = supabase.storage.from("project-images").getPublicUrl(path);
+      uploaded.push(data.publicUrl);
+    }
+
+    setImages((prev) => [...prev, ...uploaded]);
+    setUploadingImages(false);
+  };
+
+  const removeImage = (url: string) => {
+    setImages((prev) => prev.filter((u) => u !== url));
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -258,6 +293,40 @@ export default function DashboardPortfolioPage() {
                   )}
                 </div>
                 <div className="space-y-2">
+                  <Label htmlFor="images">Gallery Images</Label>
+                  <Input
+                    id="images"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageUpload}
+                    disabled={uploadingImages}
+                  />
+                  {uploadingImages && (
+                    <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Loader2 className="h-3 w-3 animate-spin" /> Uploading...
+                    </p>
+                  )}
+                  {images.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {images.map((url, i) => (
+                        <div key={`${url}-${i}`} className="relative">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={url} alt={`Gallery image ${i + 1} preview`} className="h-20 w-20 rounded-md border object-cover" />
+                          <button
+                            type="button"
+                            onClick={() => removeImage(url)}
+                            className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground"
+                            aria-label="Remove image"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-2">
                   <Label>Capabilities (comma-separated per category)</Label>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div className="space-y-1">
@@ -301,7 +370,7 @@ export default function DashboardPortfolioPage() {
               </div>
 
               <div className="flex gap-2">
-                <Button type="submit" disabled={loading}>
+                <Button type="submit" disabled={loading || uploadingImages}>
                   {loading ? "Saving..." : editing ? "Update" : "Create"}
                 </Button>
                 <Button type="button" variant="outline" onClick={() => { setShowForm(false); resetForm(); }}>
