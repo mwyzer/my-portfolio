@@ -34,8 +34,13 @@ interface DataJson {
 /**
  * Read files/data.json and format it into clean, structured markdown
  * for the AI agent. This is the sole data source.
+ *
+ * @param options.includePrivate - When false, omits address, phone/WhatsApp,
+ * date of birth, age, and place of birth (used for the public-facing chat
+ * agent). Defaults to true for other callers that need the full record.
  */
-export function readDataJson(): string {
+export function readDataJson(options: { includePrivate?: boolean } = {}): string {
+  const { includePrivate = true } = options;
   const filesDir = path.join(process.cwd(), "files");
   const jsonPath = path.join(filesDir, "data.json");
 
@@ -51,9 +56,22 @@ export function readDataJson(): string {
 
     const pi = data.personal_information;
     if (pi) {
-      sections.push(
-        `## Personal Information\n- **Name**: ${pi.name}\n- **Gender**: ${pi.gender}\n- **Age**: ${pi.age}\n- **Date of Birth**: ${pi.date_of_birth}\n- **Place of Birth**: ${pi.place_of_birth}\n- **Address**: ${pi.address}\n- **Email**: ${pi.email}\n- **Phone/WhatsApp**: ${pi.phone_whatsapp}`
-      );
+      const lines = [`## Personal Information`, `- **Name**: ${pi.name}`, `- **Gender**: ${pi.gender}`];
+      if (includePrivate) {
+        lines.push(
+          `- **Age**: ${pi.age}`,
+          `- **Date of Birth**: ${pi.date_of_birth}`,
+          `- **Place of Birth**: ${pi.place_of_birth}`,
+          `- **Address**: ${pi.address}`
+        );
+      } else if (pi.public_location) {
+        lines.push(`- **Location**: ${pi.public_location}`);
+      }
+      lines.push(`- **Email**: ${pi.email}`);
+      if (includePrivate) {
+        lines.push(`- **Phone/WhatsApp**: ${pi.phone_whatsapp}`);
+      }
+      sections.push(lines.join("\n"));
     }
 
     if (data.professional_titles?.length) {
@@ -164,15 +182,4 @@ export function readDataJson(): string {
  */
 export async function extractAllPdfs(): Promise<string> {
   return readDataJson();
-}
-
-let cachedContext: string | null = null;
-let cachedAt = 0;
-
-/**
- * Invalidate the file cache — call this after updating files.
- */
-export function invalidatePdfCache(): void {
-  cachedContext = null;
-  cachedAt = 0;
 }

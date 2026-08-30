@@ -37,7 +37,7 @@ export default function ChatPanel({ onClose }: { onClose: () => void }) {
     []
   );
 
-  const { messages, sendMessage, status, error } = useChat({
+  const { messages, sendMessage, status, error, regenerate } = useChat({
     transport,
     onError: (err) => console.error("[chat-widget] useChat error:", err),
     onFinish: (msg) => console.log("[chat-widget] onFinish:", msg),
@@ -152,6 +152,13 @@ export default function ChatPanel({ onClose }: { onClose: () => void }) {
             }}
           >
             <span>⚠️ {error.message || "Failed to get response"}</span>
+            <button
+              type="button"
+              onClick={() => regenerate()}
+              className="underline ml-2"
+            >
+              Coba lagi
+            </button>
           </div>
         )}
         <div ref={messagesEndRef} />
