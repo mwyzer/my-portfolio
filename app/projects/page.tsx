@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, ExternalLink, Github, Youtube, Eye } from "lucide-react";
+import { ArrowRight, ExternalLink, Eye } from "lucide-react";
+import { Github, Youtube } from "@/components/brand-icons";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import type { PortfolioProject, CaseStudy } from "@/types/database";
 import ThemeToggle from "@/components/theme-toggle";

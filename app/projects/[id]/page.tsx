@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import { after } from "next/server";
 import Link from "next/link";
-import { ArrowLeft, ExternalLink, Github, Youtube, Layout, Database, Sparkles, Rocket, CheckCircle2, UserCircle2, Eye } from "lucide-react";
+import { ArrowLeft, ExternalLink, Layout, Database, Sparkles, Rocket, CheckCircle2, UserCircle2, Eye } from "lucide-react";
+import { Github, Youtube } from "@/components/brand-icons";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
 import type { PortfolioProject, CaseStudy } from "@/types/database";
 import ThemeToggle from "@/components/theme-toggle";
