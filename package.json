@@ -8,8 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "vitest run",
-    "test:watch": "vitest",
+    "test": "cross-env NODE_ENV=test vitest run",
+    "test:watch": "cross-env NODE_ENV=test vitest",
     "test:smoke": "playwright test --config=playwright.smoke.config.ts",
     "test:all": "vitest run && playwright test --config=playwright.smoke.config.ts",
     "test:log": "node scripts/test-logger.mjs"
