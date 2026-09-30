@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "anti-ui-slop": {
+      "source": "uizze/uizze",
+      "sourceType": "github",
+      "skillPath": "skills/anti-ui-slop/SKILL.md",
+      "computedHash": "8b9b037a31305c8a75fd21bed31a9db9e6a638d9830b555f83ad3347ce2a76e5"
+    }
+  }
+}
