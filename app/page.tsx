@@ -99,10 +99,10 @@ export default async function HomePage({
       {/* ── Navigation ── */}
       <nav className="glass sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3 text-text hover:text-accent transition-colors">
-            <span className="font-display font-semibold text-lg">{profile?.name || "Portfolio"}</span>
+          <Link href="/" className="flex items-center gap-3 text-text hover:text-accent transition-colors min-w-0">
+            <span className="font-display font-semibold text-lg truncate">{profile?.name || "Portfolio"}</span>
           </Link>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 shrink-0">
             <Link href="/#product" className="btn-noir btn-noir-ghost btn-noir-sm">Product</Link>
             <Link href="/#projects" className="btn-noir btn-noir-ghost btn-noir-sm">Work</Link>
             <Link href="/#experience" className="btn-noir btn-noir-ghost btn-noir-sm">Experience</Link>
