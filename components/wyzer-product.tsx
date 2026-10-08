@@ -36,7 +36,7 @@ export default function WyzerProduct() {
       </p>
       <div className="mt-8 flex flex-wrap gap-3">
         <a
-          href="mailto:info@wyzer.my.id?subject=Wyzer%20demo"
+          href="mailto:contact@wyzer.my.id?subject=Wyzer%20demo"
           className="btn-noir btn-noir-primary"
         >
           Book a demo
