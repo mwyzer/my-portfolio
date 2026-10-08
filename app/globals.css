@@ -237,3 +237,44 @@ html.light .glass {
   background: var(--surface);
   white-space: nowrap;
 }
+
+/* ── Project card hover — subtle lift + accent glow.
+   Applied on top of .card-noir specifically for project cards (not every
+   card-noir site-wide), CSS-transition based rather than GSAP. ── */
+.card-noir-project {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+.card-noir-project:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px -16px var(--color-accent-glow), 0 0 0 1px var(--color-accent-glow);
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-noir-project:hover {
+    transform: none;
+  }
+}
+
+/* ── Hero ambient background — a soft, slow-drifting accent blob behind
+   the hero content to break up the flat --bg. Purely decorative. ── */
+@keyframes hero-blob-drift {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-46%, -54%) scale(1.08); }
+}
+.hero-glow-bg {
+  position: absolute;
+  top: 32%;
+  left: 50%;
+  width: 640px;
+  height: 640px;
+  max-width: 90vw;
+  background: radial-gradient(circle, var(--color-accent-glow) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  animation: hero-blob-drift 14s ease-in-out infinite;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-glow-bg {
+    animation: none;
+  }
+}

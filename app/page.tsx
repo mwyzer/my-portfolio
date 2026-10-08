@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
-import { formatDate } from "@/lib/utils";
+import { formatDate, buildInlineBadges } from "@/lib/utils";
 import { ArrowRight, ExternalLink, Mail, Phone, Code2, Database, Palette, Rocket, Layout, Server, Globe, Eye } from "lucide-react";
 import { Github, Youtube, Linkedin, Gitlab } from "@/components/brand-icons";
 import type { PortfolioAbout, PortfolioProject, BlogPost, CaseStudy } from "@/types/database";
@@ -13,6 +13,7 @@ import AnimateOnScroll from "@/components/animate-on-scroll";
 import DecryptedText from "@/components/decrypted-text";
 import HeroCTA from "@/components/hero-cta";
 import ProjectPreview from "@/components/project-preview";
+import WyzerProduct from "@/components/wyzer-product";
 
 // ── Module-level helpers (hoisted out to avoid re-creating per render) ──
 const iconForCategory = (cat: string) => {
@@ -102,6 +103,7 @@ export default async function HomePage({
             <span className="font-display font-semibold text-lg">{profile?.name || "Portfolio"}</span>
           </Link>
           <div className="flex items-center gap-1">
+            <Link href="/#product" className="btn-noir btn-noir-ghost btn-noir-sm">Product</Link>
             <Link href="/#projects" className="btn-noir btn-noir-ghost btn-noir-sm">Work</Link>
             <Link href="/#experience" className="btn-noir btn-noir-ghost btn-noir-sm">Experience</Link>
             <Link href="/blog" className="btn-noir btn-noir-ghost btn-noir-sm">Blog</Link>
@@ -114,9 +116,18 @@ export default async function HomePage({
       </nav>
 
       <main>
+        <WyzerProduct />
+
         {/* ── Hero ── */}
-        <section className="py-24 md:py-32">
-          <div className="max-w-2xl mx-auto px-4 text-center">
+        <section className="relative overflow-hidden py-24 md:py-32">
+          <div className="hero-glow-bg" aria-hidden="true" />
+          <AnimateOnScroll
+            immediate
+            stagger={0.12}
+            y={18}
+            duration={0.7}
+            className="relative z-10 max-w-2xl mx-auto px-4 text-center"
+          >
             {profile?.avatar_url && (
               <div className="mb-8 inline-block rounded-full glow">
                 <div className="w-32 h-32 rounded-full p-0.5" style={{ background: "linear-gradient(135deg, var(--color-accent), rgba(99,102,241,0.3))" }}>
@@ -156,10 +167,6 @@ export default async function HomePage({
 
             <HeroCTA />
 
-            <p className="mt-6 text-sm text-text-dim">
-              Available for <span className="text-text-muted">{social?.availability || "Freelance · Remote · Contract"}</span>
-            </p>
-
             {social && (
               <div className="flex flex-wrap justify-center gap-2 mt-6">
                 {social.email && (
@@ -189,7 +196,7 @@ export default async function HomePage({
                 )}
               </div>
             )}
-          </div>
+          </AnimateOnScroll>
         </section>
 
         {/* ── Below-fold: streamed via Suspense ──
@@ -290,8 +297,12 @@ async function HomeBelowFold({
               const capabilities = caseStudy?.capabilities
                 ? Object.values(caseStudy.capabilities).flat()
                 : [];
+              const { shown: badges, remaining: moreBadges } = buildInlineBadges(
+                capabilities,
+                project.technologies ?? []
+              );
               return (
-              <div key={project.id} className="card-noir flex flex-col h-full">
+              <div key={project.id} className="card-noir card-noir-project flex flex-col h-full">
                 <div className="flex items-start justify-between gap-2 mb-2">
                   {project.category ? (
                     <span className="badge-noir capitalize">{project.category}</span>
@@ -315,27 +326,24 @@ async function HomeBelowFold({
                   <p className="text-sm text-text-dim mb-2">{project.subtitle}</p>
                 )}
                 <p className="text-sm text-text-muted mb-4 flex-1 mt-2">{project.description}</p>
-                {project.technologies && project.technologies.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mb-4">
-                    {project.technologies.map((tech, k) => (
-                      <span key={`${tech}-${k}`} className="badge-noir">{tech}</span>
-                    ))}
-                  </div>
-                )}
                 {excerpt && (
                   <p className="text-xs italic mb-3 line-clamp-2" style={{ color: "var(--text-dim)" }}>
                     {excerpt}
                   </p>
                 )}
-                {capabilities.length > 0 && (
+                {badges.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mb-4">
-                    {capabilities.slice(0, 4).map((item, i) => (
-                      <span key={`${item}-${i}`} className="badge-noir" style={{ borderColor: "var(--color-accent)", color: "var(--color-accent)" }}>
-                        {item}
+                    {badges.map((b, i) => (
+                      <span
+                        key={`${b.label}-${i}`}
+                        className="badge-noir"
+                        style={b.accent ? { borderColor: "var(--color-accent)", color: "var(--color-accent)" } : undefined}
+                      >
+                        {b.label}
                       </span>
                     ))}
-                    {capabilities.length > 4 && (
-                      <span className="badge-noir">+{capabilities.length - 4} more</span>
+                    {moreBadges > 0 && (
+                      <span className="badge-noir">+{moreBadges} more</span>
                     )}
                   </div>
                 )}
@@ -457,71 +465,62 @@ async function HomeBelowFold({
         </section>
       )}
 
-      {/* ── Education ── */}
-      {educationEntries.length > 0 && (
+      {/* ── Education & Certifications ──
+          Both are the least chronologically-important content (unlike Work
+          Experience, sequencing between them doesn't matter), so they share
+          one compact section as plain cards rather than each getting their
+          own copy-pasted alternating timeline. */}
+      {(educationEntries.length > 0 || certEntries.length > 0) && (
         <section className="py-20">
-          <div className="max-w-3xl mx-auto px-4">
+          <div className="max-w-4xl mx-auto px-4">
             <AnimateOnScroll y={20} duration={0.6}>
-              <h2 className="text-3xl font-bold text-center text-text mb-12">Formal Education</h2>
+              <h2 className="text-3xl font-bold text-center text-text mb-12">Education &amp; Certifications</h2>
             </AnimateOnScroll>
-            <AnimateOnScroll stagger={0.15} y={25} duration={0.5} triggerStart="top 80%">
-            <div className="relative">
-              <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px md:-translate-x-px" style={{ background: "var(--border)" }} />
-              <div className="space-y-8">
-                {educationEntries.map((entry, i) => {
-                  const lines = entry.split("\n").filter(Boolean);
-                  const institution = lines[0] || "";
-                  const period = lines[1] || "";
-                  const isLeft = i % 2 === 0;
-                  return (
-                    <div key={i} className={`relative flex items-start gap-6 ${isLeft ? "md:flex-row" : "md:flex-row-reverse"}`}>
-                      <div className="absolute left-4 md:left-1/2 w-3 h-3 rounded-full -translate-x-1/2 mt-1.5 z-10" style={{ background: "var(--color-accent)", boxShadow: "0 0 8px var(--color-accent-glow)" }} />
-                      <div className={`ml-10 md:ml-0 md:w-1/2 ${isLeft ? "md:pr-8 md:text-right" : "md:pl-8"}`}>
-                        <div className="card-noir !p-4">
-                          <h3 className="font-semibold text-text text-base">{institution}</h3>
-                          {period && <p className="text-sm text-text-dim mt-1">{period}</p>}
-                        </div>
-                      </div>
+            <div className={`grid gap-x-10 gap-y-10 ${educationEntries.length > 0 && certEntries.length > 0 ? "md:grid-cols-2" : ""}`}>
+              {educationEntries.length > 0 && (
+                <div>
+                  <AnimateOnScroll y={15} duration={0.4}>
+                    <h3 className="text-sm font-semibold uppercase tracking-wide text-text-dim mb-4">Education</h3>
+                  </AnimateOnScroll>
+                  <AnimateOnScroll stagger={0.08} y={15} duration={0.4} staggerSelector=".card-noir" triggerStart="top 85%">
+                    <div className="space-y-3">
+                      {educationEntries.map((entry, i) => {
+                        const lines = entry.split("\n").filter(Boolean);
+                        const institution = lines[0] || "";
+                        const period = lines[1] || "";
+                        return (
+                          <div key={i} className="card-noir !p-4">
+                            <h4 className="font-semibold text-text text-sm">{institution}</h4>
+                            {period && <p className="text-xs text-text-dim mt-1">{period}</p>}
+                          </div>
+                        );
+                      })}
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-            </AnimateOnScroll>
-          </div>
-        </section>
-      )}
-
-      {/* ── Certifications ── */}
-      {certEntries.length > 0 && (
-        <section className="py-20" style={{ background: "var(--surface)" }}>
-          <div className="max-w-3xl mx-auto px-4">
-            <AnimateOnScroll y={20} duration={0.6}>
-              <h2 className="text-3xl font-bold text-center text-text mb-12">Certifications &amp; Training</h2>
-            </AnimateOnScroll>
-            <AnimateOnScroll stagger={0.15} y={25} duration={0.5} triggerStart="top 80%">
-            <div className="relative">
-              <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-px md:-translate-x-px" style={{ background: "var(--border)" }} />
-              <div className="space-y-8">
-                {certEntries.map((entry, i) => {
-                  const [year, ...rest] = entry.split("\t").filter(Boolean);
-                  const desc = rest.join(" ");
-                  const isLeft = i % 2 === 0;
-                  return (
-                    <div key={i} className={`relative flex items-start gap-6 ${isLeft ? "md:flex-row" : "md:flex-row-reverse"}`}>
-                      <div className="absolute left-4 md:left-1/2 w-3 h-3 rounded-full -translate-x-1/2 mt-1.5 z-10" style={{ background: "var(--color-accent)", boxShadow: "0 0 8px var(--color-accent-glow)" }} />
-                      <div className={`ml-10 md:ml-0 md:w-1/2 ${isLeft ? "md:pr-8 md:text-right" : "md:pl-8"}`}>
-                        <div className="card-noir !p-4">
-                          <h3 className="font-semibold text-text text-base">{desc}</h3>
-                          {year && <p className="text-sm text-text-dim mt-1">{year}</p>}
-                        </div>
-                      </div>
+                  </AnimateOnScroll>
+                </div>
+              )}
+              {certEntries.length > 0 && (
+                <div>
+                  <AnimateOnScroll y={15} duration={0.4}>
+                    <h3 className="text-sm font-semibold uppercase tracking-wide text-text-dim mb-4">Certifications &amp; Training</h3>
+                  </AnimateOnScroll>
+                  <AnimateOnScroll stagger={0.08} y={15} duration={0.4} staggerSelector=".card-noir" triggerStart="top 85%">
+                    <div className="space-y-3">
+                      {certEntries.map((entry, i) => {
+                        const [year, ...rest] = entry.split("\t").filter(Boolean);
+                        const desc = rest.join(" ");
+                        return (
+                          <div key={i} className="card-noir !p-4">
+                            <h4 className="font-semibold text-text text-sm">{desc}</h4>
+                            {year && <p className="text-xs text-text-dim mt-1">{year}</p>}
+                          </div>
+                        );
+                      })}
                     </div>
-                  );
-                })}
-              </div>
+                  </AnimateOnScroll>
+                </div>
+              )}
             </div>
-            </AnimateOnScroll>
           </div>
         </section>
       )}

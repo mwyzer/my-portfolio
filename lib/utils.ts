@@ -20,3 +20,28 @@ export function slugify(text: string) {
     .replace(/[\s_-]+/g, "-")
     .replace(/^-+|-+$/g, "");
 }
+
+export interface InlineBadge {
+  label: string;
+  /** Render with the accent border/text treatment (used for capabilities) */
+  accent: boolean;
+}
+
+/**
+ * Combines a project's capabilities + technologies into a single capped
+ * badge row, prioritizing capabilities (the differentiators) over raw
+ * tech-stack names, with a "+N more" remainder — used to keep project
+ * cards from stacking multiple separate badge rows.
+ */
+export function buildInlineBadges(
+  capabilities: string[] = [],
+  technologies: string[] = [],
+  max = 5
+): { shown: InlineBadge[]; remaining: number } {
+  const combined: InlineBadge[] = [
+    ...capabilities.map((label) => ({ label, accent: true })),
+    ...technologies.map((label) => ({ label, accent: false })),
+  ];
+  const shown = combined.slice(0, max);
+  return { shown, remaining: Math.max(0, combined.length - shown.length) };
+}

@@ -6,6 +6,7 @@ import type { PortfolioProject, CaseStudy } from "@/types/database";
 import ThemeToggle from "@/components/theme-toggle";
 import ProjectPreview from "@/components/project-preview";
 import { sanitizeUrl } from "@/lib/sanitize";
+import { buildInlineBadges } from "@/lib/utils";
 
 // A project only gets a "View Case Study" link once Problem/Solution/Architecture
 // has actually been filled in via the dashboard.
@@ -35,6 +36,11 @@ export default async function ProjectsPage() {
 
   const projects = (data || []).filter((p) => p.title.trim().toLowerCase() !== STATIC_PROJECT_TITLE);
 
+  const lmsBadges = buildInlineBadges(
+    [],
+    ["Nuxt 4", "Vue 3", "TypeScript", "Pinia", "Supabase", "Nitro", "Vite", "Vuestic UI", "PWA", "Vitest", "Playwright"]
+  );
+
   return (
     <div className="min-h-screen" style={{ background: "var(--bg)", color: "var(--text)" }}>
       {/* Navigation */}
@@ -43,6 +49,7 @@ export default async function ProjectsPage() {
           <Link href="/" className="font-semibold text-lg text-text hover:text-accent transition-colors">Portfolio</Link>
           <div className="flex items-center gap-1">
             <Link href="/" className="btn-noir btn-noir-ghost btn-noir-sm">Home</Link>
+            <Link href="/#product" className="btn-noir btn-noir-ghost btn-noir-sm">Product</Link>
             <Link href="/projects" className="btn-noir btn-noir-sm" style={{ background: "var(--color-accent)", color: "#fff", borderColor: "var(--color-accent)" }}>Projects</Link>
             <Link href="/blog" className="btn-noir btn-noir-ghost btn-noir-sm">Blog</Link>
             <ThemeToggle />
@@ -58,15 +65,16 @@ export default async function ProjectsPage() {
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {/* Static: LMS Mahasiswa */}
-          <div className="card-noir flex flex-col h-full">
+          <div className="card-noir card-noir-project flex flex-col h-full">
             <h3 className="font-semibold text-text text-lg mb-2">LMS Mahasiswa</h3>
             <p className="text-sm text-text-muted mb-4 flex-1">
               Full-stack Learning Management System — multi-role (student, instructor, admin), attendance, assignments, quizzes, AI chat assistant, Python playground &amp; PWA support.
             </p>
             <div className="flex flex-wrap gap-1.5 mb-4">
-              {["Nuxt 4", "Vue 3", "TypeScript", "Pinia", "Supabase", "Nitro", "Vite", "Vuestic UI", "PWA", "Vitest", "Playwright"].map((t) => (
-                <span key={t} className="badge-noir">{t}</span>
+              {lmsBadges.shown.map((b, i) => (
+                <span key={`${b.label}-${i}`} className="badge-noir">{b.label}</span>
               ))}
+              {lmsBadges.remaining > 0 && <span className="badge-noir">+{lmsBadges.remaining} more</span>}
             </div>
             <div className="flex gap-2">
               <a href="https://nuxt-lms-mahasiswa.vercel.app" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
@@ -85,8 +93,12 @@ export default async function ProjectsPage() {
             const capabilities = caseStudy?.capabilities
               ? Object.values(caseStudy.capabilities).flat()
               : [];
+            const { shown: badges, remaining: moreBadges } = buildInlineBadges(
+              capabilities,
+              project.technologies ?? []
+            );
             return (
-            <div key={project.id} className="card-noir flex flex-col h-full">
+            <div key={project.id} className="card-noir card-noir-project flex flex-col h-full">
               <div className="flex items-start justify-between gap-2 mb-2">
                 {project.category ? (
                   <span className="badge-noir capitalize">{project.category}</span>
@@ -110,27 +122,24 @@ export default async function ProjectsPage() {
                 <p className="text-sm text-text-dim mb-2">{project.subtitle}</p>
               )}
               <p className="text-sm text-text-muted mb-4 flex-1 mt-2">{project.description}</p>
-              {project.technologies && project.technologies.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mb-4">
-                  {project.technologies.map((tech, i) => (
-                    <span key={`${tech}-${i}`} className="badge-noir">{tech}</span>
-                  ))}
-                </div>
-              )}
               {excerpt && (
                 <p className="text-xs italic mb-3 line-clamp-2" style={{ color: "var(--text-dim)" }}>
                   {excerpt}
                 </p>
               )}
-              {capabilities.length > 0 && (
+              {badges.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mb-4">
-                  {capabilities.slice(0, 4).map((item, i) => (
-                    <span key={`${item}-${i}`} className="badge-noir" style={{ borderColor: "var(--color-accent)", color: "var(--color-accent)" }}>
-                      {item}
+                  {badges.map((b, i) => (
+                    <span
+                      key={`${b.label}-${i}`}
+                      className="badge-noir"
+                      style={b.accent ? { borderColor: "var(--color-accent)", color: "var(--color-accent)" } : undefined}
+                    >
+                      {b.label}
                     </span>
                   ))}
-                  {capabilities.length > 4 && (
-                    <span className="badge-noir">+{capabilities.length - 4} more</span>
+                  {moreBadges > 0 && (
+                    <span className="badge-noir">+{moreBadges} more</span>
                   )}
                 </div>
               )}

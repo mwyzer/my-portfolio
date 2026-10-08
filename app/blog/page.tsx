@@ -26,6 +26,7 @@ export default async function BlogPage() {
           <Link href="/" className="font-semibold text-lg text-text hover:text-accent transition-colors">Portfolio</Link>
           <div className="flex items-center gap-1">
             <Link href="/" className="btn-noir btn-noir-ghost btn-noir-sm">Home</Link>
+            <Link href="/#product" className="btn-noir btn-noir-ghost btn-noir-sm">Product</Link>
             <Link href="/blog" className="btn-noir btn-noir-sm" style={{ background: "var(--color-accent)", color: "#fff", borderColor: "var(--color-accent)" }}>Blog</Link>
             <ThemeToggle />
           </div>

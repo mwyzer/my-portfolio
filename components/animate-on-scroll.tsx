@@ -30,6 +30,20 @@ function getGsap() {
   return gsapPromise;
 }
 
+// Above-the-fold content (e.g. the hero) is already in the viewport on load,
+// so it can't rely on ScrollTrigger (which needs a scroll to fire) and can't
+// afford the idle-callback wait either — that risks a visible "pop in fully
+// styled, then reset and animate" flash. This loader skips both: no idle
+// wait, no ScrollTrigger chunk, just gsap's core fetched as soon as the
+// component mounts.
+let gsapImmediatePromise: Promise<typeof import("gsap")> | null = null;
+function getGsapImmediate() {
+  if (!gsapImmediatePromise) {
+    gsapImmediatePromise = import("gsap");
+  }
+  return gsapImmediatePromise;
+}
+
 interface AnimateOnScrollProps {
   children: ReactNode;
   /** CSS selector for child elements to stagger (default: direct children) */
@@ -50,6 +64,12 @@ interface AnimateOnScrollProps {
   className?: string;
   /** HTML tag for the wrapper */
   as?: ElementType;
+  /**
+   * Play immediately on mount instead of waiting for scroll-into-view.
+   * Use this for above-the-fold content (e.g. the hero) where
+   * ScrollTrigger would never reliably fire.
+   */
+  immediate?: boolean;
 }
 
 export default function AnimateOnScroll({
@@ -63,6 +83,7 @@ export default function AnimateOnScroll({
   triggerStart = "top 85%",
   className = "",
   as: Tag = "div",
+  immediate = false,
 }: AnimateOnScrollProps) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -76,7 +97,7 @@ export default function AnimateOnScroll({
 
     let cancelled = false;
 
-    getGsap().then((gsap) => {
+    (immediate ? getGsapImmediate() : getGsap()).then((gsap) => {
       if (cancelled || !el) return;
 
       const targets = staggerSelector
@@ -87,19 +108,21 @@ export default function AnimateOnScroll({
         gsap.default.fromTo(
           targets,
           { y, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration,
-            delay,
-            stagger,
-            ease,
-            scrollTrigger: {
-              trigger: el,
-              start: triggerStart,
-              toggleActions: "play none none none",
-            },
-          }
+          immediate
+            ? { y: 0, opacity: 1, duration, delay, stagger, ease }
+            : {
+                y: 0,
+                opacity: 1,
+                duration,
+                delay,
+                stagger,
+                ease,
+                scrollTrigger: {
+                  trigger: el,
+                  start: triggerStart,
+                  toggleActions: "play none none none",
+                },
+              }
         );
       }, el);
 
@@ -109,7 +132,7 @@ export default function AnimateOnScroll({
     return () => {
       cancelled = true;
     };
-  }, [staggerSelector, stagger, y, duration, delay, ease, triggerStart]);
+  }, [staggerSelector, stagger, y, duration, delay, ease, triggerStart, immediate]);
 
   const Comp = Tag as any;
   return (
