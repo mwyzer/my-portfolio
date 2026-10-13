@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode, type ElementType } from "react";
+import { cycleXPattern } from "@/lib/utils";
 
 // GSAP + ScrollTrigger are deferred to first idle callback. They're ~400 KiB
 // combined and only needed for scroll animations in below-fold sections —
@@ -121,7 +122,7 @@ export default function AnimateOnScroll({
       // GSAP's own function-based-value convention (index, target, targets),
       // but never passed in as a function prop from the Server Component.
       const fromX = xPattern
-        ? (i: number) => xPattern[i % xPattern.length]
+        ? (i: number) => cycleXPattern(xPattern, i)
         : x;
 
       const ctx = gsap.default.context(() => {

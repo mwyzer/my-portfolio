@@ -45,3 +45,16 @@ export function buildInlineBadges(
   const shown = combined.slice(0, max);
   return { shown, remaining: Math.max(0, combined.length - shown.length) };
 }
+
+/**
+ * Resolves a per-index X offset (px) from a cycling pattern — e.g. pattern
+ * `[-40, 0, 40]` gives index 0 => -40, 1 => 0, 2 => 40, 3 => -40 again.
+ * Backs AnimateOnScroll's `xPattern` prop, which exists specifically so a
+ * Server Component can request per-card left/right fly-in with a plain
+ * serializable array instead of a function prop (functions can't cross the
+ * Server -> Client Component boundary — see animate-on-scroll.tsx).
+ */
+export function cycleXPattern(pattern: number[], index: number): number {
+  if (pattern.length === 0) return 0;
+  return pattern[index % pattern.length];
+}

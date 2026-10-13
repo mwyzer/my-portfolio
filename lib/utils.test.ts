@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { cn, formatDate, slugify } from "@/lib/utils";
+import { cn, formatDate, slugify, cycleXPattern } from "@/lib/utils";
 
 describe("cn", () => {
   it("merges class names", () => {
@@ -62,5 +62,35 @@ describe("slugify", () => {
 
   it("handles empty string", () => {
     expect(slugify("")).toBe("");
+  });
+});
+
+describe("cycleXPattern", () => {
+  it("returns the value at the given index for a pattern longer than the index", () => {
+    expect(cycleXPattern([-40, 0, 40], 0)).toBe(-40);
+    expect(cycleXPattern([-40, 0, 40], 1)).toBe(0);
+    expect(cycleXPattern([-40, 0, 40], 2)).toBe(40);
+  });
+
+  it("wraps around once the index exceeds the pattern length", () => {
+    expect(cycleXPattern([-40, 0, 40], 3)).toBe(-40);
+    expect(cycleXPattern([-40, 0, 40], 4)).toBe(0);
+    expect(cycleXPattern([-40, 0, 40], 5)).toBe(40);
+  });
+
+  it("always returns the single entry for a one-element pattern", () => {
+    expect(cycleXPattern([25], 0)).toBe(25);
+    expect(cycleXPattern([25], 7)).toBe(25);
+  });
+
+  it("returns 0 for an empty pattern instead of throwing", () => {
+    expect(cycleXPattern([], 0)).toBe(0);
+    expect(cycleXPattern([], 3)).toBe(0);
+  });
+
+  it("supports a 2-entry pattern for a left/right-only grid", () => {
+    expect(cycleXPattern([-40, 40], 0)).toBe(-40);
+    expect(cycleXPattern([-40, 40], 1)).toBe(40);
+    expect(cycleXPattern([-40, 40], 2)).toBe(-40);
   });
 });
