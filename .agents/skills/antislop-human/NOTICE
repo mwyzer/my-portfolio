@@ -1,0 +1,13 @@
+# Third-Party Notice
+
+This skill is copied, unmodified, from the `antislop-human` skill in the
+`antislop` project.
+
+Original work: https://github.com/miqdadbadjuber/anti-slop
+Commit: b1cdf87d49b1653293d58424516fd80394008345 (2026-10-13)
+Original license: MIT (included in LICENSE).
+Copyright (c) 2026 Miqdad Badjuber (antislop)
+
+Only the `antislop-human` skill folder was taken — not the rest of the
+antislop system (the core `antislop.md`, its other skills, or its
+CLI installer/CLAUDE.md pointer-block mechanism).
