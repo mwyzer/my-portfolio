@@ -20,11 +20,6 @@ export const metadata = {
   description: "All projects, past and present",
 };
 
-// Kept in sync with the STATIC_PROJECT_TITLE guard in app/page.tsx —
-// this card is hardcoded (not dashboard-managed), so it's filtered out of
-// the Supabase list below to avoid a duplicate.
-const STATIC_PROJECT_TITLE = "lms mahasiswa";
-
 export default async function ProjectsPage() {
   const supabase = await createServerSupabaseClient();
 
@@ -34,12 +29,7 @@ export default async function ProjectsPage() {
     .order("featured", { ascending: false })
     .order("order", { ascending: true }) as unknown as Promise<{ data: PortfolioProject[] | null; error: any }>);
 
-  const projects = (data || []).filter((p) => p.title.trim().toLowerCase() !== STATIC_PROJECT_TITLE);
-
-  const lmsBadges = buildInlineBadges(
-    [],
-    ["Nuxt 4", "Vue 3", "TypeScript", "Pinia", "Supabase", "Nitro", "Vite", "Vuestic UI", "PWA", "Vitest", "Playwright"]
-  );
+  const projects = data || [];
 
   return (
     <div className="min-h-screen" style={{ background: "var(--bg)", color: "var(--text)" }}>
@@ -64,29 +54,6 @@ export default async function ProjectsPage() {
         </p>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Static: LMS Mahasiswa */}
-          <div className="card-noir card-noir-project flex flex-col h-full">
-            <h3 className="font-semibold text-text text-lg mb-2">LMS Mahasiswa</h3>
-            <p className="text-sm text-text-muted mb-4 flex-1">
-              Full-stack Learning Management System — multi-role (student, instructor, admin), attendance, assignments, quizzes, AI chat assistant, Python playground &amp; PWA support.
-            </p>
-            <div className="flex flex-wrap gap-1.5 mb-4">
-              {lmsBadges.shown.map((b, i) => (
-                <span key={`${b.label}-${i}`} className="badge-noir">{b.label}</span>
-              ))}
-              {lmsBadges.remaining > 0 && <span className="badge-noir">+{lmsBadges.remaining} more</span>}
-            </div>
-            <div className="flex gap-2">
-              <a href="https://nuxt-lms-mahasiswa.vercel.app" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-                <ExternalLink className="h-4 w-4" /> Live
-              </a>
-              <a href="https://github.com/mwyzer/vue-lms-mahasiswa" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
-                <Github className="h-4 w-4" /> Code
-              </a>
-            </div>
-          </div>
-
-          {/* Dynamic: all Supabase projects */}
           {projects.map((project) => {
             const caseStudy = project.case_study as CaseStudy | null;
             const excerpt = caseStudy?.solution || caseStudy?.problem;
