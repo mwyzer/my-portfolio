@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode, type ElementType } from "react";
-import { cycleXPattern } from "@/lib/utils";
 
 // GSAP + ScrollTrigger are deferred to first idle callback. They're ~400 KiB
 // combined and only needed for scroll animations in below-fold sections —
@@ -31,20 +30,6 @@ function getGsap() {
   return gsapPromise;
 }
 
-// Above-the-fold content (e.g. the hero) is already in the viewport on load,
-// so it can't rely on ScrollTrigger (which needs a scroll to fire) and can't
-// afford the idle-callback wait either — that risks a visible "pop in fully
-// styled, then reset and animate" flash. This loader skips both: no idle
-// wait, no ScrollTrigger chunk, just gsap's core fetched as soon as the
-// component mounts.
-let gsapImmediatePromise: Promise<typeof import("gsap")> | null = null;
-function getGsapImmediate() {
-  if (!gsapImmediatePromise) {
-    gsapImmediatePromise = import("gsap");
-  }
-  return gsapImmediatePromise;
-}
-
 interface AnimateOnScrollProps {
   children: ReactNode;
   /** CSS selector for child elements to stagger (default: direct children) */
@@ -53,17 +38,6 @@ interface AnimateOnScrollProps {
   stagger?: number;
   /** Y offset to fade up from (px) */
   y?: number;
-  /** X offset to fly in from (px), applied to every target the same way. */
-  x?: number;
-  /**
-   * Per-target X offset (px), cycling by index — e.g. `[-40, 0, 40]` makes
-   * the first target fly in from the left, the last from the right, and
-   * anything in between just fades up. Takes priority over `x` when set.
-   * A plain array (not a function) so it stays serializable across the
-   * Server → Client Component boundary — this component is always
-   * rendered from a Server Component with plain props, never a closure.
-   */
-  xPattern?: number[];
   /** Animation duration in seconds */
   duration?: number;
   /** Delay before animation starts */
@@ -76,12 +50,6 @@ interface AnimateOnScrollProps {
   className?: string;
   /** HTML tag for the wrapper */
   as?: ElementType;
-  /**
-   * Play immediately on mount instead of waiting for scroll-into-view.
-   * Use this for above-the-fold content (e.g. the hero) where
-   * ScrollTrigger would never reliably fire.
-   */
-  immediate?: boolean;
 }
 
 export default function AnimateOnScroll({
@@ -89,15 +57,12 @@ export default function AnimateOnScroll({
   staggerSelector,
   stagger = 0.08,
   y = 30,
-  x = 0,
-  xPattern,
   duration = 0.7,
   delay = 0,
   ease = "power3.out",
   triggerStart = "top 85%",
   className = "",
   as: Tag = "div",
-  immediate = false,
 }: AnimateOnScrollProps) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -111,40 +76,30 @@ export default function AnimateOnScroll({
 
     let cancelled = false;
 
-    (immediate ? getGsapImmediate() : getGsap()).then((gsap) => {
+    getGsap().then((gsap) => {
       if (cancelled || !el) return;
 
       const targets = staggerSelector
         ? el.querySelectorAll(staggerSelector)
         : el.children;
 
-      // Built here, client-side, from the serializable `xPattern` array —
-      // GSAP's own function-based-value convention (index, target, targets),
-      // but never passed in as a function prop from the Server Component.
-      const fromX = xPattern
-        ? (i: number) => cycleXPattern(xPattern, i)
-        : x;
-
       const ctx = gsap.default.context(() => {
         gsap.default.fromTo(
           targets,
-          { y, x: fromX, opacity: 0 },
-          immediate
-            ? { y: 0, x: 0, opacity: 1, duration, delay, stagger, ease }
-            : {
-                y: 0,
-                x: 0,
-                opacity: 1,
-                duration,
-                delay,
-                stagger,
-                ease,
-                scrollTrigger: {
-                  trigger: el,
-                  start: triggerStart,
-                  toggleActions: "play none none none",
-                },
-              }
+          { y, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration,
+            delay,
+            stagger,
+            ease,
+            scrollTrigger: {
+              trigger: el,
+              start: triggerStart,
+              toggleActions: "play none none none",
+            },
+          }
         );
       }, el);
 
@@ -154,7 +109,7 @@ export default function AnimateOnScroll({
     return () => {
       cancelled = true;
     };
-  }, [staggerSelector, stagger, y, x, xPattern, duration, delay, ease, triggerStart, immediate]);
+  }, [staggerSelector, stagger, y, duration, delay, ease, triggerStart]);
 
   const Comp = Tag as any;
   return (

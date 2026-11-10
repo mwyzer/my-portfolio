@@ -18,7 +18,7 @@ import AnalyticsDeferred from "@/components/deferred/analytics-deferred";
 
 export const metadata: Metadata = {
   title: {
-    default: "Wyzer: AI agents for Indonesian SMEs",
+    default: "Wyzer's Portfolio",
     template: "%s | Wyzer's Portfolio",
   },
   description: "Personal portfolio and blog",

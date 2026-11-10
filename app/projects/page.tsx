@@ -6,7 +6,6 @@ import type { PortfolioProject, CaseStudy } from "@/types/database";
 import ThemeToggle from "@/components/theme-toggle";
 import ProjectPreview from "@/components/project-preview";
 import { sanitizeUrl } from "@/lib/sanitize";
-import { buildInlineBadges } from "@/lib/utils";
 
 // A project only gets a "View Case Study" link once Problem/Solution/Architecture
 // has actually been filled in via the dashboard.
@@ -20,6 +19,11 @@ export const metadata = {
   description: "All projects, past and present",
 };
 
+// Kept in sync with the STATIC_PROJECT_TITLE guard in app/page.tsx —
+// this card is hardcoded (not dashboard-managed), so it's filtered out of
+// the Supabase list below to avoid a duplicate.
+const STATIC_PROJECT_TITLE = "lms mahasiswa";
+
 export default async function ProjectsPage() {
   const supabase = await createServerSupabaseClient();
 
@@ -29,7 +33,7 @@ export default async function ProjectsPage() {
     .order("featured", { ascending: false })
     .order("order", { ascending: true }) as unknown as Promise<{ data: PortfolioProject[] | null; error: any }>);
 
-  const projects = data || [];
+  const projects = (data || []).filter((p) => p.title.trim().toLowerCase() !== STATIC_PROJECT_TITLE);
 
   return (
     <div className="min-h-screen" style={{ background: "var(--bg)", color: "var(--text)" }}>
@@ -39,7 +43,6 @@ export default async function ProjectsPage() {
           <Link href="/" className="font-semibold text-lg text-text hover:text-accent transition-colors">Portfolio</Link>
           <div className="flex items-center gap-1">
             <Link href="/" className="btn-noir btn-noir-ghost btn-noir-sm">Home</Link>
-            <Link href="/#product" className="btn-noir btn-noir-ghost btn-noir-sm">Product</Link>
             <Link href="/projects" className="btn-noir btn-noir-sm" style={{ background: "var(--color-accent)", color: "#fff", borderColor: "var(--color-accent)" }}>Projects</Link>
             <Link href="/blog" className="btn-noir btn-noir-ghost btn-noir-sm">Blog</Link>
             <ThemeToggle />
@@ -54,18 +57,36 @@ export default async function ProjectsPage() {
         </p>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Static: LMS Mahasiswa */}
+          <div className="card-noir flex flex-col h-full">
+            <h3 className="font-semibold text-text text-lg mb-2">LMS Mahasiswa</h3>
+            <p className="text-sm text-text-muted mb-4 flex-1">
+              Full-stack Learning Management System — multi-role (student, instructor, admin), attendance, assignments, quizzes, AI chat assistant, Python playground &amp; PWA support.
+            </p>
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              {["Nuxt 4", "Vue 3", "TypeScript", "Pinia", "Supabase", "Nitro", "Vite", "Vuestic UI", "PWA", "Vitest", "Playwright"].map((t) => (
+                <span key={t} className="badge-noir">{t}</span>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <a href="https://nuxt-lms-mahasiswa.vercel.app" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                <ExternalLink className="h-4 w-4" /> Live
+              </a>
+              <a href="https://github.com/mwyzer/vue-lms-mahasiswa" target="_blank" rel="noreferrer" className="btn-noir btn-noir-ghost btn-noir-sm">
+                <Github className="h-4 w-4" /> Code
+              </a>
+            </div>
+          </div>
+
+          {/* Dynamic: all Supabase projects */}
           {projects.map((project) => {
             const caseStudy = project.case_study as CaseStudy | null;
             const excerpt = caseStudy?.solution || caseStudy?.problem;
             const capabilities = caseStudy?.capabilities
               ? Object.values(caseStudy.capabilities).flat()
               : [];
-            const { shown: badges, remaining: moreBadges } = buildInlineBadges(
-              capabilities,
-              project.technologies ?? []
-            );
             return (
-            <div key={project.id} className="card-noir card-noir-project flex flex-col h-full">
+            <div key={project.id} className="card-noir flex flex-col h-full">
               <div className="flex items-start justify-between gap-2 mb-2">
                 {project.category ? (
                   <span className="badge-noir capitalize">{project.category}</span>
@@ -89,24 +110,27 @@ export default async function ProjectsPage() {
                 <p className="text-sm text-text-dim mb-2">{project.subtitle}</p>
               )}
               <p className="text-sm text-text-muted mb-4 flex-1 mt-2">{project.description}</p>
+              {project.technologies && project.technologies.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mb-4">
+                  {project.technologies.map((tech, i) => (
+                    <span key={`${tech}-${i}`} className="badge-noir">{tech}</span>
+                  ))}
+                </div>
+              )}
               {excerpt && (
                 <p className="text-xs italic mb-3 line-clamp-2" style={{ color: "var(--text-dim)" }}>
                   {excerpt}
                 </p>
               )}
-              {badges.length > 0 && (
+              {capabilities.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 mb-4">
-                  {badges.map((b, i) => (
-                    <span
-                      key={`${b.label}-${i}`}
-                      className="badge-noir"
-                      style={b.accent ? { borderColor: "var(--color-accent)", color: "var(--color-accent)" } : undefined}
-                    >
-                      {b.label}
+                  {capabilities.slice(0, 4).map((item, i) => (
+                    <span key={`${item}-${i}`} className="badge-noir" style={{ borderColor: "var(--color-accent)", color: "var(--color-accent)" }}>
+                      {item}
                     </span>
                   ))}
-                  {moreBadges > 0 && (
-                    <span className="badge-noir">+{moreBadges} more</span>
+                  {capabilities.length > 4 && (
+                    <span className="badge-noir">+{capabilities.length - 4} more</span>
                   )}
                 </div>
               )}
