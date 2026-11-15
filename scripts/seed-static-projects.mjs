@@ -55,7 +55,7 @@ const projects = [
   {
     title: "PropertyHub",
     description:
-      "Multi-tenant property listing platform for agencies, banks, and companies across Indonesia — buyer, salesperson, tenant-admin, and platform-admin roles with listing management, photo uploads, and saved properties.",
+      "Multi-tenant property listing platform for agencies, banks, and companies across Indonesia: buyer, salesperson, tenant-admin, and platform-admin roles with listing management, photo uploads, and saved properties.",
     technologies: [
       "Go",
       "Gin",
@@ -70,7 +70,7 @@ const projects = [
       "k6",
       "Playwright",
     ],
-    github_url: "https://github.com/mwyzer/99999",
+    github_url: "https://github.com/mwyzer/golang-next-property-listings",
     category: "personal",
     featured: true,
     order: 8,

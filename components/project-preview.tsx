@@ -63,11 +63,11 @@ export default function ProjectPreview({ projectId, title, caseStudy, children }
             )}
             {caseStudy.highlights && caseStudy.highlights.length > 0 && (
               <section>
-                <h3 className="text-sm font-semibold text-text mb-2">What I Built</h3>
+                <h3 className="text-sm font-semibold text-text mb-2">Architecture &amp; Engineering Highlights</h3>
                 <ul className="space-y-1.5">
                   {caseStudy.highlights.map((item, i) => (
                     <li key={`${item}-${i}`} className="flex items-start gap-2 text-sm text-text-muted">
-                      <CheckCircle2 className="h-3.5 w-3.5 mt-0.5 shrink-0 text-accent" />
+                      <CheckCircle2 aria-hidden="true" className="h-3.5 w-3.5 mt-0.5 shrink-0 text-accent" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -76,7 +76,7 @@ export default function ProjectPreview({ projectId, title, caseStudy, children }
             )}
             {(sanitizeUrl(caseStudy.architecture) || caseStudy.architectureDiagram) && (
               <section>
-                <h3 className="text-sm font-semibold text-text mb-2">Architecture</h3>
+                <h3 className="text-sm font-semibold text-text mb-2">System Architecture</h3>
                 {caseStudy.architectureDiagram && (
                   <pre className="card-noir overflow-x-auto whitespace-pre font-mono text-[11px] text-text-muted leading-relaxed">
                     {caseStudy.architectureDiagram}
@@ -87,10 +87,45 @@ export default function ProjectPreview({ projectId, title, caseStudy, children }
                   <img
                     src={sanitizeUrl(caseStudy.architecture)}
                     alt="Architecture diagram"
+                    width={800}
+                    height={450}
                     className={`w-full rounded-lg border ${caseStudy.architectureDiagram ? "mt-3" : ""}`}
                     style={{ borderColor: "var(--border)" }}
                   />
                 )}
+              </section>
+            )}
+            {caseStudy.engineeringDecisions && caseStudy.engineeringDecisions.length > 0 && (
+              <section>
+                <h3 id="preview-decisions-heading" className="text-sm font-semibold text-text mb-2">
+                  Engineering Decisions
+                </h3>
+                <div
+                  tabIndex={0}
+                  role="region"
+                  aria-labelledby="preview-decisions-heading"
+                  className="overflow-x-auto rounded-lg border"
+                  style={{ borderColor: "var(--border)" }}
+                >
+                  <table className="w-full text-xs">
+                    <thead className="sticky top-0 z-10" style={{ background: "var(--surface)" }}>
+                      <tr className="border-b text-left text-text-dim" style={{ borderColor: "var(--border)" }}>
+                        <th scope="col" className="px-3 py-2 font-medium">Challenge</th>
+                        <th scope="col" className="px-3 py-2 font-medium">Decision</th>
+                        <th scope="col" className="px-3 py-2 font-medium">Rationale</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {caseStudy.engineeringDecisions.map((d, i) => (
+                        <tr key={i} className={i > 0 ? "border-t" : ""} style={{ borderColor: "var(--border)" }}>
+                          <td className="px-3 py-2 text-text-muted align-top">{d.problem}</td>
+                          <td className="px-3 py-2 text-text font-medium align-top">{d.decision}</td>
+                          <td className="px-3 py-2 text-text-muted align-top">{d.reason}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </section>
             )}
             {caseStudy.images && caseStudy.images.filter((url) => sanitizeUrl(url)).length > 0 && (
@@ -137,7 +172,7 @@ export default function ProjectPreview({ projectId, title, caseStudy, children }
 
             {caseStudy.metrics && caseStudy.metrics.length > 0 && (
               <section>
-                <h3 className="text-sm font-semibold text-text mb-2">Results</h3>
+                <h3 className="text-sm font-semibold text-text mb-2">Quantified Engineering Metrics</h3>
                 <div className="flex flex-wrap gap-1.5">
                   {caseStudy.metrics.map((item, i) => (
                     <span

@@ -3,8 +3,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
+import { mergeWithFlagshipProjects } from "@/lib/flagship-projects";
 import { formatDate } from "@/lib/utils";
-import { ArrowRight, ExternalLink, Mail, Phone, Code2, Database, Palette, Rocket, Layout, Server, Globe, Eye } from "lucide-react";
+import { ArrowRight, ExternalLink, Mail, Phone, Code2, Database, Palette, Rocket, Layout, Server, Globe, Eye, CheckCircle2 } from "lucide-react";
 import { Github, Youtube, Linkedin, Gitlab } from "@/components/brand-icons";
 import type { PortfolioAbout, PortfolioProject, BlogPost, CaseStudy } from "@/types/database";
 import { sanitizeUrl } from "@/lib/sanitize";
@@ -27,11 +28,12 @@ const iconForCategory = (cat: string) => {
 };
 
 const DEFAULT_TECH_STACK: { category: string; items: string[] }[] = [
-  { category: "Backend", items: ["Laravel", "ASP.NET Core", "FastAPI", "Supabase"] },
-  { category: "Frontend", items: ["React", "Next.js", "Vue", "TypeScript"] },
-  { category: "Database", items: ["PostgreSQL", "MySQL", "Redis", "pgvector"] },
-  { category: "AI", items: ["RAG", "LangGraph", "LangChain", "MCP", "LLM APIs"] },
-  { category: "Infrastructure", items: ["Docker", "CI/CD", "vLLM", "Ollama"] },
+  { category: "Core Languages", items: ["Python 3", "Go (Golang)", "Java 21", "TypeScript", "SQL", "C# / PHP"] },
+  { category: "Backend & Distributed", items: ["FastAPI", "Spring Boot 3", "Go Gin", "NestJS", "ASP.NET Core", "Laravel"] },
+  { category: "Frontend", items: ["React 18", "Next.js", "Vue 3 / Nuxt 4", "Angular 16", "Tailwind CSS"] },
+  { category: "Data & Messaging", items: ["PostgreSQL", "Redis", "Apache Kafka", "pgvector", "MySQL"] },
+  { category: "AI & Algorithms", items: ["LangGraph", "LangChain", "RAG", "MCP", "OpenCV", "IR Metrics (NDCG/MRR)"] },
+  { category: "Testing & Infra", items: ["Docker Compose", "pytest", "JUnit 5", "Go testing", "Vitest", "Playwright", "CI/CD"] },
 ];
 
 const accentColors = [
@@ -250,7 +252,7 @@ async function HomeBelowFold({
       .limit(3) as unknown as Promise<{ data: BlogPost[] | null; error: any }>,
   ]);
 
-  const projects = projectsResult.data;
+  const projects = mergeWithFlagshipProjects(projectsResult.data, { featuredOnly: true, limit: 6 });
   const posts = postsResult.data;
 
   return (
@@ -286,6 +288,8 @@ async function HomeBelowFold({
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {projects?.map((project) => {
               const caseStudy = project.case_study as CaseStudy | null;
+              const highlights = caseStudy?.highlights ?? [];
+              const metrics = caseStudy?.metrics ?? [];
               const excerpt = caseStudy?.solution || caseStudy?.problem;
               const capabilities = caseStudy?.capabilities
                 ? Object.values(caseStudy.capabilities).flat()
@@ -298,15 +302,18 @@ async function HomeBelowFold({
                   ) : <span />}
                   {project.views > 0 && (
                     <span className="flex items-center gap-1 text-xs text-text-dim shrink-0">
-                      <Eye className="h-3.5 w-3.5" /> {project.views.toLocaleString()}
+                      <Eye aria-hidden="true" className="h-3.5 w-3.5" /> {project.views.toLocaleString()}
                     </span>
                   )}
                 </div>
                 {caseStudy ? (
                   <ProjectPreview projectId={project.id} title={project.title} caseStudy={caseStudy}>
-                    <h3 className="font-semibold text-text text-lg text-left cursor-pointer hover:text-accent transition-colors">
+                    <button
+                      type="button"
+                      className="font-semibold text-text text-lg text-left cursor-pointer hover:text-accent transition-colors"
+                    >
                       {project.title}
-                    </h3>
+                    </button>
                   </ProjectPreview>
                 ) : (
                   <h3 className="font-semibold text-text text-lg">{project.title}</h3>
@@ -314,7 +321,39 @@ async function HomeBelowFold({
                 {project.subtitle && (
                   <p className="text-sm text-text-dim mb-2">{project.subtitle}</p>
                 )}
-                <p className="text-sm text-text-muted mb-4 flex-1 mt-2">{project.description}</p>
+                {metrics.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 my-2">
+                    {metrics.slice(0, 3).map((metric, mIdx) => (
+                      <span
+                        key={`${metric}-${mIdx}`}
+                        className="badge-noir text-xs font-medium"
+                        style={{ borderColor: "var(--color-accent)", color: "var(--color-accent)" }}
+                      >
+                        {metric}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <p className="text-sm text-text-muted mb-3 mt-1">{project.description}</p>
+                {highlights.length > 0 ? (
+                  <div className="mb-4 flex-1 rounded-lg border p-3" style={{ borderColor: "var(--border)", background: "var(--bg)" }}>
+                    <p className="text-xs font-semibold text-text mb-1.5">Architecture &amp; Engineering Highlights</p>
+                    <ul className="space-y-1.5">
+                      {highlights.slice(0, 2).map((hl, hIdx) => (
+                        <li key={`${hl}-${hIdx}`} className="flex items-start gap-1.5 text-xs text-text-muted leading-relaxed">
+                          <CheckCircle2 aria-hidden="true" className="h-3.5 w-3.5 mt-0.5 shrink-0 text-accent" />
+                          <span className="line-clamp-2">{hl}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : excerpt ? (
+                  <p className="text-xs italic mb-3 flex-1 line-clamp-2" style={{ color: "var(--text-dim)" }}>
+                    {excerpt}
+                  </p>
+                ) : (
+                  <div className="flex-1" />
+                )}
                 {project.technologies && project.technologies.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mb-4">
                     {project.technologies.map((tech, k) => (
@@ -322,12 +361,7 @@ async function HomeBelowFold({
                     ))}
                   </div>
                 )}
-                {excerpt && (
-                  <p className="text-xs italic mb-3 line-clamp-2" style={{ color: "var(--text-dim)" }}>
-                    {excerpt}
-                  </p>
-                )}
-                {capabilities.length > 0 && (
+                {highlights.length === 0 && capabilities.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mb-4">
                     {capabilities.slice(0, 4).map((item, i) => (
                       <span key={`${item}-${i}`} className="badge-noir" style={{ borderColor: "var(--color-accent)", color: "var(--color-accent)" }}>
@@ -559,8 +593,8 @@ async function HomeBelowFold({
       <section className="py-24" style={{ background: "var(--surface)" }}>
         <div className="max-w-xl mx-auto px-4 text-center">
           <AnimateOnScroll y={15} duration={0.5}>
-            <h2 className="text-3xl md:text-4xl font-bold text-text mb-4">Let&apos;s build something.</h2>
-            <p className="text-text-muted mb-8">Have a project, role, or idea in mind? Reach out.</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-text mb-4">Available for Engineering &amp; AI Systems Roles</h2>
+            <p className="text-text-muted mb-8">Reach out for software engineering, distributed backend architecture, or RL environment work.</p>
             <div className="flex flex-wrap justify-center gap-2">
               {social.email && (
                 <a href={`mailto:${social.email}`} className="btn-noir btn-noir-primary btn-noir-sm">

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, ExternalLink, Layout, Database, Sparkles, Rocket, CheckCircle2, UserCircle2, Eye } from "lucide-react";
 import { Github, Youtube } from "@/components/brand-icons";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
+import { resolveProjectById } from "@/lib/flagship-projects";
 import type { PortfolioProject, CaseStudy } from "@/types/database";
 import ThemeToggle from "@/components/theme-toggle";
 import { sanitizeUrl } from "@/lib/sanitize";
@@ -23,12 +24,13 @@ export async function generateMetadata({ params }: ProjectPageProps) {
   const { id } = await params;
   const supabase = await createServerSupabaseClient();
 
-  const { data: project } = await supabase
+  const { data: dbProject } = await supabase
     .from("portfolio_projects")
-    .select("title, description")
+    .select("*")
     .eq("id", id)
-    .single<Pick<PortfolioProject, "title" | "description">>();
+    .maybeSingle<PortfolioProject>();
 
+  const project = resolveProjectById(id, dbProject ?? null);
   if (!project) return { title: "Project Not Found" };
 
   return {
@@ -41,16 +43,19 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   const { id } = await params;
   const supabase = await createServerSupabaseClient();
 
-  const { data: project } = await supabase
+  const { data: dbProject } = await supabase
     .from("portfolio_projects")
     .select("*")
     .eq("id", id)
-    .single<PortfolioProject>();
+    .maybeSingle<PortfolioProject>();
 
+  const project = resolveProjectById(id, dbProject ?? null);
   if (!project) notFound();
 
   // Fire after the response is sent so the view-count write never delays render.
-  after(() => supabase.rpc("increment_project_views", { project_id: project.id }));
+  if (dbProject?.id) {
+    after(() => supabase.rpc("increment_project_views", { project_id: dbProject.id }));
+  }
 
   const caseStudy = project.case_study as CaseStudy | null;
 
@@ -138,11 +143,11 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
             {caseStudy.highlights && caseStudy.highlights.length > 0 && (
               <section>
-                <h2 className="text-xl font-bold text-text mb-3">What I Built</h2>
+                <h2 className="text-xl font-bold text-text mb-3">Architecture &amp; Engineering Highlights</h2>
                 <ul className="space-y-2">
                   {caseStudy.highlights.map((item, i) => (
                     <li key={`${item}-${i}`} className="flex items-start gap-2 text-text-muted">
-                      <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0 text-accent" />
+                      <CheckCircle2 aria-hidden="true" className="h-4 w-4 mt-0.5 shrink-0 text-accent" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -152,7 +157,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
             {(sanitizeUrl(caseStudy.architecture) || caseStudy.architectureDiagram) && (
               <section>
-                <h2 className="text-xl font-bold text-text mb-3">Architecture</h2>
+                <h2 className="text-xl font-bold text-text mb-3">System Architecture</h2>
                 {caseStudy.architectureDiagram && (
                   <pre className="card-noir overflow-x-auto whitespace-pre font-mono text-xs text-text-muted leading-relaxed">
                     {caseStudy.architectureDiagram}
@@ -163,6 +168,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   <img
                     src={sanitizeUrl(caseStudy.architecture)}
                     alt="Architecture diagram"
+                    width={960}
+                    height={540}
                     className={`w-full rounded-lg border ${caseStudy.architectureDiagram ? "mt-4" : ""}`}
                     style={{ borderColor: "var(--border)" }}
                   />
@@ -180,6 +187,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                       key={`${url}-${i}`}
                       src={sanitizeUrl(url)}
                       alt={`${project.title} screenshot ${i + 1}`}
+                      width={640}
+                      height={400}
                       className="w-full rounded-lg border"
                       style={{ borderColor: "var(--border)" }}
                     />
@@ -197,7 +206,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                     return (
                       <div key={g.key} className="card-noir">
                         <div className="flex items-center gap-2 mb-3">
-                          <Icon className="h-5 w-5 text-accent" />
+                          <Icon aria-hidden="true" className="h-5 w-5 text-accent" />
                           <h3 className="font-semibold text-text text-sm">{g.label}</h3>
                         </div>
                         <div className="flex flex-wrap gap-1.5">
@@ -214,22 +223,30 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
             {caseStudy.engineeringDecisions && caseStudy.engineeringDecisions.length > 0 && (
               <section>
-                <h2 className="text-xl font-bold text-text mb-3">Engineering Decisions</h2>
-                <div className="overflow-x-auto rounded-lg border" style={{ borderColor: "var(--border)" }}>
+                <h2 id="engineering-decisions-heading" className="text-xl font-bold text-text mb-3">
+                  Engineering Decisions
+                </h2>
+                <div
+                  tabIndex={0}
+                  role="region"
+                  aria-labelledby="engineering-decisions-heading"
+                  className="overflow-x-auto rounded-lg border"
+                  style={{ borderColor: "var(--border)" }}
+                >
                   <table className="w-full text-sm">
-                    <thead>
+                    <thead className="sticky top-0 z-10" style={{ background: "var(--surface)" }}>
                       <tr className="border-b text-left text-text-dim" style={{ borderColor: "var(--border)" }}>
-                        <th className="px-4 py-2.5 font-medium">Problem</th>
-                        <th className="px-4 py-2.5 font-medium">Decision</th>
-                        <th className="px-4 py-2.5 font-medium">Reason</th>
+                        <th scope="col" className="px-4 py-2.5 font-medium">Challenge</th>
+                        <th scope="col" className="px-4 py-2.5 font-medium">Decision</th>
+                        <th scope="col" className="px-4 py-2.5 font-medium">Rationale</th>
                       </tr>
                     </thead>
                     <tbody>
                       {caseStudy.engineeringDecisions.map((d, i) => (
                         <tr key={i} className={i > 0 ? "border-t" : ""} style={{ borderColor: "var(--border)" }}>
-                          <td className="px-4 py-2.5 text-text-muted">{d.problem}</td>
-                          <td className="px-4 py-2.5 text-text font-medium">{d.decision}</td>
-                          <td className="px-4 py-2.5 text-text-muted">{d.reason}</td>
+                          <td className="px-4 py-2.5 text-text-muted align-top">{d.problem}</td>
+                          <td className="px-4 py-2.5 text-text font-medium align-top">{d.decision}</td>
+                          <td className="px-4 py-2.5 text-text-muted align-top">{d.reason}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -244,7 +261,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 <ul className="space-y-2">
                   {caseStudy.contribution.map((item, i) => (
                     <li key={`${item}-${i}`} className="flex items-start gap-2 text-text-muted">
-                      <UserCircle2 className="h-4 w-4 mt-0.5 shrink-0 text-accent" />
+                      <UserCircle2 aria-hidden="true" className="h-4 w-4 mt-0.5 shrink-0 text-accent" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -254,7 +271,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
             {caseStudy.metrics && caseStudy.metrics.length > 0 && (
               <section>
-                <h2 className="text-xl font-bold text-text mb-3">Results</h2>
+                <h2 className="text-xl font-bold text-text mb-3">Quantified Engineering Metrics</h2>
                 <div className="flex flex-wrap gap-2">
                   {caseStudy.metrics.map((item, i) => (
                     <span
