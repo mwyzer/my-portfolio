@@ -1,23 +1,24 @@
 {
   "personal_information": {
-    "name": "Muhammad Wyzer",
+    "name": "Muhammad Wyzer, S.Kom.",
     "gender": "Male",
     "age": 41,
     "place_of_birth": "Jakarta",
     "date_of_birth": "1984-08-24",
     "address": "RT 01/02 Kampung Legok Nyenang, Cibeuteung Muara Village, Ciseeng District, Bogor Regency, West Java 16330",
-    "public_location": "Bogor Regency, West Java, Indonesia",
+    "public_location": "Bogor Regency, West Java, Indonesia (Remote Ready)",
     "email": "muhammad.wyzer@gmail.com",
     "phone_whatsapp": "+62 822 1137 6074"
   },
   "professional_titles": [
-    "Backend Engineer",
-    "Full-Stack Developer",
-    "Programming Instructor",
-    "AI Automation Specialist"
+    "Software Engineer (Python3 · Go · Java · TypeScript)",
+    "Full-Stack & Distributed Backend Engineer",
+    "AI Systems & RL Environment Engineer",
+    "Certified Coding & Artificial Intelligence Trainer"
   ],
-  "professional_summary": "Backend Engineer and Full-Stack Developer with 5+ years of experience building web applications, REST APIs, database-driven systems, business automation solutions, and technology education programs. Skilled in Laravel, Tailwind CSS, MySQL, PostgreSQL, API integrations, technical support, troubleshooting, and system stability.",
+  "professional_summary": "Full-Stack and Backend Software Engineer with 5+ years of industry and instructional experience designing, debugging, and modernizing production web applications, distributed backends, and AI-enabled platforms. Author of 20+ production-grade repositories across Python 3, Go (Golang), Java 21, and TypeScript, featuring 250+ automated unit, integration, and E2E test suites and containerized Docker / CI/CD environments. Proven ability to translate complex domain rules—including maritime SOLAS/STCW compliance, shift-based workforce risk engines, multi-tenant ISP billing, civil engineering SDI algorithms, and Information Retrieval ranking metrics (NDCG, MRR)—into deterministic verifiers and clean reference implementations.",
   "contact": {
+    "website": "https://www.wyzer.my.id",
     "github": "https://github.com/mwyzer",
     "gitlab": "https://gitlab.com/mwyzer",
     "linkedin": "https://www.linkedin.com/in/muhammad-wyzer/",
@@ -27,8 +28,8 @@
   },
   "education": [
     {
-      "institution": "Syarif Hidayatullah State Islamic University Jakarta",
-      "degree": "B.Sc. in Informatics Engineering",
+      "institution": "Syarif Hidayatullah State Islamic University (UIN) Jakarta",
+      "degree": "B.Sc. in Informatics Engineering (Sarjana Komputer / S.Kom.)",
       "start_year": 2002,
       "end_year": 2011
     },
@@ -51,45 +52,51 @@
   "certifications_and_training": [
     {
       "year": 2025,
-      "name": "Training of Trainer Mata Pelajaran Koding dan Kecerdasan Artifisial",
-      "organization": "KEMENDIKNAS Indonesia"
+      "name": "Training of Trainer (Bimbingan Teknis Pengajar) — Coding and Artificial Intelligence (Koding dan Kecerdasan Artifisial)",
+      "organization": "Ministry of Primary and Secondary Education (KEMENDIKDASMEN Indonesia)"
+    },
+    {
+      "year": 2013,
+      "name": "Certificate of Appreciation — IT Helpdesk at WTO Ministerial Conference IX",
+      "organization": "PT. Nusantara Compnet Integrator"
     },
     {
       "year": 2007,
-      "name": "Internship",
-      "organization": "PT. Krakatau Steel, Cilegon, Banten"
+      "name": "Engineering Internship",
+      "organization": "PT. Krakatau Steel (Persero) Tbk, Cilegon, Banten"
     }
   ],
   "work_experience": [
     {
-      "position": "Mentor",
+      "position": "Mentor (Programming Fundamentals & Software Engineering)",
       "company": "Universitas Tujuh Belas Agustus 1945 Jakarta",
+      "location": "North Jakarta",
       "start": "2025-09",
       "end": "Present",
       "responsibilities": [
-        "Provided mentoring in Programming Fundamentals and Productivity Tools",
-        "Teach programming, informatics, and computational thinking",
-        "Develop learning materials and practical assignments",
-        "Mentor students in software development projects"
+        "Design programming problems, reference solutions, and deterministic grading rubrics in Programming Fundamentals and Software Engineering",
+        "Teach algorithms, data structures, informatics, and computational thinking",
+        "Mentor university students in debugging complex codebases, writing automated tests, and software development projects"
       ]
     },
     {
-      "position": "Mentor",
+      "position": "Mentor (Informatics & Computational Thinking)",
       "company": "Ganesha Operation",
       "start": "2025-12",
       "end": "Present",
       "responsibilities": [
-        "Provided mentoring in Informatics and Computational Thinking"
+        "Provide structured mentoring in Informatics, Algorithmic Problem Solving, and Computational Thinking",
+        "Guide students in decomposing complex logical constraints into step-by-step verifiable solutions"
       ]
     },
     {
-      "position": "Facilitator",
-      "company": "PT. Anagata Sisedu Nusantara",
+      "position": "Coding & AI Curriculum Facilitator",
+      "company": "PT. Anagata Sisedu Nusantara (Anagata Academy)",
       "start": "2025-05",
       "end": "Present",
       "responsibilities": [
-        "Delivered instruction aligned with the national curriculum on coding and artificial intelligence",
-        "Guided students in logical thinking, problem-solving, and digital literacy skills"
+        "Deliver instruction aligned with the national curriculum on Coding and Artificial Intelligence",
+        "Guide educators and students in logical thinking, algorithmic problem-solving, and AI workflows"
       ]
     },
     {
@@ -98,6 +105,10 @@
       "location": "North Kalimantan",
       "start": "2024-08",
       "end": "2025-02",
+      "responsibilities": [
+        "Architected and delivered an end-to-end Internet Voucher Sales and Customer Management System automating voucher lifecycle, billing, and customer tracking",
+        "Developed corporate web platforms with normalized relational schemas and role-based access control"
+      ],
       "projects": [
         {
           "name": "Company Profile Website",
@@ -129,16 +140,16 @@
       ]
     },
     {
-      "position": "Technical Support",
+      "position": "Technical Support & Backend Systems Developer",
       "company": "PT. Taman Kreasi Indonesia",
       "location": "Semarang",
       "start": "2023-08",
       "end": "2024-07",
       "responsibilities": [
-        "Checked incoming cargo logs in the database",
-        "Ensured stable network and database performance",
-        "Developed additional required modules",
-        "Created an employee monitoring project with KPI charts"
+        "Audited and debugged high-volume incoming cargo logs in production relational databases",
+        "Maintained, refactored, and modernized legacy business modules across Laravel 5.5 and Laravel 8 stacks",
+        "Designed and built an Employee KPI & Performance Monitoring platform backed by PostgreSQL analytical queries",
+        "Ensured stable network and database performance across operational environments"
       ],
       "technology_stacks": [
         [
@@ -166,17 +177,15 @@
       "start": "2022-08-01",
       "end": "2022-11-30",
       "responsibilities": [
-        "Developed online tutoring learning modules",
-        "Assisted office IT operations",
-        "Integrated Moodle API with Laravel",
-        "Designed and implemented a web platform connecting courses, tutors, and students",
-        "Performed troubleshooting for networks, computers, and other devices"
+        "Engineered custom API integrations bridging Moodle LMS with core Laravel backend services",
+        "Designed and implemented a full-stack web platform connecting courses, tutors, and students",
+        "Developed online tutoring learning modules and diagnosed cross-system integration and network issues"
       ],
       "technology_stack": [
         "Laravel 7",
         "MySQL",
         "jQuery",
-        "Moodle"
+        "Moodle API"
       ],
       "software": [
         "Articulate Storyline 3"
@@ -186,78 +195,189 @@
         "Laragon",
         "HeidiSQL"
       ]
+    },
+    {
+      "position": "IT Helpdesk Engineer (WTO Ministerial Conference IX)",
+      "company": "PT. Nusantara Compnet Integrator",
+      "location": "Bali / Jakarta",
+      "start": "2013-11-06",
+      "end": "2013-12-20",
+      "responsibilities": [
+        "Provided mission-critical IT helpdesk, network, and systems troubleshooting during the 9th WTO Ministerial Conference"
+      ]
+    },
+    {
+      "position": "Desktop Support Engineer (Dept. CSS — Project PAMA)",
+      "company": "PT. Berca Hardayaperkasa",
+      "location": "Jakarta",
+      "start": "2012-06-18",
+      "end": "2013-07-31",
+      "responsibilities": [
+        "Delivered enterprise system support, hardware/software diagnostics, and enterprise infrastructure maintenance for Project PAMA"
+      ]
     }
   ],
   "skills": {
-    "backend": [
-      "Laravel",
+    "languages": [
+      "Python 3 (3.11+)",
+      "Go (Golang 1.21–1.25)",
+      "Java (Java 21)",
+      "TypeScript (5.x)",
+      "JavaScript (ES6+)",
+      "SQL",
       "PHP",
-      "REST API",
-      "API Integration"
+      "C#"
+    ],
+    "backend": [
+      "FastAPI",
+      "Spring Boot 3",
+      "Go Gin",
+      "GORM",
+      "Flask 3",
+      "Django",
+      "NestJS",
+      "Express.js",
+      "Async SQLAlchemy 2.0",
+      "Laravel (5.5–12)"
     ],
     "frontend": [
-      "React",
+      "React 18",
       "Next.js",
+      "Vue 3",
+      "Nuxt 4",
+      "Angular 16",
+      "Astro SSR",
       "Tailwind CSS",
-      "jQuery"
+      "Pinia"
     ],
-    "database": [
-      "MySQL",
-      "PostgreSQL"
+    "database_and_messaging": [
+      "PostgreSQL (16/17, pgvector)",
+      "MySQL 8",
+      "Redis 7 (Pub/Sub, BullMQ, Caching)",
+      "Apache Kafka 3.9",
+      "ChromaDB",
+      "Supabase",
+      "MinIO (S3)"
     ],
-    "ai_and_automation": [
-      "Artificial Intelligence",
-      "AI Automation"
+    "testing_and_verification": [
+      "pytest",
+      "JUnit 5 / Spring Boot Test",
+      "Go testing (table-driven tests)",
+      "Vitest",
+      "Playwright (E2E & Smoke Testing)",
+      "Information Retrieval Metrics (NDCG, MRR)",
+      "Deterministic Domain Verifiers"
     ],
-    "other": [
-      "Technical Support",
-      "Network Troubleshooting",
-      "Database Management",
-      "Programming Education",
-      "Computational Thinking"
+    "devops_and_infrastructure": [
+      "Docker & Multi-Stage Dockerfiles",
+      "Docker Compose",
+      "GitHub Actions CI/CD",
+      "Flyway & golang-migrate",
+      "Linux / Bash"
+    ],
+    "ai_and_algorithms": [
+      "LangGraph (Multi-Agent Workflows & Interrupts)",
+      "LangChain",
+      "RAG & Hybrid Semantic Search",
+      "Google Gemini SDK / OpenAI / Anthropic / DeepSeek APIs",
+      "OpenCV & Numerical Signal Processing (Gaussian Smoothing, Z-Score Outlier Detection)"
     ]
   },
   "portfolio_projects": [
     {
-      "name": "Bread Forecast — Sistem Estimasi Dropping Roti Otomatis",
-      "problem": "Manual bread dropping estimation using Excel was prone to calculation errors, slow, and made return risk difficult to monitor.",
-      "solution": "Web application for uploading D9017F files, processing sales estimation data, calculating return rates, classifying risk, calculating recommended quantities, and exporting detailed and weekly estimates.",
+      "name": "WorkForceOS — Enterprise Workforce Scheduling & Risk Intelligence Platform",
+      "repository": "https://github.com/mwyzer/WorkForceOS",
+      "problem": "Organizations with shift-based employees struggle with fragmented scheduling, attendance corrections, midnight/cross-timezone shift handovers, and undetected operational fatigue or compliance risks.",
+      "solution": "A Java 21 / Spring Boot 3 modular monolith and Angular 16 platform centralizing shift rosters, attendance, leave/overtime/swap approvals, shift handovers, immutable audit logging, and a hybrid Heuristic + LLM Workforce Risk Intelligence Engine.",
       "features": [
-        "Upload Excel D9017F",
-        "Automatic validation of thousands of data rows",
-        "Filter by Dropping Day, Week Invoice, and Invoice Day",
-        "Forecast summary dashboard",
-        "Risk classification: Low, Medium, High",
-        "Complete forecast table",
-        "Export Detail Estimasi",
-        "Export Weekly Estimasi",
-        "Configurable threshold and multiplier formula"
+        "JWT bearer authentication & role-based security filter",
+        "Shift templates, roster assignments, and publishing workflows",
+        "Clock-in/out attendance tracking with auditable correction workflows",
+        "Multi-stage leave, overtime, and shift-swap approval state machines",
+        "Structured shift handover lifecycle (create, submit, acknowledge)",
+        "Workforce Risk Intelligence Pipeline (heuristic risk engine + LLM analysis + persisted PostgreSQL alerts via Flyway)"
       ],
       "metrics": {
-        "total_outlets": 105,
-        "total_products": 46,
-        "total_recommended_quantity": 1883,
-        "forecast_results": 1113,
-        "validated_rows": 21763,
-        "low_risk": 692,
-        "medium_risk": 4,
-        "high_risk": 417
+        "total_files": 411,
+        "automated_test_files": 89,
+        "docker_configs": 3
       },
       "technology_stack": [
-        "Next.js",
-        "React",
+        "Java 21",
+        "Spring Boot 3",
+        "PostgreSQL",
+        "Flyway",
+        "Angular 16",
         "TypeScript",
-        "Tailwind CSS",
-        "XLSX Parser",
-        "Chart Components",
-        "Client-side Processing",
-        "Excel Export"
+        "JUnit 5",
+        "Maven",
+        "Docker"
       ]
     },
     {
-      "name": "PropertyHub — Platform Multi-Tenant Listing Properti",
+      "name": "Nautical ERP (nautica_erp) — Autonomous Maritime Operations & Voyage Clearance Engine",
+      "repository": "https://github.com/mwyzer/nautica_erp",
+      "problem": "Issuing Port Clearance in commercial shipping requires manually cross-checking dozens of SOLAS, STCW 2010, and MARPOL compliance documents, bunker fuel reserves, and maintenance defect logs.",
+      "solution": "A FastAPI + Async SQLAlchemy 2.0 ERP featuring a Deterministic Maritime Clearance Engine paired with a Google Gemini AI Maritime Superintendent Agent for multi-factor voyage clearance audits.",
+      "features": [
+        "Deterministic Steaming Hours & Safe Bunker Fuel verifier (enforcing 15% mandatory MARPOL/reserve buffer)",
+        "Fuel burn-rate anomaly detection across VLSFO/MGO logs",
+        "Automated STCW 2010 crew certification expiry and minimum manning table verification",
+        "SOLAS critical hull, engine, and steering PMS defect screening",
+        "AI Maritime Superintendent Agent for automated multi-factor Port Clearance auditing"
+      ],
+      "metrics": {
+        "total_files": 119,
+        "automated_test_files": 17,
+        "docker_configs": 3
+      },
+      "technology_stack": [
+        "Python 3",
+        "FastAPI",
+        "Async SQLAlchemy 2.0",
+        "PostgreSQL",
+        "TypeScript",
+        "Google Gemini SDK",
+        "pytest",
+        "Docker"
+      ]
+    },
+    {
+      "name": "FIHOS (go-react-fihos) — Multi-Tenant Wi-Fi Hotspot Billing & Network Operating System",
+      "repository": "https://github.com/mwyzer/go-react-fihos",
+      "problem": "Small ISPs, cafes, and hotspot operators in Southeast Asia need a unified, multi-tenant platform to manage MikroTik routers, voucher lifecycles, customer wallets, dynamic bandwidth boosting, and anomaly detection.",
+      "solution": "A 6-container production system built with Go (Gin), React (Vite), PostgreSQL 17, and Redis 7 featuring background worker routines for router synchronization, billing windows, and live session monitoring.",
+      "features": [
+        "Multi-tenant isolation via X-Tenant-Id with Admin, Owner, and Staff RBAC",
+        "MikroTik REST router sync & probe workers (with deterministic simulate mode and real transport)",
+        "Voucher batch generation, lifecycle management, and revocation",
+        "Customer wallets, monthly billing window generation, and HMAC-signed payment webhooks",
+        "Scheduled dynamic bandwidth rate-boost windows with live session reconciliation",
+        "Traffic analytics rollups and automated usage anomaly detection engine"
+      ],
+      "metrics": {
+        "total_files": 140,
+        "automated_test_files": 18,
+        "docker_services": 6
+      },
+      "technology_stack": [
+        "Go (Golang)",
+        "Gin",
+        "React 18",
+        "TypeScript",
+        "PostgreSQL 17",
+        "Redis 7",
+        "golang-migrate",
+        "Docker Compose"
+      ]
+    },
+    {
+      "name": "PropertyHub (golang-next-property-listings) — Multi-Tenant Property Marketplace",
+      "repository": "https://github.com/mwyzer/golang-next-property-listings",
       "type": "Multi-Tenant Property Listing Platform",
-      "description": "Web-based multi-tenant platform for managing property listings across property agencies, banks, and asset-owning companies.",
+      "description": "Enterprise multi-tenant platform for managing property listings across real estate agencies, banks, and asset-owning corporations in Indonesia.",
+      "problem": "Property agencies, banks, and asset-holding corporations lack a centralized, auditable multi-tenant marketplace with strict tenant isolation and multi-stage listing verification.",
+      "solution": "A Go 1.25 + React 18 + PostgreSQL 16 + Apache Kafka 3.9 platform providing 4-tier RBAC, deterministic listing approval workflows, event streaming, and full audit logging.",
       "target_users": [
         "Platform Admin",
         "Tenant Admin",
@@ -265,87 +385,245 @@
         "Buyer"
       ],
       "features": [
-        "Role-Based Access Control",
-        "Admin Dashboard",
-        "Tenant Management",
-        "Property Listing Management",
-        "Listing Review and Approval",
-        "Audit Logs",
-        "Profile Management",
-        "Upgrade Request Management"
+        "4-Tier Role-Based Access Control (Platform Admin, Tenant Admin, Salesman, Buyer)",
+        "Multi-Tenant Management & Upgrade Request Workflows",
+        "Deterministic Listing Review State Machine (Draft -> Pending Review -> Approved/Rejected)",
+        "Event-driven architecture with Apache Kafka 3.9",
+        "Immutable Audit Logs recording actor, role, target, action, and timestamp"
       ],
-      "workflow": {
-        "listing_review": [
-          "Salesman creates listing",
-          "Listing enters Draft status",
-          "Salesman submits listing",
-          "Listing enters Pending Review",
-          "Platform Admin reviews listing",
-          "Valid listing becomes Approved",
-          "Invalid listing becomes Rejected"
-        ],
-        "tenant_management": [
-          "Platform Admin creates tenant",
-          "Tenant Admin is created",
-          "Tenant Admin manages salesmen",
-          "Salesman creates property listings",
-          "Platform Admin monitors tenant activity"
-        ],
-        "audit_log": [
-          "User performs an action",
-          "System stores the activity",
-          "Audit log records action, target, user, role, and timestamp"
-        ]
+      "metrics": {
+        "total_files": 157,
+        "automated_test_files": 17,
+        "docker_configs": 7
       },
-      "business_value": [
-        "Property listing marketplace",
-        "Internal property agency dashboard",
-        "Bank asset management system",
-        "Corporate asset listing system",
-        "Multi-tenant property SaaS platform",
-        "Property listing verification system"
+      "technology_stack": [
+        "Go 1.25",
+        "Gin",
+        "GORM",
+        "PostgreSQL 16",
+        "Apache Kafka 3.9",
+        "React 18",
+        "TypeScript",
+        "Docker",
+        "GitHub Actions CI/CD",
+        "Playwright",
+        "k6"
+      ]
+    },
+    {
+      "name": "TalentMatch AI — Explainable Resume Screening & Candidate Ranking Platform",
+      "repository": "https://github.com/mwyzer/TalentMatch-AI---Flask---ReactJS",
+      "problem": "Traditional candidate screening relies on subjective gut feel or opaque keyword matching without measurable ranking accuracy or explainable skill-gap justification.",
+      "solution": "An end-to-end Python 3.11 (Flask 3) and React/TypeScript platform implementing a weighted multi-signal hybrid scoring pipeline benchmarked with Information Retrieval (IR) metrics.",
+      "features": [
+        "Dual-provider LLM layer (OpenAI + Anthropic) with automatic fallback",
+        "Weighted multi-signal scoring pipeline (38% skills, 24% semantic vector similarity, experience, education, domain)",
+        "Automated skill-gap analysis and plain-language match justification",
+        "Quantitative Information Retrieval evaluation suite computing NDCG and MRR metrics"
       ],
-      "technology_context": [
-        "Vite development server"
+      "metrics": {
+        "total_files": 145,
+        "automated_test_files": 27,
+        "docker_configs": 6
+      },
+      "technology_stack": [
+        "Python 3.11",
+        "Flask 3",
+        "React 18",
+        "TypeScript 5.3",
+        "Vector Embeddings",
+        "pytest",
+        "Docker",
+        "GitHub Actions CI/CD"
+      ]
+    },
+    {
+      "name": "Shipping Ops Agent — Multi-Agent Maritime Logistics & Data Reconciliation System",
+      "repository": "https://github.com/mwyzer/shipping-ops-agent",
+      "problem": "Shipping operations staff face 91 recurring pain points across manifest reconciliation, heterogeneous vendor invoices, schedule shifts, and high-volume correspondence.",
+      "solution": "A LangGraph multi-agent system (1 Coordinator + 6 Specialist Agents) with FastAPI and Next.js that turns operational spreadsheets, invoices, and .eml files into human-reviewed action items.",
+      "features": [
+        "Reconciliation Agent: Manifest vs. container/stacking list matching with deterministic ISO 6346 check-digit validation and look-alike ID detection",
+        "Data Input Agent: Multi-layout invoice normalization, fuzzy vendor master matching, and duplicate/swapped invoice detection",
+        "Schedule Agent: Baseline vs. latest ETD shift analysis, CY closing recalculation, and TEU roll proposals",
+        "Reporting, Email Triage, and Tariff Quotation specialist agents with LangGraph human-in-the-loop interrupts"
+      ],
+      "metrics": {
+        "total_files": 62,
+        "automated_test_files": 9,
+        "survey_pain_points_addressed": 91
+      },
+      "technology_stack": [
+        "Python 3",
+        "FastAPI",
+        "LangGraph",
+        "Next.js",
+        "TypeScript",
+        "Pandas / OpenPyXL",
+        "pytest"
+      ]
+    },
+    {
+      "name": "Nexus AI — Enterprise Knowledge Base (RAG) & Autonomous Decision Platform",
+      "repository": "https://github.com/mwyzer/Nexus-AI",
+      "problem": "Enterprises need a modular, security-hardened platform to search internal documents with verifiable citations and execute auditable multi-step AI workflows.",
+      "solution": "A microservices platform combining a Next.js UI, NestJS API Gateway, Python FastAPI AI service, and background workers with strict JWT/RBAC/ACL security.",
+      "features": [
+        "Citation-grounded RAG pipeline across PDF, Markdown, TXT, and HTML documents",
+        "Autonomous multi-step decision agents with full execution audit logs",
+        "Modular microservices architecture with NestJS gateway and Python AI workers"
+      ],
+      "metrics": {
+        "total_files": 180,
+        "automated_test_files": 23,
+        "docker_configs": 4
+      },
+      "technology_stack": [
+        "TypeScript",
+        "NestJS",
+        "Next.js",
+        "Python 3",
+        "FastAPI",
+        "LangChain",
+        "PostgreSQL",
+        "Docker"
+      ]
+    },
+    {
+      "name": "LMS Mahasiswa (vue-lms-mahasiswa) — Full-Stack Academic Learning Management System",
+      "repository": "https://github.com/mwyzer/vue-lms-mahasiswa",
+      "problem": "University course materials, assignments, attendance, and grades are often scattered across disconnected tools, causing missed deadlines and unmonitored student progress.",
+      "solution": "A centralized full-stack LMS built with Nuxt 4, Vue 3, TypeScript, Pinia, and Supabase supporting Student, Instructor, and Administrator workflows.",
+      "features": [
+        "Multi-role RBAC (Student, Instructor, Administrator) with Supabase Auth & PostgreSQL RLS",
+        "Course modules, assignment submissions, interactive quizzes, and attendance tracking",
+        "Embedded AI study assistant and interactive Python playground",
+        "Comprehensive automated testing suite with 50 Vitest & Playwright test files"
+      ],
+      "metrics": {
+        "total_files": 211,
+        "automated_test_files": 50
+      },
+      "technology_stack": [
+        "TypeScript",
+        "Nuxt 4",
+        "Vue 3",
+        "Pinia",
+        "Supabase (PostgreSQL)",
+        "Vitest",
+        "Playwright"
+      ]
+    },
+    {
+      "name": "Acadio — University Academic Information System (SIAKAD)",
+      "repository": "https://github.com/mwyzer/acadio",
+      "problem": "Universities require a fast, clean-architecture backend to manage academic schedules, course enrollments, grades, and role-based faculty/student access.",
+      "solution": "A containerized Go (Gin + GORM) and React TypeScript Academic Information System with JWT authentication and clean repository/handler separation.",
+      "metrics": {
+        "total_files": 105,
+        "automated_test_files": 23,
+        "docker_configs": 3
+      },
+      "technology_stack": [
+        "Go (Golang)",
+        "Gin",
+        "GORM",
+        "PostgreSQL",
+        "React 18",
+        "TypeScript",
+        "Docker"
+      ]
+    },
+    {
+      "name": "Road & Building Condition Analyzers (penilai-kondisi-jalan & cek-kondisi-rumah)",
+      "repository": "https://github.com/mwyzer/penilai-kondisi-jalan",
+      "problem": "Manual civil engineering inspections of road pavement (Bina Marga SDI) and residential building damage from photos/videos are slow and inconsistent.",
+      "solution": "Python (OpenCV, Streamlit) and Next.js/TypeScript assessment tools combining deterministic civil engineering formulas, signal smoothing, and multimodal vision analysis.",
+      "features": [
+        "Automated Bina Marga Surface Distress Index (SDI) calculation from crack area/width, potholes, and wheel rutting",
+        "Gaussian kernel smoothing along road stationing (STA) and z-score outlier detection (|z| > 2)",
+        "Smartphone accelerometer vertical vibration RMS computation and EXIF GPS mapping",
+        "Weighted 8-component building condition index and repair priority estimation using OpenCV"
+      ],
+      "metrics": {
+        "total_files": 96,
+        "automated_test_files": 13
+      },
+      "technology_stack": [
+        "Python 3",
+        "OpenCV",
+        "NumPy / SciPy",
+        "Streamlit",
+        "Next.js",
+        "TypeScript"
+      ]
+    },
+    {
+      "name": "Bread Forecast — Automated Bakery Dropping & Return-Risk Estimation System",
+      "repository": "https://github.com/mwyzer/bread-forecasting",
+      "problem": "Manual bread dropping estimation using Excel was prone to calculation errors, slow, and made return risk difficult to monitor across 100+ outlets.",
+      "solution": "A Next.js and TypeScript web application for parsing D9017F Excel files, validating 21,000+ rows, calculating return rates, classifying outlet risk, and computing recommended dropping quantities.",
+      "features": [
+        "Automated validation of 21,763+ transaction rows from D9017F Excel uploads",
+        "Configurable threshold and multiplier formulas for return-risk classification (Low, Medium, High)",
+        "Detailed and weekly estimation Excel exports across 105 outlets and 46 products"
+      ],
+      "metrics": {
+        "total_outlets": 105,
+        "total_products": 46,
+        "total_recommended_quantity": 1883,
+        "forecast_results": 1113,
+        "validated_rows": 21763
+      },
+      "technology_stack": [
+        "Next.js",
+        "React",
+        "TypeScript",
+        "Tailwind CSS",
+        "XLSX Parser"
       ]
     }
   ],
   "community_and_leadership": [
     {
-      "role": "Facilitator – Coding & Artificial Intelligence (AI)",
-      "location": "Lokus Sukabumi",
+      "role": "Facilitator – Coding & Artificial Intelligence (AI) (Anagata Academy Batch II)",
+      "location": "Lokus Sukabumi (SMAN 1 Cikembar)",
       "year": 2025
     },
     {
-      "role": "YouTube Creator",
+      "role": "University Programming Mentor",
+      "location": "Universitas 17 Agustus 1945 Jakarta",
+      "year": 2025
+    },
+    {
+      "role": "YouTube Creator (Programming & AI Tutorials)",
       "channel": "@wyzer24"
     }
   ],
   "cover_letter": {
-    "target_position": "Full Stack Developer / Software Engineer",
+    "target_position": "Software Engineer — Reinforcement Learning Environments / Backend & AI Systems",
     "key_points": [
-      "Strong background in web application development, technical support, and IT education",
-      "Experience with Laravel, Tailwind CSS, MySQL, PostgreSQL, and API integrations",
-      "Built a company profile website and an internet voucher sales and customer management system",
-      "Experience maintaining network and database stability",
-      "Developed an employee monitoring system with KPI dashboards",
-      "Active involvement in programming, informatics, and artificial intelligence education",
-      "Participated in Training of Trainers programs for Coding and Artificial Intelligence",
-      "Strong communication, adaptability, problem-solving, and continuous learning"
+      "Hands-on expertise across Python 3, Go (Golang), Java 21, and TypeScript with 20+ full-stack and backend repositories on GitHub (github.com/mwyzer)",
+      "Built reproducible, multi-container Docker environments and 250+ automated test files (pytest, JUnit 5, Go testing, Vitest, Playwright)",
+      "Designed deterministic domain verifiers and algorithmic engines including SOLAS/STCW maritime clearance rules, ISO 6346 container check-digit validation, NDCG/MRR Information Retrieval evaluation, and Bina Marga SDI Gaussian smoothing",
+      "Proven industry experience debugging production databases, modernizing legacy codebases, and optimizing backend queries",
+      "Certified Coding & AI Trainer (KEMENDIKDASMEN) and University Programming Mentor experienced in formulating clear, unambiguous technical specifications and reference solutions"
     ],
-    "closing": "Interested in contributing technical skills and experience to an organization's technical goals."
+    "closing": "Ready to start immediately and deliver high-signal, reproducible software engineering RL environments and deterministic verifiers."
   },
   "portfolio_metadata": {
-    "document_type": "Professional Portfolio",
+    "document_type": "Professional Portfolio & RL Software Engineering Profile",
     "featured_projects": [
-      "Bread Forecast — Sistem Estimasi Dropping Roti Otomatis",
-      "PropertyHub — Platform Multi-Tenant Listing Properti"
+      "WorkForceOS — Enterprise Workforce Scheduling & Risk Intelligence Platform",
+      "Nautical ERP (nautica_erp) — Autonomous Maritime Operations & Voyage Clearance Engine",
+      "FIHOS (go-react-fihos) — Multi-Tenant Wi-Fi Hotspot Billing & Network Operating System",
+      "PropertyHub (golang-next-property-listings) — Multi-Tenant Property Marketplace",
+      "TalentMatch AI — Explainable Resume Screening & Candidate Ranking Platform",
+      "Shipping Ops Agent — Multi-Agent Maritime Logistics & Data Reconciliation System"
     ]
   },
   "source_documents": [
-    "Cover Letter - Muhammad Wyzer.pdf",
-    "CV Muhammad Wyzer English.pdf",
-    "Muhammad_Wyzer_CV_ATS_v2(2).pdf",
-    "PORTFOLIO-MUHAMMAD WYZER.pdf"
+    "CV_Muhammad_Wyzer.pdf",
+    "files/data.json"
   ]
 }

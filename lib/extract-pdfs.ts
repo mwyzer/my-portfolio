@@ -85,7 +85,7 @@ export function readDataJson(options: { includePrivate?: boolean } = {}): string
     if (data.contact && Object.keys(data.contact).length) {
       const c = data.contact;
       sections.push(
-        `## Contact Links\n${c.github ? `- GitHub: ${c.github}\n` : ""}${c.gitlab ? `- GitLab: ${c.gitlab}\n` : ""}${c.linkedin ? `- LinkedIn: ${c.linkedin}\n` : ""}${c.youtube ? `- YouTube: ${c.youtube}\n` : ""}${c.facebook ? `- Facebook: ${c.facebook}\n` : ""}${c.instagram ? `- Instagram: ${c.instagram}\n` : ""}`.trim()
+        `## Contact Links\n${c.website ? `- Website: ${c.website}\n` : ""}${c.github ? `- GitHub: ${c.github}\n` : ""}${c.gitlab ? `- GitLab: ${c.gitlab}\n` : ""}${c.linkedin ? `- LinkedIn: ${c.linkedin}\n` : ""}${c.youtube ? `- YouTube: ${c.youtube}\n` : ""}${c.facebook ? `- Facebook: ${c.facebook}\n` : ""}${c.instagram ? `- Instagram: ${c.instagram}\n` : ""}`.trim()
       );
     }
 
@@ -141,6 +141,7 @@ export function readDataJson(options: { includePrivate?: boolean } = {}): string
     if (data.portfolio_projects?.length) {
       const projLines = data.portfolio_projects.map((p) => {
         const lines: string[] = [`### ${p.name}`];
+        if (p.repository) lines.push(`**Repository**: ${p.repository}`);
         if (p.problem) lines.push(`**Problem**: ${p.problem}`);
         if (p.solution) lines.push(`**Solution**: ${p.solution}`);
         if (p.description) lines.push(`**Description**: ${p.description}`);
