@@ -1,4 +1,4 @@
-import type { PortfolioProject, CaseStudy } from "@/types/database";
+import type { PortfolioAbout, PortfolioProject, CaseStudy } from "@/types/database";
 
 export interface FlagshipProjectEntry {
   matchTitles: string[];
@@ -6,6 +6,128 @@ export interface FlagshipProjectEntry {
 }
 
 const NOW_ISO = "2026-11-15T00:00:00.000Z";
+
+export const DEFAULT_HERO_PROOF: string[] = [
+  "Core Languages · Python 3 / Go / Java 21 / TypeScript",
+  "AI & Verification · LangGraph / RAG / 250+ Automated Test Suites",
+  "Production Infra · Docker / PostgreSQL / Redis / Kafka / CI/CD",
+];
+
+export const DEFAULT_SKILLS: string[] = [
+  "Python 3",
+  "Go (Golang)",
+  "Java 21",
+  "TypeScript",
+  "FastAPI",
+  "Spring Boot 3",
+  "Go Gin",
+  "React 18",
+  "Next.js",
+  "Vue 3 / Nuxt 4",
+  "PostgreSQL",
+  "Redis",
+  "Apache Kafka",
+  "Docker",
+  "LangGraph",
+  "RAG",
+];
+
+const UPGRADED_TITLE = "Software Engineer (Python 3 · Go · Java 21 · TypeScript) & AI Engineer";
+const UPGRADED_BIO =
+  "Full-Stack and Backend Software Engineer with 5+ years of experience building scalable backend services, distributed systems, and AI-enabled platforms across Python 3, Go, Java 21, and TypeScript. Author of 20+ production-oriented repositories featuring 250+ automated test suites, Dockerized environments, and deterministic domain engines.";
+
+const UPGRADED_EXPERIENCE = `September 2025 - Present
+Mentor - Tujuh Belas Agustus 1945 University, North Jakarta
+• Designed programming problems, reference solutions, and deterministic grading rubrics in Programming Fundamentals and Software Engineering
+• Mentored students in algorithms, data structures, debugging, and software projects
+
+December 2025 - Present
+Mentor - Ganesha Operation
+• Provided mentoring in Informatics, Algorithmic Problem Solving, and Computational Thinking
+
+May 2025 - Present
+Facilitator - PT. Anagata Sisedu Nusantara
+• Delivered instruction aligned with the national curriculum on coding and AI
+• Guided students in developing logical thinking, problem-solving, and digital literacy skills
+
+August 2024 - February 2025
+Full Stack Developer - PT. Pasifik Wija Teknologi, North Kalimantan
+• Built a web application for internet voucher sales and customer management (Laravel 10, MySQL, Laravel Filament)
+• Developed a corporate platform with normalized relational schemas and RBAC (Laravel 10, Tailwind, MySQL)
+
+August 2023 - July 2024
+Technical Support & Backend Developer - PT. Taman Kreasi Indonesia, Semarang
+• Audited and debugged high-volume incoming cargo logs in production relational databases
+• Maintained, refactored, and modernized legacy business modules (Laravel 5.5 to Laravel 8, MySQL, PostgreSQL)
+• Created an employee KPI & performance monitoring platform with analytical charts (Laravel 8, PostgreSQL, jQuery)
+
+August 2022 - November 2022
+Software Developer - PT. Tutoria Sentra Edukasi, East Jakarta
+• Engineered custom API integrations bridging Moodle LMS with Laravel backend services
+• Designed and implemented a web platform connecting courses, tutors, and students
+• Performed troubleshooting for networks, computers, and cross-system integrations`;
+
+export function normalizePortfolioProfile(dbProfile: PortfolioAbout | null): PortfolioAbout {
+  const base: PortfolioAbout = dbProfile ?? {
+    id: "default-profile",
+    created_at: NOW_ISO,
+    updated_at: NOW_ISO,
+    name: "Muhammad Wyzer",
+    title: UPGRADED_TITLE,
+    bio: UPGRADED_BIO,
+    avatar_url: "https://gitlab.com/uploads/-/system/user/avatar/6791914/avatar.png?width=800",
+    resume_url: "/CV_Muhammad_Wyzer.pdf",
+    skills: DEFAULT_SKILLS,
+    social_links: {},
+  };
+
+  const isLegacyTitle =
+    !base.title ||
+    base.title.trim().toLowerCase() === "full stack developer & mentor";
+  const isLegacyBio =
+    !base.bio ||
+    base.bio.includes("over 3 years of experience building web applications using Laravel");
+  const isLegacySkills =
+    !base.skills ||
+    base.skills.length === 0 ||
+    base.skills.includes("jQuery") ||
+    base.skills.includes("Moodle");
+
+  const rawSocial = (base.social_links as Record<string, any> | null) ?? {};
+  const existingProof = Array.isArray(rawSocial.heroProof) ? rawSocial.heroProof : [];
+  const isLegacyProof =
+    existingProof.length === 0 ||
+    existingProof.some((p: string) => typeof p === "string" && p.includes("Laravel / .NET"));
+
+  const cleanStr = (val: string) => val.replace(/—/g, "-").replace(/–/g, "-");
+
+  const rawExperience = typeof rawSocial.experience === "string" ? rawSocial.experience : "";
+  const isLegacyExperience =
+    !rawExperience || !rawExperience.includes("deterministic grading rubrics");
+
+  const upgradedSocial: Record<string, any> = {
+    linkedin: rawSocial.linkedin || "https://www.linkedin.com/in/muhammad-wyzer/",
+    github: rawSocial.github || "https://github.com/mwyzer",
+    gitlab: rawSocial.gitlab || "https://gitlab.com/mwyzer",
+    email: rawSocial.email || "muhammad.wyzer@gmail.com",
+    phone: rawSocial.phone || "+62 822 1137 6074",
+    ...rawSocial,
+    heroProof: isLegacyProof ? DEFAULT_HERO_PROOF : existingProof.map(cleanStr),
+    experience: cleanStr(isLegacyExperience ? UPGRADED_EXPERIENCE : rawExperience),
+    education: typeof rawSocial.education === "string" ? cleanStr(rawSocial.education) : rawSocial.education,
+    certifications:
+      typeof rawSocial.certifications === "string" ? cleanStr(rawSocial.certifications) : rawSocial.certifications,
+  };
+
+  return {
+    ...base,
+    title: isLegacyTitle ? UPGRADED_TITLE : cleanStr(base.title),
+    bio: isLegacyBio ? UPGRADED_BIO : cleanStr(base.bio),
+    resume_url: base.resume_url || "/CV_Muhammad_Wyzer.pdf",
+    skills: isLegacySkills ? DEFAULT_SKILLS : base.skills,
+    social_links: upgradedSocial,
+  };
+}
 
 export const FLAGSHIP_PROJECT_ENTRIES: FlagshipProjectEntry[] = [
   {
@@ -318,6 +440,85 @@ export const FLAGSHIP_PROJECT_ENTRIES: FlagshipProjectEntry[] = [
     },
   },
   {
+    matchTitles: ["talentmatch ai", "talentmatch-ai---flask---reactjs"],
+    project: {
+      id: "talentmatch-ai",
+      created_at: NOW_ISO,
+      updated_at: NOW_ISO,
+      title: "TalentMatch AI",
+      subtitle: "Explainable Resume Screening & IR Evaluation Pipeline",
+      description:
+        "End-to-end AI recruitment platform turning resumes and job descriptions into explainable, measurable hiring decisions using a weighted multi-signal hybrid scoring pipeline benchmarked with NDCG and MRR metrics.",
+      image_url: null,
+      live_url: null,
+      github_url: "https://github.com/mwyzer/TalentMatch-AI---Flask---ReactJS",
+      youtube_url: null,
+      technologies: [
+        "Python 3.11",
+        "Flask 3",
+        "React 18",
+        "TypeScript 5.3",
+        "Vector Embeddings",
+        "OpenAI / Anthropic",
+        "pytest",
+        "Docker",
+        "GitHub Actions",
+      ],
+      featured: true,
+      order: 5,
+      category: "personal",
+      views: 0,
+      case_study: {
+        problem:
+          "Candidate screening is often driven by subjective gut feel or brittle keyword filters that provide no explainability, skill-gap breakdown, or quantitative ranking evaluation.",
+        solution:
+          "Engineered a Python 3.11 (Flask 3) and React 18 platform with a dual-provider LLM extraction layer, vector semantic search, weighted multi-signal hybrid scoring, and Information Retrieval (NDCG, MRR) benchmarking.",
+        architecture: "",
+        architectureDiagram: `[Resume Upload / Job Spec]
+            |
+            v
+[Dual-Provider LLM Layer (OpenAI + Anthropic Fallback)]
+            |
+            v
+[Vector Embeddings + Semantic Search] ---> [Weighted Hybrid Scoring Engine]
+                                             |-- 38% Skills Match
+                                             |-- 24% Semantic Similarity
+                                             +-- 38% Experience, Education, Domain
+                                                        |
+                                                        v
+                                    [Explainable Ranking + IR Eval (NDCG, MRR)]`,
+        highlights: [
+          "Built a weighted multi-signal scoring pipeline (38% skills, 24% semantic vector similarity, experience, education, projects, domain fit) with plain-language justification.",
+          "Implemented a dual-provider LLM abstraction layer (OpenAI + Anthropic) with automatic failover and zero vendor lock-in.",
+          "Created an Information Retrieval (IR) evaluation suite computing NDCG and MRR metrics across 27 automated test files.",
+        ],
+        capabilities: {
+          fullStackEngineering: ["React 18 + TypeScript 5.3", "Interactive Candidate Ranking UI"],
+          backendData: ["Python 3.11 + Flask 3", "Vector Embeddings & Semantic Search"],
+          aiEngineering: ["Hybrid Multi-Signal Scoring", "Dual-Provider LLM Failover", "IR Metrics (NDCG, MRR)"],
+          deliveryQuality: ["27 Automated Test Files", "6 Docker Configs", "GitHub Actions CI/CD"],
+        },
+        engineeringDecisions: [
+          {
+            problem: "Pure vector similarity often ranks generalist resumes above candidates with exact required technical skills.",
+            decision: "Weighted Multi-Signal Hybrid Scoring (38% Skills + 24% Semantic + 38% Metadata)",
+            reason: "Combines exact skill-graph matching with semantic context, verified quantitatively using NDCG and MRR ranking metrics.",
+          },
+          {
+            problem: "Single LLM API outages or rate limits breaking resume ingestion pipelines.",
+            decision: "Dual-Provider Abstraction with Automatic Fallback",
+            reason: "Seamlessly switches between OpenAI and Anthropic providers while enforcing identical structured output schemas.",
+          },
+        ],
+        contribution: [
+          "Designed and built the full-stack platform, hybrid scoring engine, dual-LLM layer, and IR evaluation benchmark.",
+          "Wrote 27 automated test suites and containerized the application with 6 Docker configurations and CI/CD.",
+        ],
+        metrics: ["145 Source Files", "27 Automated Test Files", "6 Docker Configs", "NDCG & MRR Evaluated"],
+      } satisfies CaseStudy as unknown as PortfolioProject["case_study"],
+    },
+  },
+  {
     matchTitles: ["shipping ops agent", "shipping-ops-agent"],
     project: {
       id: "shipping-ops-agent",
@@ -341,7 +542,7 @@ export const FLAGSHIP_PROJECT_ENTRIES: FlagshipProjectEntry[] = [
         "pytest",
       ],
       featured: true,
-      order: 5,
+      order: 6,
       category: "personal",
       views: 0,
       case_study: {
@@ -424,7 +625,7 @@ export const FLAGSHIP_PROJECT_ENTRIES: FlagshipProjectEntry[] = [
         "Playwright",
       ],
       featured: false,
-      order: 6,
+      order: 7,
       category: "personal",
       views: 0,
       case_study: {
@@ -490,7 +691,7 @@ export const FLAGSHIP_PROJECT_ENTRIES: FlagshipProjectEntry[] = [
         "Docker",
       ],
       featured: false,
-      order: 7,
+      order: 8,
       category: "personal",
       views: 0,
       case_study: {
@@ -556,7 +757,7 @@ export const FLAGSHIP_PROJECT_ENTRIES: FlagshipProjectEntry[] = [
         "pytest",
       ],
       featured: false,
-      order: 8,
+      order: 9,
       category: "personal",
       views: 0,
       case_study: {
@@ -623,7 +824,7 @@ export const FLAGSHIP_PROJECT_ENTRIES: FlagshipProjectEntry[] = [
         "XLSX Parser",
       ],
       featured: false,
-      order: 9,
+      order: 10,
       category: "work",
       views: 0,
       case_study: {
@@ -667,7 +868,82 @@ export const FLAGSHIP_PROJECT_ENTRIES: FlagshipProjectEntry[] = [
       } satisfies CaseStudy as unknown as PortfolioProject["case_study"],
     },
   },
+  {
+    matchTitles: ["modernhub"],
+    project: {
+      id: "modernhub",
+      created_at: NOW_ISO,
+      updated_at: NOW_ISO,
+      title: "ModernHub - Team Work & Project Management Platform",
+      subtitle: "Role-Based Project, Task & Activity Audit Management System",
+      description:
+        "Role-based work management platform built with CodeIgniter 4, PHP 8.2, and MySQL 8 enabling organizations to assign, track, and audit employee tasks across projects with recoverable soft deletion and REST API endpoints.",
+      image_url: null,
+      live_url: null,
+      github_url: "https://github.com/mwyzer/modernhub",
+      youtube_url: null,
+      technologies: [
+        "CodeIgniter 4",
+        "PHP 8.2+",
+        "MySQL 8",
+        "Tailwind CSS",
+        "Docker",
+        "PHPUnit",
+      ],
+      featured: false,
+      order: 11,
+      category: "personal",
+      views: 0,
+      case_study: {
+        problem:
+          "Organizations lacked visibility into employee workload and overdue tasks due to manual task tracking and missing activity audit trails.",
+        solution:
+          "Built a CodeIgniter 4 + MySQL 8 platform with Admin, Manager, and Member role boundaries, task workflow deadlines, activity audit logging, and recoverable soft deletion.",
+        architecture: "",
+        architectureDiagram: `[Role-Aware Web UI / REST API Client]
+                 |
+                 v
+[CodeIgniter 4 (PHP 8.2+) Application]
+  |-- Role Guards (Admin / Manager / Member)
+  |-- Project & Task Workflow Engine
+  |-- Activity Audit Trail & Soft-Delete Recovery
+                 |
+                 v
+          [MySQL 8 Database]`,
+        highlights: [
+          "Implemented 3-tier role-based access control (Admin, Manager, Member) for project and task lifecycle management.",
+          "Engineered an immutable activity audit trail and recoverable soft-deletion workflow backed by MySQL 8 and PHPUnit tests.",
+        ],
+        capabilities: {
+          fullStackEngineering: ["CodeIgniter 4 MVC", "Tailwind CSS Dashboards", "REST API"],
+          backendData: ["PHP 8.2+", "MySQL 8", "Activity Audit Logging"],
+          aiEngineering: [],
+          deliveryQuality: ["PHPUnit Test Suite", "Dockerized Environment"],
+        },
+        engineeringDecisions: [
+          {
+            problem: "Accidental deletion of active project tasks losing historical work records.",
+            decision: "Recoverable Soft Deletion + Activity Audit Log",
+            reason: "Preserves referential integrity and full accountability across all project mutations.",
+          },
+        ],
+        contribution: [
+          "Designed the relational schema, RBAC filters, task workflow controllers, and PHPUnit tests.",
+        ],
+        metrics: ["3 Role Tiers", "REST API + MVC", "Docker + PHPUnit"],
+      } satisfies CaseStudy as unknown as PortfolioProject["case_study"],
+    },
+  },
 ];
+
+function sanitizeProjectCopy(project: PortfolioProject): PortfolioProject {
+  return {
+    ...project,
+    title: project.title.replace(/—/g, "-"),
+    subtitle: project.subtitle ? project.subtitle.replace(/—/g, "-") : project.subtitle,
+    description: project.description ? project.description.replace(/—/g, "-") : project.description,
+  };
+}
 
 function enrichExistingProject(dbProj: PortfolioProject, flagship: PortfolioProject): PortfolioProject {
   const existingCs = (dbProj.case_study as CaseStudy | null) ?? null;
@@ -699,14 +975,21 @@ function enrichExistingProject(dbProj: PortfolioProject, flagship: PortfolioProj
       ? flagship.github_url
       : dbProj.github_url;
 
-  return {
+  const rawDesc = (dbProj.description || "").trim();
+  const useFlagshipDesc = rawDesc.length < 50 || rawDesc.length > 260;
+
+  return sanitizeProjectCopy({
     ...dbProj,
+    title: flagship.title || dbProj.title,
     subtitle: dbProj.subtitle || flagship.subtitle,
+    description: useFlagshipDesc ? flagship.description : rawDesc,
     github_url: fixedGithubUrl,
     live_url: dbProj.live_url || flagship.live_url,
     technologies: dbProj.technologies?.length ? dbProj.technologies : flagship.technologies,
+    featured: flagship.featured,
+    order: flagship.order,
     case_study: mergedCs as unknown as PortfolioProject["case_study"],
-  };
+  });
 }
 
 export function mergeWithFlagshipProjects(
@@ -721,7 +1004,12 @@ export function mergeWithFlagshipProjects(
     const entry = FLAGSHIP_PROJECT_ENTRIES.find((e) =>
       e.matchTitles.some((t) => lowerTitle.includes(t))
     );
-    if (!entry) return dbProj;
+    if (!entry) {
+      return sanitizeProjectCopy({
+        ...dbProj,
+        order: (dbProj.order ?? 50) + 20,
+      });
+    }
     matchedFlagshipIds.add(entry.project.id);
     return enrichExistingProject(dbProj, entry.project);
   });
@@ -730,21 +1018,20 @@ export function mergeWithFlagshipProjects(
     (e) => !matchedFlagshipIds.has(e.project.id)
   ).map((e) => e.project);
 
-  // Place top flagship projects first so WorkForceOS, Nautical ERP, FIHOS, etc.
-  // immediately stand out alongside existing case-study projects.
   const combined = [...missingFlagships, ...enrichedDb];
 
   const filtered = options.featuredOnly
-    ? combined.filter((p) => p.featured || Boolean(p.case_study))
+    ? combined.filter((p) => p.featured)
     : combined;
 
-  // Sort: projects with full case studies & featured flag first
   filtered.sort((a, b) => {
+    if (a.featured !== b.featured) return a.featured ? -1 : 1;
+    const aOrder = a.order ?? 99;
+    const bOrder = b.order ?? 99;
+    if (aOrder !== bOrder) return aOrder - bOrder;
     const aHasCs = Boolean(a.case_study) ? 1 : 0;
     const bHasCs = Boolean(b.case_study) ? 1 : 0;
-    if (aHasCs !== bHasCs) return bHasCs - aHasCs;
-    if (a.featured !== b.featured) return a.featured ? -1 : 1;
-    return (a.order ?? 99) - (b.order ?? 99);
+    return bHasCs - aHasCs;
   });
 
   return options.limit ? filtered.slice(0, options.limit) : filtered;
@@ -759,7 +1046,7 @@ export function resolveProjectById(
     const entry = FLAGSHIP_PROJECT_ENTRIES.find(
       (e) => e.project.id === id || e.matchTitles.some((t) => lowerTitle.includes(t))
     );
-    return entry ? enrichExistingProject(dbProject, entry.project) : dbProject;
+    return entry ? enrichExistingProject(dbProject, entry.project) : sanitizeProjectCopy(dbProject);
   }
 
   const bySlug = FLAGSHIP_PROJECT_ENTRIES.find((e) => e.project.id === id);

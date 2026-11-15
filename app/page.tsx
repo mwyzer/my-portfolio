@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
-import { mergeWithFlagshipProjects } from "@/lib/flagship-projects";
+import { mergeWithFlagshipProjects, normalizePortfolioProfile, DEFAULT_HERO_PROOF } from "@/lib/flagship-projects";
 import { formatDate } from "@/lib/utils";
 import { ArrowRight, ExternalLink, Mail, Phone, Code2, Database, Palette, Rocket, Layout, Server, Globe, Eye, CheckCircle2 } from "lucide-react";
 import { Github, Youtube, Linkedin, Gitlab } from "@/components/brand-icons";
@@ -74,19 +74,16 @@ export default async function HomePage({
 
   // Fetch profile only — this is all the hero section needs.
   // Projects & blog posts are streamed later via Suspense to reduce TTFB.
-  const { data: profile } = await (supabase
+  const { data: rawProfile } = await (supabase
     .from("portfolio_about")
     .select("*")
     .single() as unknown as Promise<{ data: PortfolioAbout | null; error: any }>);
 
-  const social = (profile?.social_links as Record<string, any> | null) ?? {};
+  const profile = normalizePortfolioProfile(rawProfile);
+  const social = (profile.social_links as Record<string, any> | null) ?? {};
   const heroProof: string[] = Array.isArray(social?.heroProof) && social.heroProof.length > 0
     ? social.heroProof
-    : [
-        "Full-Stack · Laravel / .NET / React / Vue",
-        "AI Engineering · RAG / Agents / LangGraph / pgvector",
-        "Production · Docker / PostgreSQL / Redis / CI/CD",
-      ];
+    : DEFAULT_HERO_PROOF;
   const educationEntries: string[] = (typeof social?.education === "string" ? social.education.split("\n\n").filter(Boolean) : []);
   const certEntries: string[] = (typeof social?.certifications === "string" ? social.certifications.split("\n\n").filter(Boolean) : []);
   const experienceEntries: string[] = (typeof social?.experience === "string" ? social.experience.split("\n\n").filter(Boolean) : []);
