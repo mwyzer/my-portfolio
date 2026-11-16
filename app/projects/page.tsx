@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, ExternalLink, Eye, CheckCircle2 } from "lucide-react";
 import { Github, Youtube } from "@/components/brand-icons";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
-import { mergeWithFlagshipProjects } from "@/lib/flagship-projects";
+import { mergeWithFlagshipProjects, normalizeMetrics } from "@/lib/flagship-projects";
 import type { PortfolioProject, CaseStudy } from "@/types/database";
 import ThemeToggle from "@/components/theme-toggle";
 import ProjectPreview from "@/components/project-preview";
@@ -56,13 +56,13 @@ export default async function ProjectsPage() {
           {projects.map((project) => {
             const caseStudy = project.case_study as CaseStudy | null;
             const highlights = caseStudy?.highlights ?? [];
-            const metrics = caseStudy?.metrics ?? [];
+            const metrics = normalizeMetrics(caseStudy?.metrics);
             const excerpt = caseStudy?.solution || caseStudy?.problem;
             const capabilities = caseStudy?.capabilities
               ? Object.values(caseStudy.capabilities).flat()
               : [];
             return (
-            <div key={project.id} className="card-noir flex flex-col h-full">
+            <div key={project.id} className="card-noir flex flex-col h-full min-w-0 overflow-hidden">
               <div className="flex items-start justify-between gap-2 mb-2">
                 {project.category ? (
                   <span className="badge-noir capitalize">{project.category}</span>
@@ -89,7 +89,7 @@ export default async function ProjectsPage() {
                 <p className="text-sm text-text-dim mb-2">{project.subtitle}</p>
               )}
               {metrics.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 my-2">
+                <div className="flex flex-wrap gap-1.5 my-2 min-w-0">
                   {metrics.slice(0, 3).map((metric, mIdx) => (
                     <span
                       key={`${metric}-${mIdx}`}

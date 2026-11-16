@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {
   FLAGSHIP_PROJECT_ENTRIES,
   mergeWithFlagshipProjects,
+  normalizeMetrics,
   normalizePortfolioProfile,
   resolveProjectById,
 } from "@/lib/flagship-projects";
@@ -104,6 +105,55 @@ describe("flagship-projects", () => {
     expect(normalized.skills).toContain("Go (Golang)");
     expect(normalized.skills).toContain("Java 21");
     expect(normalized.skills).not.toContain("jQuery");
+  });
+
+  it("normalizes delimited and multi-line metric strings into individual clean badges", () => {
+    const rawMetrics = ["211 Source Files\n50 Automated Test Files", "Latency < 500ms; Availability 99.9%"];
+    const cleaned = normalizeMetrics(rawMetrics);
+    expect(cleaned).toEqual([
+      "211 Source Files",
+      "50 Automated Test Files",
+      "Latency < 500ms",
+      "Availability 99.9%",
+    ]);
+  });
+
+  it("replaces malformed un-split metrics on Nexus AI with curated flagship metrics", () => {
+    const dbNexus: PortfolioProject = {
+      id: "uuid-nexus",
+      created_at: "2026-01-01T00:00:00Z",
+      updated_at: "2026-01-01T00:00:00Z",
+      title: "Nexus AI - Enterprise AI Knowledge & Agent Platform",
+      subtitle: "Enterprise Conversation",
+      description: "Platform description",
+      image_url: null,
+      live_url: null,
+      github_url: "https://github.com/mwyzer/Nexus-AI",
+      youtube_url: null,
+      technologies: ["Next.js"],
+      featured: false,
+      order: 12,
+      case_study: {
+        problem: "Old problem",
+        solution: "Old solution",
+        metrics: [
+          "Search latency          < 500 ms Agent response          < 5 s Availability target     99.9%",
+        ],
+      } as unknown as PortfolioProject["case_study"],
+      category: "personal",
+      views: 10,
+    };
+
+    const merged = mergeWithFlagshipProjects([dbNexus]);
+    const nexus = merged.find((p) => p.title.includes("Nexus AI"));
+    expect(nexus).toBeDefined();
+    const cs = nexus?.case_study as unknown as CaseStudy;
+    expect(cs?.metrics).toEqual([
+      "Search < 500ms",
+      "Response < 5s",
+      "Availability 99.9%",
+      "RAG Relevance > 85%",
+    ]);
   });
 
   it("resolves flagship project by slug id when not yet in Supabase", () => {

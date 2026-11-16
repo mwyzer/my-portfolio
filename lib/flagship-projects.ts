@@ -934,20 +934,189 @@ export const FLAGSHIP_PROJECT_ENTRIES: FlagshipProjectEntry[] = [
       } satisfies CaseStudy as unknown as PortfolioProject["case_study"],
     },
   },
+  {
+    matchTitles: ["nexus ai", "nexus-ai"],
+    project: {
+      id: "nexus-ai",
+      created_at: NOW_ISO,
+      updated_at: NOW_ISO,
+      title: "Nexus AI - Enterprise AI Knowledge & Agent Platform",
+      subtitle: "Enterprise Conversation, Knowledge & Decision Intelligence Platform",
+      description:
+        "Modular enterprise AI platform designed to centralize organizational knowledge, power RAG-based search, orchestrate autonomous AI agents, and connect enterprise systems through MCP.",
+      image_url: null,
+      live_url: null,
+      github_url: "https://github.com/mwyzer/Nexus-AI",
+      youtube_url: null,
+      technologies: [
+        "Next.js",
+        "TypeScript",
+        "Tailwind CSS",
+        "FastAPI",
+        "Python",
+        "LangChain",
+        "LangGraph",
+        "pgvector",
+        "MCP",
+      ],
+      featured: false,
+      order: 12,
+      category: "personal",
+      views: 0,
+      case_study: {
+        problem:
+          "Enterprise knowledge is fragmented across tools, causing slow contextual retrieval and making autonomous agent governance and tool calling difficult to audit.",
+        solution:
+          "Built a modular enterprise AI platform combining RAG-based search, LangGraph agent workflows, and Model Context Protocol (MCP) integrations with sub-second retrieval latency.",
+        architecture: "",
+        architectureDiagram: `[Next.js + TypeScript Web Client]
+              |
+              v  (REST / WebSocket)
+[FastAPI Python Backend]
+  |-- LangChain / LangGraph Agent Orchestrator
+  |-- Hybrid Vector Search Engine (pgvector)
+  +-- MCP Tool Server Integrations`,
+        highlights: [
+          "Architected enterprise RAG workflows integrating hybrid vector search with pgvector.",
+          "Implemented autonomous agent workflows via LangGraph and Model Context Protocol (MCP).",
+          "Optimized search latency to < 500ms and conversational decision pipelines.",
+        ],
+        capabilities: {
+          fullStackEngineering: ["Next.js", "TypeScript", "Tailwind CSS"],
+          backendData: ["FastAPI", "Python", "pgvector", "PostgreSQL"],
+          aiEngineering: ["LangGraph", "LangChain", "RAG", "MCP Integration"],
+          deliveryQuality: ["Sub-500ms Search", "Type-Safe Contracts"],
+        },
+        engineeringDecisions: [
+          {
+            problem: "Balancing generative capability with enterprise access governance.",
+            decision: "Strict Tool Calling via Model Context Protocol (MCP)",
+            reason: "Constrains agent actions to explicitly declared, audited backend tools.",
+          },
+        ],
+        contribution: [
+          "Developed the Next.js frontend, FastAPI orchestrator, pgvector search, and MCP tools.",
+        ],
+        metrics: ["Search < 500ms", "Response < 5s", "Availability 99.9%", "RAG Relevance > 85%"],
+      } satisfies CaseStudy as unknown as PortfolioProject["case_study"],
+    },
+  },
+  {
+    matchTitles: ["dems"],
+    project: {
+      id: "dems",
+      created_at: NOW_ISO,
+      updated_at: NOW_ISO,
+      title: "DEMS - Document Eligibility Management System",
+      subtitle: "Workflow-Driven Document Processing & Approval Platform",
+      description:
+        "Full-lifecycle document eligibility platform for environmental permit applications, status tracking, review workflows, and automated official report generation.",
+      image_url: null,
+      live_url: "https://dems-teal.vercel.app",
+      github_url: "https://gitlab.com/mwyzer/dems",
+      youtube_url: null,
+      technologies: [
+        "Laravel 11",
+        "PHP 8.3",
+        "Vue 3",
+        "TypeScript",
+        "PostgreSQL",
+        "Redis",
+        "Docker",
+        "LangGraph",
+      ],
+      featured: false,
+      order: 13,
+      category: "personal",
+      views: 0,
+      case_study: {
+        problem:
+          "Environmental permit applications involved slow manual document classification, untracked review revisions, and lack of automated validation.",
+        solution:
+          "Engineered a Laravel API and Vue 3 SPA with 3-tier RBAC, document status workflows, and an AI classifier layer via LangGraph and Google Gemini.",
+        architecture: "",
+        architectureDiagram: `[Vue 3 SPA (Vercel)] ---> [Laravel 11 API (Render / Docker)]
+                                |
+                     +----------+----------+
+                     |                     |
+                     v                     v
+          [PostgreSQL / Redis]      [Python / LangGraph Microservice]`,
+        highlights: [
+          "Built a multi-tier RBAC workflow (Admin, Reviewer, Applicant) for environmental permit documents.",
+          "Integrated an AI classification service to pre-validate incoming uploads before official review.",
+        ],
+        capabilities: {
+          fullStackEngineering: ["Vue 3 SPA", "Pinia", "Tailwind CSS"],
+          backendData: ["Laravel 11", "PostgreSQL", "Redis Horizon"],
+          aiEngineering: ["Document Classification via LangGraph"],
+          deliveryQuality: ["Dockerized Deployment", "Automated PDF Reports"],
+        },
+        engineeringDecisions: [
+          {
+            problem: "Decoupling AI document processing from transactional web requests.",
+            decision: "Separate Python/LangGraph Microservice via Redis Queue",
+            reason: "Prevents heavy document parsing from impacting core web API latency.",
+          },
+        ],
+        contribution: [
+          "Developed the Laravel backend, Vue 3 frontend, and document review state machine.",
+        ],
+        metrics: ["3-Tier RBAC", "PDF & Excel Reports", "Multi-Stage Status Workflow"],
+      } satisfies CaseStudy as unknown as PortfolioProject["case_study"],
+    },
+  },
 ];
 
+export function normalizeMetrics(rawMetrics: unknown): string[] {
+  if (!rawMetrics) return [];
+  const list = Array.isArray(rawMetrics) ? rawMetrics : [String(rawMetrics)];
+  const result: string[] = [];
+  for (const item of list) {
+    if (!item || typeof item !== "string") continue;
+    const tokens = item
+      .split(/\n|\t|;|\|/)
+      .map((s) => s.trim().replace(/^[-•*]\s*/, ""))
+      .filter((s) => s.length > 0);
+    for (const token of tokens) {
+      result.push(token.replace(/—/g, "-"));
+    }
+  }
+  return result;
+}
+
 function sanitizeProjectCopy(project: PortfolioProject): PortfolioProject {
+  const existingCs = (project.case_study as CaseStudy | null) ?? null;
+  const cleanedCs = existingCs
+    ? {
+        ...existingCs,
+        metrics: normalizeMetrics(existingCs.metrics),
+      }
+    : null;
+
   return {
     ...project,
     title: project.title.replace(/—/g, "-"),
     subtitle: project.subtitle ? project.subtitle.replace(/—/g, "-") : project.subtitle,
     description: project.description ? project.description.replace(/—/g, "-") : project.description,
+    case_study: cleanedCs as unknown as PortfolioProject["case_study"],
   };
 }
 
 function enrichExistingProject(dbProj: PortfolioProject, flagship: PortfolioProject): PortfolioProject {
   const existingCs = (dbProj.case_study as CaseStudy | null) ?? null;
   const flagshipCs = flagship.case_study as unknown as CaseStudy;
+
+  const rawExistingMetrics = existingCs?.metrics ? normalizeMetrics(existingCs.metrics) : [];
+  const hasMalformedExistingMetrics = rawExistingMetrics.some(
+    (m) => m.length > 40 || m.includes("completion target") || m.includes("Search latency")
+  );
+
+  const metricsToUse =
+    flagshipCs.metrics?.length && (!rawExistingMetrics.length || hasMalformedExistingMetrics)
+      ? flagshipCs.metrics
+      : rawExistingMetrics.length
+        ? rawExistingMetrics
+        : flagshipCs.metrics ?? [];
 
   const mergedCs: CaseStudy = existingCs
     ? {
@@ -961,7 +1130,7 @@ function enrichExistingProject(dbProj: PortfolioProject, flagship: PortfolioProj
           ? existingCs.engineeringDecisions
           : flagshipCs.engineeringDecisions,
         contribution: existingCs.contribution?.length ? existingCs.contribution : flagshipCs.contribution,
-        metrics: existingCs.metrics?.length ? existingCs.metrics : flagshipCs.metrics,
+        metrics: metricsToUse,
         capabilities:
           existingCs.capabilities &&
           Object.values(existingCs.capabilities).some((arr) => Array.isArray(arr) && arr.length > 0)

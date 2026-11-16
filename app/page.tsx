@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "@/lib/supabase-server";
-import { mergeWithFlagshipProjects, normalizePortfolioProfile, DEFAULT_HERO_PROOF } from "@/lib/flagship-projects";
+import { mergeWithFlagshipProjects, normalizePortfolioProfile, DEFAULT_HERO_PROOF, normalizeMetrics } from "@/lib/flagship-projects";
 import { formatDate } from "@/lib/utils";
 import { ArrowRight, ExternalLink, Mail, Phone, Code2, Database, Palette, Rocket, Layout, Server, Globe, Eye, CheckCircle2 } from "lucide-react";
 import { Github, Youtube, Linkedin, Gitlab } from "@/components/brand-icons";
@@ -286,13 +286,13 @@ async function HomeBelowFold({
             {projects?.map((project) => {
               const caseStudy = project.case_study as CaseStudy | null;
               const highlights = caseStudy?.highlights ?? [];
-              const metrics = caseStudy?.metrics ?? [];
+              const metrics = normalizeMetrics(caseStudy?.metrics);
               const excerpt = caseStudy?.solution || caseStudy?.problem;
               const capabilities = caseStudy?.capabilities
                 ? Object.values(caseStudy.capabilities).flat()
                 : [];
               return (
-              <div key={project.id} className="card-noir flex flex-col h-full">
+              <div key={project.id} className="card-noir flex flex-col h-full min-w-0 overflow-hidden">
                 <div className="flex items-start justify-between gap-2 mb-2">
                   {project.category ? (
                     <span className="badge-noir capitalize">{project.category}</span>
@@ -319,7 +319,7 @@ async function HomeBelowFold({
                   <p className="text-sm text-text-dim mb-2">{project.subtitle}</p>
                 )}
                 {metrics.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 my-2">
+                  <div className="flex flex-wrap gap-1.5 my-2 min-w-0">
                     {metrics.slice(0, 3).map((metric, mIdx) => (
                       <span
                         key={`${metric}-${mIdx}`}
