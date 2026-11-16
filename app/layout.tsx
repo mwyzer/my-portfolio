@@ -58,7 +58,11 @@ export default async function RootLayout({
           `,
         }} />
       </head>
-      <body className="min-h-screen antialiased" suppressHydrationWarning>
+      <body
+        className="min-h-screen antialiased bg-[#0a0a0b] text-[#fafafa]"
+        style={{ backgroundColor: "var(--bg, #0a0a0b)", color: "var(--text, #fafafa)" }}
+        suppressHydrationWarning
+      >
         {children}
         <ChatWidgetDeferred />
         <Toaster />
